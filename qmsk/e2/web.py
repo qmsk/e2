@@ -58,7 +58,24 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
     )
 
     def render_preset(self, preset):
-        return html.button(type='submit', name='preset', value=preset.preset)(preset.title)
+        presets = self.app.presets
+        css = set()
+
+        log.info("preset=%s preview=%s program=%s", preset, presets.preview, presets.program)
+
+        if preset == presets.preview:
+            css.add('preview')
+        
+        if preset == presets.program:
+            css.add('program')
+
+        return html.button(
+                type    = 'submit',
+                name    = 'preset',
+                value   = preset.preset,
+                class_  = ' '.join(css) if css else None,
+                id      = 'preset-{preset}'.format(preset=preset.preset)
+        )(preset.title)
 
     def status(self):
         if self.error:
@@ -165,11 +182,15 @@ class E2Web(qmsk.web.async.Application):
             Raises qmsk.e2.client.Error
         """
        
+        # preset -> preview?
         log.info("preset: %s", preset)
 
         if preset:
             yield from self.client.PRESET_recall(preset)
+            
+            self.presets.activate_preview(preset)
 
+        # preview -> program?
         if 'cut' in params:
             transition = 0
         elif 'autotrans' in params:
@@ -183,6 +204,8 @@ class E2Web(qmsk.web.async.Application):
 
         if transition is not None:
             yield from self.client.ATRN(transition)
+            
+            self.presets.activate_program()
 
         return transition
 

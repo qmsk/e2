@@ -2,6 +2,9 @@ button {
     width: 150px;
     height: 150px;
     margin: 1em;
+
+    border: none;
+    border-radius: 4px;
 }
 
 #container {
@@ -18,6 +21,14 @@ button {
 
 #presets button {
     margin: 1em;
+}
+
+#presets button.preview {
+    border: 4px solid green;
+}
+
+#presets button.program {
+    border: 4px solid red;
 }
 
 #tools {

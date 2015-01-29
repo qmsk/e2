@@ -21,6 +21,20 @@ class E2Presets:
     def __init__ (self, presets):
         self.presets = {id: Preset(id, **values) for id, values in presets.items()}
 
+        self.preview = self.program = None
+
+    def activate_preview (self, preset):
+        log.info("%s -> %s", self.preview, preset)
+        self.preview = preset
+    
+    def activate_program (self, preset=None):
+        if preset is None:
+            preset = self.preview
+            self.preview = None
+
+        log.info("%s -> %s", self.program, preset)
+        self.program = preset
+
     def __iter__ (self):
         for preset in self.presets.values():
             yield preset
