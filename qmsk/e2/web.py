@@ -27,6 +27,8 @@ class Index(qmsk.web.html.HTMLMixin, qmsk.web.async.Handler):
             preset = None
         
         try:
+            log.info("preset: %s", preset)
+
             if preset:
                 yield from self.app.client.PRESET_recall(preset)
 
@@ -34,11 +36,13 @@ class Index(qmsk.web.html.HTMLMixin, qmsk.web.async.Handler):
 
             if 'cut' in self.request.form:
                 autotrans = 0
-            if 'autotrans' in self.request.form:
+            elif 'autotrans' in self.request.form:
                 autotrans = True
             else:
                 autotrans = None 
             
+            log.info("autotrans: %s", autotrans)
+
             if autotrans is not None:
                 yield from self.app.client.ATRN(autotrans)
 
@@ -52,8 +56,8 @@ class Index(qmsk.web.html.HTMLMixin, qmsk.web.async.Handler):
     def render(self):
         return (
             html.h1(self.title()),
-            html.p("Recalled preset {preset}".format(preset=self.preset)) if self.preset else None,
-            html.p("Autotransitioned {autotrans}".format(autotrans=self.autotrans)) if self.autotrans else None,
+            html.p("Recalled preset {preset}".format(preset=self.preset)) if self.preset is not None else None,
+            html.p("Autotransitioned {autotrans}".format(autotrans=self.autotrans)) if self.autotrans is not None else None,
             html.p("Error: {error}".format(error=self.error)) if self.error else None,
             html.form(action='', method='POST')(
                 html.input(type='text', name='preset', placeholder='Preset number'),
