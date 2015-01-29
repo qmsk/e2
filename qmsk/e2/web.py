@@ -2,6 +2,7 @@ import asyncio
 import aiohttp.wsgi
 import logging; log = logging.getLogger('qmsk.e2.web')
 import qmsk.web
+import time
 import werkzeug
 import werkzeug.exceptions
 
@@ -44,8 +45,9 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
     CSS = (
         'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
         'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css',
-
-        '/static/qmsk.e2/e2.css?10',
+        
+        # de-cache
+        '/static/qmsk.e2/e2.css?' + str(time.time()),
     )
 
     JS = (
