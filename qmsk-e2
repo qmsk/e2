@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+
+import qmsk.cli
+
+def main (argv):
+    parser = qmsk.cli.parser()
+
+    args = qmsk.cli.parse(parser, argv)
+
+    return 0
+
+if __name__ == '__main__':
+    qmsk.cli.main(main)
