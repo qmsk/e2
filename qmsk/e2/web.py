@@ -3,6 +3,7 @@ import aiohttp.wsgi
 import logging; log = logging.getLogger('qmsk.e2.web')
 import qmsk.web
 import werkzeug
+import werkzeug.exceptions
 
 import qmsk.web.async
 import qmsk.web.html
@@ -13,12 +14,29 @@ html = qmsk.web.html.html5
 
 class BaseHandler(qmsk.web.async.Handler):
     def init(self):
-        self.preset = self.autotrans = self.error = None
+        self.preset = self.transition = self.error = None
 
     @asyncio.coroutine
     def process_async(self):
+        try:
+            preset = self.request.form.get('preset', type=int)
+        except ValueError as error:
+            self.error = error
+            return
+        
+        if preset:
+            try:
+                self.preset = self.app.presets[preset]
+            except KeyError as error:
+                self.error = error
+                return
+
         if self.request.method == 'POST':
-            self.preset, self.autotrans, self.error = yield from self.app.process(self.request.form)
+            try:
+                self.transition = yield from self.app.process(self.preset, self.request.form)
+            except qmsk.e2.client.Error as error:
+                self.error = error
+                return
  
 class Index(qmsk.web.html.HTMLMixin, BaseHandler):
     TITLE = "Encore2 Control"
@@ -26,6 +44,12 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
 
     def render_preset(self, preset):
         return html.button(type='submit', name='preset', value=preset.preset)(preset.title)
+
+    def status(self):
+        if self.error:
+            return 400
+        else:
+            return 200
 
     def render(self):
         return (
@@ -41,20 +65,47 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
             ),
             html.div(
                 html.p("Recalled preset {preset}".format(preset=self.preset)) if self.preset is not None else None,
-                html.p("Autotransitioned {autotrans}".format(autotrans=self.autotrans)) if self.autotrans is not None else None,
+                html.p("Autotransitioned {transition}".format(transition=self.transition)) if self.transition is not None else None,
                 html.p("Error: {error}".format(error=self.error)) if self.error else None,
             ),
         )
 
-class API(qmsk.web.json.JSONMixin, BaseHandler):
-    def render_json(self):
-        out = dict()
-        
-        if self.preset is not None:
-            out['preset'] = self.preset
+class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
+    def render_preset(self, preset):
+        return {
+            'preset': preset.preset,
+            'title': preset.title,
+        }
 
-        if self.autotrans is not None:
-            out['autotrans'] = self.autotrans
+class APIPresets(APIBase):
+    def process(self):
+        self.presets = self.app.presets
+
+    def render_json(self):
+        return [self.render_preset(preset) for preset in self.presets]
+
+class APIPreset(APIBase):
+    def init(self):
+        self.transition = self.error = None
+
+    @asyncio.coroutine
+    def process_async(self, preset):
+        try:
+            self.preset = self.app.presets[preset]
+        except KeyError as error:
+            raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
+
+        if self.request.method == 'POST':
+            try:
+                self.transition = yield from self.app.process(self.preset, self.request.form)
+            except qmsk.e2.client.Error as error:
+                self.error = werkzeug.exceptions.InternalServerError
+
+    def render_json(self):
+        out = self.render_preset(self.preset)
+        
+        if self.transition is not None:
+            out['transition'] = self.transition
 
         if self.error is not None:
             out['error'] = self.error
@@ -63,8 +114,9 @@ class API(qmsk.web.json.JSONMixin, BaseHandler):
 
 class E2Web(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
-        '/':        Index,
-        '/api/v1':  API,
+        '/':                            Index,
+        '/api/v1/':                     APIPresets,
+        '/api/v1/preset/<int:preset>':  APIPreset,
     })
 
     def __init__ (self, client, presets):
@@ -77,7 +129,7 @@ class E2Web(qmsk.web.async.Application):
         self.presets = presets
     
     @asyncio.coroutine
-    def process(self, params):
+    def process(self, preset, params):
         """
             Process an action request
 
@@ -86,38 +138,31 @@ class E2Web(qmsk.web.async.Application):
                 cut: *
                 autotrans: *
 
-            Returns preset, autotrans, error
+            Returns transition value.
 
-            Raises werkzeug.HTTPException.
+            Raises qmsk.e2.client.Error
         """
-        
-        try:
-            preset = params.get('preset', type=int)
-        except ValueError as error:
-            raise werkzeug.BadRequest("preset={preset}: {error}".format(preset=params.get('preset'), error=error))
-        
-        try:
-            log.info("preset: %s", preset)
+       
+        log.info("preset: %s", preset)
 
-            if preset:
-                yield from self.client.PRESET_recall(preset)
+        if preset:
+            yield from self.client.PRESET_recall(preset)
 
-            if 'cut' in params:
-                autotrans = 0
-            elif 'autotrans' in params:
-                autotrans = True
-            else:
-                autotrans = None 
-            
-            log.info("autotrans: %s", autotrans)
-
-            if autotrans is not None:
-                yield from self.client.ATRN(autotrans)
-
-        except qmsk.e2.client.Error as error:
-            return preset, autotrans, error
+        if 'cut' in params:
+            transition = 0
+        elif 'autotrans' in params:
+            transition = True
+        elif 'transition' in params:
+            transition = int(params['transition'])
         else:
-            return preset, autotrans, None
+            transition = None 
+        
+        log.info("transition: %s", transition)
+
+        if transition is not None:
+            yield from self.client.ATRN(transition)
+
+        return transition
 
 @asyncio.coroutine
 def start (client, presets, loop, port, host=None):
