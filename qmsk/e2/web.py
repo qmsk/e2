@@ -146,12 +146,21 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
 
         return out
 
-class APIPresets(APIBase):
+class APIIndex(APIBase):
     def process(self):
         self.presets = self.app.presets
 
+    def render_group (self, group):
+        return {
+                'title': group.title,
+                'presets': [preset.preset for preset in group.presets],
+        }
+
     def render_json(self):
-        return [self.render_preset(preset) for preset in self.presets]
+        return {
+            'presets': [self.render_preset(preset) for preset in self.presets],
+            'groups': [self.render_group(group) for group in self.presets.groups],
+        }
 
 class APIPreset(APIBase):
     def init(self):
@@ -184,7 +193,7 @@ class APIPreset(APIBase):
 class E2Web(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
         '/':                            Index,
-        '/api/v1/':                     APIPresets,
+        '/api/v1/':                     APIIndex,
         '/api/v1/preset/<int:preset>':  APIPreset,
     })
 
