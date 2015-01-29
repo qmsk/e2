@@ -57,9 +57,15 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
         html.meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"),
     )
 
+    def status(self):
+        if self.error:
+            return 400
+        else:
+            return 200
+
     def render_preset(self, preset):
         presets = self.app.presets
-        css = set()
+        css = set(['preset'])
 
         log.info("preset=%s preview=%s program=%s", preset, presets.preview, presets.program)
 
@@ -77,11 +83,16 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
                 id      = 'preset-{preset}'.format(preset=preset.preset)
         )(preset.title)
 
-    def status(self):
-        if self.error:
-            return 400
-        else:
-            return 200
+    def render_preset_group (self, group):
+        if not group.presets:
+            return
+
+        return html.div(class_='row preset-group')(
+                html.h2(group.title) if group.title else None,
+                [
+                    self.render_preset(preset) for preset in group.presets
+                ],
+        )
 
     def render(self):
         return html.div(class_='container-fluid', id='container')(
@@ -93,7 +104,7 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
             html.form(action='', method='POST')(
                 html.div(class_='row')(
                     html.div(class_='col-xs-10', id='presets')(
-                        self.render_preset(preset) for preset in self.app.presets
+                        self.render_preset_group(group) for group in self.app.presets.groups
                     ),
                     html.div(class_='col-xs-2', id='tools')(
                         html.button(type='submit', name='cut', value='cut', id='cut')("Cut"),

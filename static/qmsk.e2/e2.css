@@ -21,6 +21,12 @@ button {
 
 }
 
+#presets h2 {
+    margin: 0;
+    padding: 1em;
+    background-color: #ccc;
+}
+
 #presets button {
     float: left;
     margin: 1em;
