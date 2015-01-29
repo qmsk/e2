@@ -24,7 +24,10 @@ def start (loop, args):
         log.error("no presets given")
         return 1
     
-    web_server = yield from qmsk.e2.web.start(loop, args.e2_web_port)
+    web_server = yield from qmsk.e2.web.start(loop,
+            client  = client,
+            port    = args.e2_web_port,
+    )
 
 def main (argv):
     parser = qmsk.cli.parser()
