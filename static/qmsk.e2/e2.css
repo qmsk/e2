@@ -1,7 +1,9 @@
 button {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
+
     margin: 1em;
+    padding: 0.5em;
 
     border: none;
     border-radius: 4px;
@@ -11,24 +13,33 @@ button {
 
 #container {
     background-color: #aaa;
+    padding: 0px;
+
+    /* space for bottom status */
+    margin-bottom: 2em;
 }
 
 #header {
-    background-color: #888;
+    background-color: #448844;
+
+    padding: 0.5em;
+}
+
+#header h1 {
+    margin: 0;
 }
 
 #presets {
 
 }
 
-#presets h2 {
+#presets h3 {
     margin: 0;
-    padding: 1em;
+    padding: 0.5em 1em;
     background-color: #ccc;
 }
 
 #presets button {
-    float: left;
     margin: 1em;
 }
 
@@ -41,17 +52,54 @@ button {
 }
 
 #tools {
-    background-color: #888;
+    background-color: #444;
+    padding: 1em;
 }
 
 #tools button {
-    width: 100%;
-    display: block;
-    margin: 1em auto;
     background-color: #000000;
 
     font-size: xx-large;
     font-weight: bold;
+}
+
+/* Styles for Landscape screen */
+@media all and (orientation:landscape) {
+    #tools {
+        position: fixed;
+        top: 0px;
+        bottom: 0px;
+        right: 0px;
+        width: 20%;
+
+    }
+
+    #tools button {
+        width: 100%;
+        display: block;
+        margin: 1em auto;
+    }
+}
+
+
+/* Styles for Portrait screen */
+@media all and (orientation:portrait) {
+    #tools {
+        position: fixed;
+        top: 0px;
+        width: 100%;
+        height: 150px;
+    }
+
+    #tools button {
+        display: inline;
+        float: left;
+        margin: 0.2em 0.5em;
+    }
+    
+    #header {
+        margin-top: 150px;
+    }
 }
 
 #tools button#cut {
@@ -63,11 +111,18 @@ button {
 }
 
 #status {
-    clear: both;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    height: 2em;
 
-    padding: 1em;
+    padding: 0.2em 0.5em;
     
     background-color: #0f0f0f;
     color: #44ff44;
     font-family: monospace;
+}
+
+#status p {
+    margin: 0;
 }

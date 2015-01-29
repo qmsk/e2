@@ -45,7 +45,7 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
         'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
         'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css',
 
-        '/static/qmsk.e2/e2.css',
+        '/static/qmsk.e2/e2.css?10',
     )
 
     JS = (
@@ -54,7 +54,7 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
     )
 
     HEAD = (
-        html.meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"),
+        html.meta(name="viewport", content="width=device-width, initial-scale=1"),
     )
 
     def status(self):
@@ -87,35 +87,42 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
         if not group.presets:
             return
 
-        return html.div(class_='row preset-group')(
-                html.h2(group.title) if group.title else None,
+        return html.div(class_='preset-group')(
+                html.h3(group.title) if group.title else None,
                 [
                     self.render_preset(preset) for preset in group.presets
                 ],
         )
 
     def render(self):
+        status = []
+
+        for value, message in (
+                (self.preset, "Recalled preset {}"),
+                (self.transition, "Transitioned {}"),
+                (self.error, "Error: {}")
+        ):
+            if value is not None:
+                status.append(html.p(message.format(value)))
+
         return html.div(class_='container-fluid', id='container')(
-            html.div(class_='row')(
-                html.div(class_='col-xs-12', id='header')(
+            html.div(
+                html.div(id='header')(
                     html.h1(self.title()),
                 ),
             ),
             html.form(action='', method='POST')(
-                html.div(class_='row')(
-                    html.div(class_='col-xs-10', id='presets')(
-                        self.render_preset_group(group) for group in self.app.presets.groups
-                    ),
-                    html.div(class_='col-xs-2', id='tools')(
+                html.div(
+                    html.div(id='tools')(
                         html.button(type='submit', name='cut', value='cut', id='cut')("Cut"),
                         html.button(type='submit', name='autotrans', value='autotrans', id='autotrans')("Auto Trans"),
-                    )
+                    ),
+                    html.div(id='presets')(
+                        self.render_preset_group(group) for group in self.app.presets.groups
+                    ),
                 ),
-                html.div(class_='row', id='status')(
-                    html.p(),
-                    html.p("Recalled preset {preset}".format(preset=self.preset)) if self.preset is not None else None,
-                    html.p("Autotransitioned {transition}".format(transition=self.transition)) if self.transition is not None else None,
-                    html.p("Error: {error}".format(error=self.error)) if self.error else None,
+                html.div(id='status')(
+                    status or html.p("Ready")
                 ),
             ),
         )
