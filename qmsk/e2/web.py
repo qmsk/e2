@@ -96,8 +96,8 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
                         self.render_preset(preset) for preset in self.app.presets
                     ),
                     html.div(class_='col-xs-2', id='tools')(
-                        html.button(type='submit', name='cut', value='cut')("Cut"),
-                        html.button(type='submit', name='autotrans', value='autotrans')("Auto Trans"),
+                        html.button(type='submit', name='cut', value='cut', id='cut')("Cut"),
+                        html.button(type='submit', name='autotrans', value='autotrans', id='autotrans')("Auto Trans"),
                     )
                 ),
                 html.div(class_='row', id='status')(

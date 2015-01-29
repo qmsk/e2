@@ -5,6 +5,8 @@ button {
 
     border: none;
     border-radius: 4px;
+    background-color: #133337;
+    color: #ffffff;
 }
 
 #container {
@@ -20,6 +22,7 @@ button {
 }
 
 #presets button {
+    float: left;
     margin: 1em;
 }
 
@@ -36,13 +39,29 @@ button {
 }
 
 #tools button {
+    width: 100%;
     display: block;
     margin: 1em auto;
+    background-color: #000000;
+
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+#tools button#cut {
+    color: #00ffff;
+}
+
+#tools button#autotrans {
+    color: #ffff00;
 }
 
 #status {
-    background-color: #ddd;
     clear: both;
 
     padding: 1em;
+    
+    background-color: #0f0f0f;
+    color: #44ff44;
+    font-family: monospace;
 }
