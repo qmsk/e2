@@ -1,4 +1,5 @@
 import logging; log = logging.getLogger('qmsk.e2.presets')
+import shelve
 import yaml
 
 class Error(Exception):
@@ -10,6 +11,9 @@ class Preset:
 
         self.title = title
 
+    def __eq__ (self, preset):
+        return isinstance(preset, Preset) and preset.preset == self.preset
+
     def __str__ (self):
         return "{self.preset}: {self.title}".format(self=self)
 
@@ -19,16 +23,44 @@ class PresetGroup:
         
         self.title = title
 
+class DBProperty:
+    def __init__ (self, name):
+        self.name = name
+
+    def __get__ (self, obj, type=None):
+        log.debug("%s", self.name)
+
+        return obj.db.get(self.name)
+
+    def __set__ (self, obj, value):
+        log.debug("%s: %s", self.name, value)
+
+        obj.db[self.name] = value
+
+    def __del__ (self, obj):
+        log.debug("%s", self.name)
+
+        del obj.db[self.name]
+
 class E2Presets:
+    preview = DBProperty('preview')
+    program = DBProperty('program')
+
     @classmethod
-    def load_yaml (cls, file):
+    def load_yaml (cls, file, db=None):
         data = yaml.safe_load(file)
 
-        log.debug("%s: %s")
+        if db:
+            db = shelve.open(db, 'c')
+        else:
+            db = None
 
-        return cls(**data)
+        log.debug("data=%s, db=%s", file, data, db)
 
-    def __init__ (self, presets={ }, groups=[]):
+        return cls(db, **data)
+
+    def __init__ (self, db, presets={ }, groups=[]):
+        self.db = db
         self.groups = [ ]
         self.presets = { }
 
@@ -40,8 +72,11 @@ class E2Presets:
             group = PresetGroup(presets, **item)
 
             self.groups.append(group)
-
-        self.preview = self.program = None
+        
+        if db is None:
+            # no presistence
+            self.preview = None
+            self.program = None
 
     def _init_presets (self, presets):
         for item in presets:
@@ -72,3 +107,8 @@ class E2Presets:
 
     def __getitem__ (self, key):
         return self.presets[key]
+
+    def close(self):
+        if self.db:
+            self.db.close()
+

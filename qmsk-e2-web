@@ -2,35 +2,70 @@
 
 import argparse
 import asyncio
+import logging; log = logging.getLogger('qmsk-e2-web')
 import qmsk.cli
 import qmsk.e2.client
 import qmsk.e2.presets
 import qmsk.e2.web
 import qmsk.net.tcp
+import signal
 
-import logging; log = logging.getLogger('qmsk-e2-web')
 
-@asyncio.coroutine
-def start (loop, args):
-    try:
-        client = yield from qmsk.e2.client.E2Client.connect(args.e2_host)
-    except qmsk.net.tcp.Error as error:
-        log.error("%s: failed to connect: %s", args.e2_host, error)
-        return 1
+class Server:
+    def __init__ (self, loop):
+        self.loop = loop
 
-    if args.e2_presets_yaml:
-        presets = qmsk.e2.presets.E2Presets.load_yaml(args.e2_presets_yaml)
-    else:
-        log.error("no presets given")
-        return 1
-    
-    web_server = yield from qmsk.e2.web.start(client, presets,
-            loop    = loop,
-            port    = args.e2_web_port,
-            static  = {
-                '/static':  args.e2_web_static,
-            },
-    )
+        self.client = None
+        self.presets = None
+
+    @asyncio.coroutine
+    def start (self, args):
+        try:
+            self.client = yield from qmsk.e2.client.E2Client.connect(args.e2_host)
+        except qmsk.net.tcp.Error as error:
+            log.error("%s: failed to connect: %s", args.e2_host, error)
+            return 1
+
+        if args.e2_presets_yaml:
+            self.presets = qmsk.e2.presets.E2Presets.load_yaml(args.e2_presets_yaml,
+                db  = args.e2_presets_db,
+            )
+        else:
+            log.error("no presets given")
+            return 1
+        
+        self.web = yield from qmsk.e2.web.start(self.client, self.presets,
+                loop    = self.loop,
+                port    = args.e2_web_port,
+                static  = {
+                    '/static':  args.e2_web_static,
+                },
+        )
+
+    @asyncio.coroutine
+    def stop (self):
+        self.presets.close()
+
+def signal_stop (server):
+    """
+        Stop event loop gracefully on signal.
+    """
+
+    loop = asyncio.get_event_loop()
+
+    # tell our Server to stop
+    log.info("signalling server stop...")
+    do_stop = asyncio.async(server.stop(), loop=loop)
+
+    def _stop (do_stop):
+        log.info("stopping event loop...")
+
+        # this will ignore any new callbacks added, and cause the loop.run_forever() in main to return
+        loop.stop()
+
+    # once stopped, wind down the event loop
+    do_stop.add_done_callback(_stop)
+
 
 def main (argv):
     parser = qmsk.cli.parser()
@@ -42,13 +77,17 @@ def main (argv):
         help="Web server /static path")
     parser.add_argument('--e2-presets-yaml', metavar='PATH', type=argparse.FileType('r'),
         help="Load presets from YAML")
+    parser.add_argument('--e2-presets-db', metavar='PATH',
+        help="Store preset state in db")
     
     # setup
     args = qmsk.cli.parse(parser, argv)
     loop = asyncio.get_event_loop()
 
+    server = Server(loop)
+
     # start
-    do_start = asyncio.async(start(loop, args))
+    do_start = asyncio.async(server.start(args))
 
     try:
         log.info("start event loop")
@@ -65,6 +104,8 @@ def main (argv):
         log.info("startup complete")
 
     # run
+    loop.add_signal_handler(signal.SIGINT, signal_stop, server)
+
     try:
         log.info("enter event loop")
         loop.run_forever()
