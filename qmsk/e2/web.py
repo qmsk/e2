@@ -18,41 +18,9 @@ class Index(qmsk.web.html.HTMLMixin, qmsk.web.async.Handler):
 
     @asyncio.coroutine
     def process_async(self):
-        if self.request.method != 'POST':
-            return
+        if self.request.method == 'POST':
+            self.preset, self.autotrans, self.error = yield from self.app.process(self.request.form)
         
-        if 'preset' in self.request.form:
-            preset = int(self.request.form['preset'])
-        else:
-            preset = None
-        
-        try:
-            log.info("preset: %s", preset)
-
-            if preset:
-                yield from self.app.client.PRESET_recall(preset)
-
-                self.preset = preset
-
-            if 'cut' in self.request.form:
-                autotrans = 0
-            elif 'autotrans' in self.request.form:
-                autotrans = True
-            else:
-                autotrans = None 
-            
-            log.info("autotrans: %s", autotrans)
-
-            if autotrans is not None:
-                yield from self.app.client.ATRN(autotrans)
-
-                self.autotrans = autotrans
-
-        except qmsk.e2.client.Error as error:
-            self.error = error
-        else:
-            self.error = None
-
     def render(self):
         return (
             html.h1(self.title()),
@@ -75,6 +43,49 @@ class E2Web(qmsk.web.async.Application):
 
         self.client = client
     
+    @asyncio.coroutine
+    def process(self, params):
+        """
+            Process an action request
+
+            params: dict
+                preset: int
+                cut: *
+                autotrans: *
+
+            Returns preset, autotrans, error
+
+            Raises werkzeug.HTTPException.
+        """
+        
+        try:
+            preset = params.get('preset', type=int)
+        except ValueError as error:
+            raise werkzeug.BadRequest("preset={preset}: {error}".format(preset=params.get('preset'), error=error))
+        
+        try:
+            log.info("preset: %s", preset)
+
+            if preset:
+                yield from self.client.PRESET_recall(preset)
+
+            if 'cut' in params:
+                autotrans = 0
+            elif 'autotrans' in params:
+                autotrans = True
+            else:
+                autotrans = None 
+            
+            log.info("autotrans: %s", autotrans)
+
+            if autotrans is not None:
+                yield from self.client.ATRN(autotrans)
+
+        except qmsk.e2.client.Error as error:
+            return preset, autotrans, error
+        else:
+            return preset, autotrans, None
+
     URLS = qmsk.web.urls.rules({
         '/': Index,
     })
