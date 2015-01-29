@@ -131,10 +131,20 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
 
 class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
     def render_preset(self, preset):
-        return {
+        presets = self.app.presets
+
+        out = {
             'preset': preset.preset,
             'title': preset.title,
         }
+
+        if preset == presets.preview:
+            out['preview'] = True
+
+        if preset == presets.program:
+            out['program'] = True
+
+        return out
 
 class APIPresets(APIBase):
     def process(self):
