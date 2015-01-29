@@ -1,12 +1,71 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import asyncio
 import qmsk.cli
+import qmsk.e2.client
+import qmsk.net.tcp
+
+import logging; log = logging.getLogger('qmsk-e2')
+
+@asyncio.coroutine
+def start (args):
+    try:
+        client = yield from qmsk.e2.client.E2Client.connect(args.e2_host)
+    except qmsk.net.tcp.Error as error:
+        log.error("%s: failed to connect: %s", args.e2_host, error)
+        raise
+    
+    if args.preset_recall is not None:
+        try:
+            yield from client.PRESET_recall(args.preset_recall)
+        except qmsk.e2.client.CommandError as error:
+            log.error("%s: PRESET_recall(%s): %s", client, args.preset_recall, error)
+
+    if args.trans is not None:
+        if args.trans is True:
+            transTime = None
+        else:
+            transTime = args.trans
+
+        try:
+            yield from client.ATRN(transTime)
+        except qmsk.e2.client.CommandError as error:
+            log.error("%s: ATRN(%s): %s", client, args.preset_recall, error)
+
+
 
 def main (argv):
     parser = qmsk.cli.parser()
-
+    parser.add_argument('--e2-host', metavar='HOST',
+            help="Encore2 host address")
+    parser.add_argument('--preset-recall',  metavar='PRESET', type=int,
+            help="Recall preset")
+    parser.add_argument('--cut',            dest='trans', action='store_const', const=0,
+            help="Cut transition")
+    parser.add_argument('--autotrans',      dest='trans', action='store_true',
+            help="Auto transition")
+    parser.add_argument('--trans',          dest='trans', metavar='FRAMES', type=int,
+            help="Timed transition")
+    
+    # start
     args = qmsk.cli.parse(parser, argv)
 
+    # run
+    loop = asyncio.get_event_loop()
+    do_start = asyncio.async(start(args))
+
+    try:
+        log.info("start event loop")
+        loop.run_until_complete(do_start)
+
+    except Exception as error:
+        log.exception("Failed to start")
+        return 1
+
+    else:
+        log.info("startup complete")
+
+    log.info("exit")
     return 0
 
 if __name__ == '__main__':
