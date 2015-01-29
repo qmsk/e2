@@ -26,45 +26,51 @@ class E2Client:
 
     def __init__ (self, stream):
         self.stream = stream
+        
+        # only one command at any time
+        self.lock = asyncio.Lock()
 
     @asyncio.coroutine
     def cmd (self, cmd, *args):
         """
             Raises qmsk.net.tcp.Error, CommandError
         """
-        line = ' '.join([cmd] + [str(arg) for arg in args])
-
-        log.info("%s: %s", self, line)
         
-        yield from self.stream.writeline(line)
+        # XXX: implement timeouts to ensure livelyness
+        with (yield from self.lock):
+            line = ' '.join([cmd] + [str(arg) for arg in args])
 
-        while True:
-            line = yield from self.stream.readline()
+            log.info("%s: %s", self, line)
+            
+            yield from self.stream.writeline(line)
 
-            log.debug("%s: %s: %r", self, cmd, line)
+            while True:
+                line = yield from self.stream.readline()
 
-            if line.startswith('\x04'):
-                # wtf
-                line = line[1:]
+                log.debug("%s: %s: %r", self, cmd, line)
 
-            parts = line.split()
+                if line.startswith('\x04'):
+                    # wtf
+                    line = line[1:]
 
-            if not parts:
-                # skip
-                continue
+                parts = line.split()
 
-            elif len(parts) == 3 and parts[0] == cmd and parts[1] == '-e':
-                try:
-                    err = int(parts[2])
-                except ValueError as error:
-                    raise CommandError("%s: invalid error status: %s: %s", cmd, parts[2], line)
+                if not parts:
+                    # skip
+                    continue
 
-                break
-            else:
-                log.warning("%s: %s: %r", self, cmd, line)
-           
-        if err:
-            raise CommandError(cmd, err)
+                elif len(parts) == 3 and parts[0] == cmd and parts[1] == '-e':
+                    try:
+                        err = int(parts[2])
+                    except ValueError as error:
+                        raise CommandError("%s: invalid error status: %s: %s", cmd, parts[2], line)
+
+                    break
+                else:
+                    log.warning("%s: %s: %r", self, cmd, line)
+               
+            if err:
+                raise CommandError(cmd, err)
 
     @asyncio.coroutine
     def PRESET_recall (self, preset):
