@@ -27,6 +27,9 @@ def start (loop, args):
     web_server = yield from qmsk.e2.web.start(client, presets,
             loop    = loop,
             port    = args.e2_web_port,
+            static  = {
+                '/static':  args.e2_web_static,
+            },
     )
 
 def main (argv):
@@ -35,6 +38,8 @@ def main (argv):
         help="Encore2 host address")
     parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=8080,
         help="Web server port")
+    parser.add_argument('--e2-web-static', metavar='PATH', default='static',
+        help="Web server /static path")
     parser.add_argument('--e2-presets-yaml', metavar='PATH', type=argparse.FileType('r'),
         help="Load presets from YAML")
     

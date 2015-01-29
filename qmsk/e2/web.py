@@ -40,7 +40,22 @@ class BaseHandler(qmsk.web.async.Handler):
  
 class Index(qmsk.web.html.HTMLMixin, BaseHandler):
     TITLE = "Encore2 Control"
-       
+
+    CSS = (
+        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
+        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css',
+
+        '/static/qmsk.e2/e2.css',
+    )
+
+    JS = (
+        '//code.jquery.com/jquery-1.11.2.min.js',
+        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js',
+    )
+
+    HEAD = (
+        html.meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"),
+    )
 
     def render_preset(self, preset):
         return html.button(type='submit', name='preset', value=preset.preset)(preset.title)
@@ -52,21 +67,28 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
             return 200
 
     def render(self):
-        return (
-            html.h1(self.title()),
-            html.form(action='', method='POST')(
-                html.div(
-                    self.render_preset(preset) for preset in self.app.presets
+        return html.div(class_='container-fluid', id='container')(
+            html.div(class_='row')(
+                html.div(class_='col-xs-12', id='header')(
+                    html.h1(self.title()),
                 ),
-                html.div(
-                    html.input(type='submit', name='cut', value='Cut'),
-                    html.input(type='submit', name='autotrans', value='Auto Trans'),
-                )
             ),
-            html.div(
-                html.p("Recalled preset {preset}".format(preset=self.preset)) if self.preset is not None else None,
-                html.p("Autotransitioned {transition}".format(transition=self.transition)) if self.transition is not None else None,
-                html.p("Error: {error}".format(error=self.error)) if self.error else None,
+            html.form(action='', method='POST')(
+                html.div(class_='row')(
+                    html.div(class_='col-xs-10', id='presets')(
+                        self.render_preset(preset) for preset in self.app.presets
+                    ),
+                    html.div(class_='col-xs-2', id='tools')(
+                        html.button(type='submit', name='cut', value='cut')("Cut"),
+                        html.button(type='submit', name='autotrans', value='autotrans')("Auto Trans"),
+                    )
+                ),
+                html.div(class_='row', id='status')(
+                    html.p(),
+                    html.p("Recalled preset {preset}".format(preset=self.preset)) if self.preset is not None else None,
+                    html.p("Autotransitioned {transition}".format(transition=self.transition)) if self.transition is not None else None,
+                    html.p("Error: {error}".format(error=self.error)) if self.error else None,
+                ),
             ),
         )
 
@@ -165,12 +187,18 @@ class E2Web(qmsk.web.async.Application):
         return transition
 
 @asyncio.coroutine
-def start (client, presets, loop, port, host=None):
+def start (client, presets, loop, port,
+    host    = None,
+    static  = None,
+):
     """
         client: qmsk.e2.client.E2Client
     """
 
     application = E2Web(client, presets)
+
+    if static:
+        application = werkzeug.wsgi.SharedDataMiddleware(application, static)
 
     def server_factory():
         return aiohttp.wsgi.WSGIServerHttpProtocol(application,
