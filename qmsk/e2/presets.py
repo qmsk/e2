@@ -6,6 +6,9 @@ class Preset:
         self.preset = preset
         self.title = title
 
+    def __str__ (self):
+        return "{self.preset}: {self.title}".format(self=self)
+
 class E2Presets:
     @classmethod
     def load_yaml (cls, file):
