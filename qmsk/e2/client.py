@@ -75,12 +75,12 @@ class E2Client:
         yield from self.cmd('PRESET', '-r', preset)
 
     @asyncio.coroutine
-    def ATRN (self, transTime=None):
+    def ATRN (self, transTime=True):
         """
-            transTime:int   frames
+            transTime:int   frames or True
         """
         
-        if transTime is None:
+        if transTime is True:
             yield from self.cmd('ATRN')
         else:
             yield from self.cmd('ATRN', transTime)
