@@ -1,3 +1,4 @@
-PyYAML
 aiohttp
+autobahn
+PyYAML
 werkzeug

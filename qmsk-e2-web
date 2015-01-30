@@ -7,6 +7,7 @@ import qmsk.cli
 import qmsk.e2.client
 import qmsk.e2.presets
 import qmsk.e2.web
+import qmsk.e2.websocket
 import qmsk.net.tcp
 import signal
 
@@ -47,9 +48,16 @@ class Server:
                 },
         )
 
+        self.websocket = yield from qmsk.e2.websocket.start(self.presets,
+                loop    = self.loop,
+                listen  = args.e2_web_listen,
+                port    = args.e2_websocket_port,
+        )
+
     @asyncio.coroutine
     def stop (self):
         self.presets.close()
+        self.websocket.stop()
 
 def signal_stop (server):
     """
@@ -80,10 +88,12 @@ def main (argv):
         help="Encore2 safe mode")
     parser.add_argument('--e2-web-listen', metavar='ADDR',
         help="Web server listen address")
-    parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=8080,
+    parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=8081,
         help="Web server port")
     parser.add_argument('--e2-web-static', metavar='PATH', default='static',
         help="Web server /static path")
+    parser.add_argument('--e2-websocket-port', metavar='PORT', type=int, default=8082,
+        help="WebSocket server port")
     parser.add_argument('--e2-presets-xml', metavar='PATH',
         help="Load presets from XML backup dump directory")
     parser.add_argument('--e2-presets-yaml', metavar='PATH', type=argparse.FileType('r'),
