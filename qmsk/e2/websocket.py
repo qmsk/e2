@@ -2,6 +2,8 @@ import asyncio
 import autobahn.asyncio.websocket
 import logging; log = logging.getLogger('qmsk.e2.websocket')
 
+WEBSOCKET_PORT = 8082
+
 class WebSocket(autobahn.asyncio.websocket.WebSocketServerProtocol):
     def onConnect(self, request):
         self.peer = request.peer
@@ -43,22 +45,24 @@ class WebSocketServer(autobahn.asyncio.websocket.WebSocketServerFactory):
     def stop(self):
         self.presets.del_notify(self.update)
 
+import argparse
+
+def parser (parser):
+    group = parser.add_argument_group("qmsk.e2.websocket Options")
+    group.add_argument('--e2-websocket-port', metavar='PORT', type=int, default=WEBSOCKET_PORT,
+        help="WebSocket server port")
+
 @asyncio.coroutine
-def start (presets,
-    loop,
-    port,
-    listen  = None,
-    static  = None,
-):
+def apply (args, presets, loop):
     """
-        client: qmsk.e2.client.E2Client
+        presets: qmsk.e2.presets.E2Presets
     """
 
     factory = WebSocketServer(presets)
 
     server = yield from loop.create_server(factory,
-            host    = listen,
-            port    = port,
+            host    = args.e2_web_listen,
+            port    = args.e2_websocket_port,
     )
 
     return factory

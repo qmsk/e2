@@ -13,6 +13,9 @@ import qmsk.web.urls
 
 html = qmsk.web.html.html5
 
+WEB_PORT = 8081
+STATIC = './static'
+
 class Index(qmsk.web.async.Handler):
     CLIENT = '/static/client/e2.html'
 
@@ -371,19 +374,29 @@ class E2Web(qmsk.web.async.Application):
 
         return transition
 
+import argparse
+
+def parser (parser):
+    group = parser.add_argument_group("qmsk.e2.web Options")
+    group.add_argument('--e2-web-listen', metavar='ADDR',
+        help="Web server listen address")
+    group.add_argument('--e2-web-port', metavar='PORT', type=int, default=WEB_PORT,
+        help="Web server port")
+    group.add_argument('--e2-web-static', metavar='PATH', default=STATIC,
+        help="Web server /static path")
+
 @asyncio.coroutine
-def start (client, presets, loop, port,
-    listen  = None,
-    static  = None,
-):
+def apply (args, client, presets, loop):
     """
         client: qmsk.e2.client.E2Client
     """
 
     application = E2Web(client, presets)
 
-    if static:
-        application = werkzeug.wsgi.SharedDataMiddleware(application, static)
+    if args.e2_web_static:
+        application = werkzeug.wsgi.SharedDataMiddleware(application, {
+            '/static':  args.e2_web_static,
+        })
 
     def server_factory():
         return aiohttp.wsgi.WSGIServerHttpProtocol(application,
@@ -392,8 +405,9 @@ def start (client, presets, loop, port,
         )
 
     server = yield from loop.create_server(server_factory,
-            host    = listen,
-            port    = port,
+            host    = args.e2_web_listen,
+            port    = args.e2_web_port,
     )
 
     return application
+

@@ -324,3 +324,20 @@ class E2Presets:
     def __getitem__ (self, key):
         return self.presets[key]
 
+import argparse
+
+def parser (parser):
+    group = parser.add_argument_group("qmsk.e2.presets Options")
+    group.add_argument('--e2-presets-xml', metavar='PATH',
+        help="Load presets from XML backup dump directory")
+    group.add_argument('--e2-presets-db', metavar='PATH',
+        help="Store preset state in db")
+
+def apply (args):
+    presets = E2Presets.load(
+        xml_dir     = args.e2_presets_xml,
+        db          = args.e2_presets_db,
+    )
+
+    return presets
+

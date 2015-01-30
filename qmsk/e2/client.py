@@ -103,3 +103,22 @@ class E2Client:
 
     def __str__ (self):
         return str(self.stream)
+
+# cli
+import argparse
+
+def parser (parser):
+    group = parser.add_argument_group("qmsk.e2.client Options")
+    group.add_argument('--e2-host', metavar='HOST',
+        help="Encore2 host address")
+    group.add_argument('--e2-safe', action='store_true',
+        help="Encore2 safe mode")
+    
+@asyncio.coroutine
+def apply (args):
+    client = yield from E2Client.connect(args.e2_host,
+            safe    = args.e2_safe,
+    )
+
+    return client
+
