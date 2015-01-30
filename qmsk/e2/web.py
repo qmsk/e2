@@ -75,7 +75,7 @@ class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
     def render_header(self):
         return html.div(id='header', class_='navbar')(
             html.div(class_='navbar-header')(
-                html.a(href='#', class_='navbar-brand')(self.TITLE),
+                html.a(href=self.url(Index), class_='navbar-brand')(self.TITLE),
             ),
             html.div(class_='narbar-collapse')(
                 html.ul(class_='nav navbar-nav')(
