@@ -36,6 +36,7 @@ class Server:
         
         self.web = yield from qmsk.e2.web.start(self.client, self.presets,
                 loop    = self.loop,
+                listen  = args.e2_web_listen,
                 port    = args.e2_web_port,
                 static  = {
                     '/static':  args.e2_web_static,
@@ -71,6 +72,8 @@ def main (argv):
     parser = qmsk.cli.parser()
     parser.add_argument('--e2-host', metavar='HOST',
         help="Encore2 host address")
+    parser.add_argument('--e2-web-listen', metavar='ADDR',
+        help="Web server listen address")
     parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=8080,
         help="Web server port")
     parser.add_argument('--e2-web-static', metavar='PATH', default='static',
