@@ -216,7 +216,7 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
             'preset': preset.preset,
             'destinations': destinations,
             'title': preset.title,
-            'group': preset.group.title,
+            'group': preset.group.title if preset.group else None,
         }
        
         for destination in preset.destinations:
