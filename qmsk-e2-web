@@ -28,11 +28,13 @@ class Server:
             log.error("%s: failed to connect: %s", args.e2_host, error)
             return 1
 
-        if args.e2_presets_yaml:
-            self.presets = qmsk.e2.presets.E2Presets.load_yaml(args.e2_presets_yaml,
-                db  = args.e2_presets_db,
-            )
-        else:
+        self.presets = qmsk.e2.presets.E2Presets.load(
+            xml_dir     = args.e2_presets_xml,
+            yaml_file   = args.e2_presets_yaml,
+            db          = args.e2_presets_db,
+        )
+
+        if not self.presets.presets:
             log.error("no presets given")
             return 1
         
@@ -82,6 +84,8 @@ def main (argv):
         help="Web server port")
     parser.add_argument('--e2-web-static', metavar='PATH', default='static',
         help="Web server /static path")
+    parser.add_argument('--e2-presets-xml', metavar='PATH',
+        help="Load presets from XML backup dump directory")
     parser.add_argument('--e2-presets-yaml', metavar='PATH', type=argparse.FileType('r'),
         help="Load presets from YAML")
     parser.add_argument('--e2-presets-db', metavar='PATH',

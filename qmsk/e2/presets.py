@@ -1,8 +1,15 @@
 import logging; log = logging.getLogger('qmsk.e2.presets')
+import os
+import os.path
 import shelve
 import yaml
 
+from xml.etree import ElementTree
+
 class Error(Exception):
+    pass
+
+class XMLError(Error):
     pass
 
 class Preset:
@@ -18,10 +25,13 @@ class Preset:
         return "{self.preset}: {self.title}".format(self=self)
 
 class PresetGroup:
-    def __init__ (self, presets, *, title):
-        self.presets = presets
+    def __init__ (self, *, title):
+        self.presets = []
         
         self.title = title
+
+    def __str__ (self):
+        return self.title
 
 class DBProperty:
     def __init__ (self, name):
@@ -47,48 +57,130 @@ class E2Presets:
     program = DBProperty('program')
 
     @classmethod
-    def load_yaml (cls, file, db=None):
-        data = yaml.safe_load(file)
-
+    def load (cls, xml_dir, yaml_file, db=None):
         if db:
             db = shelve.open(db, 'c')
         else:
             db = None
 
-        log.debug("data=%s, db=%s", file, data, db)
+        obj = cls(db)
 
-        return cls(db, **data)
+        if xml_dir:
+            xml_settings = os.path.join(xml_dir, 'settings_backup.xml')
 
-    def __init__ (self, db, presets={ }, groups=[]):
+            log.info("%s", xml_settings)
+
+            obj.load_xml_settings(ElementTree.parse(xml_settings).getroot())
+            
+            xml_presets = os.path.join(xml_dir, 'presets')
+
+            for name in os.listdir(xml_presets):
+                xml_preset = os.path.join(xml_presets, name)
+
+                log.info("%s", xml_preset)
+
+                obj.load_xml_preset(ElementTree.parse(xml_preset).getroot())
+        
+        if yaml_file:
+            obj.load_yaml(**yaml.safe_load(yaml_file))
+
+        return obj
+
+    def __init__ (self, db):
         self.db = db
-        self.groups = [ ]
         self.presets = { }
-        
-        if presets:
-            self.groups.append(PresetGroup(list(self._init_presets(presets)), title=None))
-        
-        for item in groups:
-            presets = list(self._init_presets(item.pop('presets')))
 
-            group = PresetGroup(presets, **item)
+        self.default_group = PresetGroup(title=None)
+        self._groups = { None: self.default_group }
 
-            self.groups.append(group)
-        
         if db is None:
             # no presistence
             self.preview = None
             self.program = None
 
-    def _init_presets (self, presets):
-        for item in presets:
-            id = item.pop('preset')
+    def load_yaml (self, presets={ }, groups=[]):
+        """
+            Load user-editable metadata from the YAML object attributes given as keyword arguments.
+        """
 
-            if id in self.presets:
-                raise Error("Duplicate preset: {id} = {item}".format(id=id, item=item))
+        for preset, item in presets.items():
+            self._load_presets(preset, group=None, **item)
+        
+        for item in groups:
+            presets = item.pop('presets')
 
-            preset = self.presets[id] = Preset(id, **item)
+            group = self._load_group(**item)
+            
+            for item in presets:
+                self._load_preset(group=group, **item)
+    
+    def load_xml_settings (self, xml):
+        pass
 
-            yield preset
+    def parse_xml_preset (self, xml_preset):
+        """
+            Parse XML dump <Preset> and return { }
+        """
+
+        preset = int(xml_preset.attrib['id']) + 1
+        title = xml_preset.find('Name').text
+
+        if '@' in title:
+            title, group = title.split('@')
+            title = title.strip()
+            group = group.strip()
+        else:
+            group = None
+
+        if group:
+            group = self._load_group(group)
+
+        return { 
+                'preset': preset,
+                'group': group,
+                'title': title,
+        }
+
+    def load_xml_preset (self, xml):
+        """
+            Load an XML dump <PresetMgr> root element and load the <Preset>s
+        """
+
+        if xml.tag != 'PresetMgr':
+            raise XMLError("Unexpected preset root node: {xml}".format(xml=xml))
+        
+        for xml_preset in xml.findall('Preset'):
+            preset = self._load_preset(**self.parse_xml_preset(xml_preset))
+
+    def _load_group (self, title):
+        group = self._groups.get(title.lower())
+
+        if group is None:
+            group = self._groups[title.lower()] = PresetGroup(title=title)
+        
+        return group
+
+    def _load_preset (self, preset, group=None, **opts):
+        """
+            Load the given series of { 'preset': int, **opts } into (unique) Preset items.
+
+                preset: int
+                group: PresetGroup
+        """
+
+        log.info("%s @ %s: %s", preset, group, opts)
+
+        if preset in self.presets:
+            raise Error("Duplicate preset: {preset} = {item}".format(preset=preset, item=item))
+
+        obj = self.presets[preset] = Preset(preset, **opts)
+
+        if not group:
+            group = self.default_group
+
+        group.presets.append(obj)
+
+        return obj
 
     def activate_preview (self, preset):
         log.info("%s -> %s", self.preview, preset)
@@ -101,6 +193,11 @@ class E2Presets:
 
         log.info("%s -> %s", self.program, preset)
         self.program = preset
+
+    @property
+    def groups (self):
+        # TODO: sort
+        return self._groups.values()
 
     def __iter__ (self):
         for preset in self.presets.values():
