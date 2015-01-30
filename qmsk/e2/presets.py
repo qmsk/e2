@@ -12,9 +12,26 @@ class Error(Exception):
 class XMLError(Error):
     pass
 
+class Destination:
+    def __init__ (self, index, *, title):
+        self.index = index
+
+        self.title = title
+
+    def __eq__ (self, destination):
+        return isinstance(destination, Destination) and destination.index == self.index
+    
+    def __lt__ (self, preset):
+        return self.title < preset.title 
+   
+    def __str__ (self):
+        return "{self.index}: {self.title}".format(self=self)
+
 class Preset:
-    def __init__ (self, preset, *, title):
+    def __init__ (self, preset, group, destinations, *, title):
         self.preset = preset
+        self.group = group
+        self.destinations = destinations
 
         self.title = title
 
@@ -25,7 +42,7 @@ class Preset:
         return self.title < preset.title 
 
     def __str__ (self):
-        return "{self.preset}: {self.title}".format(self=self)
+        return "{self.preset}: {self.title} @ {self.group}".format(self=self)
 
 class PresetGroup:
     def __init__ (self, *, title):
@@ -98,6 +115,7 @@ class E2Presets:
 
     def __init__ (self, db):
         self.db = db
+        self._destinations = { }
         self.presets = { }
 
         self.default_group = PresetGroup(title=None)
@@ -124,8 +142,35 @@ class E2Presets:
             for item in presets:
                 self._load_preset(group=group, **item)
     
+    def parse_xml_aux_dest (self, xml):
+        return {
+            'index': int(xml.find('OutCfgIndex').text),
+            'title': xml.find('Name').text,
+        }
+        
+    def parse_xml_screen_dest_index (self, xml):
+        for xml_dest_out_map in xml.find('DestOutMapCol').findall('DestOutMap'):
+            yield int(xml_dest_out_map.find('OutCfgIndex').text)
+
+    def parse_xml_screen_dest (self, xml):
+        return {
+                'index': tuple(self.parse_xml_screen_dest_index(xml)),
+                'title': xml.find('Name').text,
+        }
+
     def load_xml_settings (self, xml):
-        pass
+        if xml.tag != 'System':
+            raise XMLError("Unexpected preset root node: {xml}".format(xml=xml))
+
+        xml_dest_mgr = xml.find('DestMgr')
+
+        for xml_aux_dest_col in xml_dest_mgr.findall('AuxDestCol'):
+            for xml_aux_dest in xml_aux_dest_col.findall('AuxDest'):
+                self._load_destination(**self.parse_xml_aux_dest(xml_aux_dest))
+        
+        for xml_screen_dest_col in xml_dest_mgr.findall('ScreenDestCol'):
+            for xml_screen_dest in xml_screen_dest_col.findall('ScreenDest'):
+                self._load_destination(**self.parse_xml_screen_dest(xml_screen_dest))
 
     def parse_xml_preset (self, xml_preset):
         """
@@ -134,6 +179,7 @@ class E2Presets:
 
         preset = int(xml_preset.attrib['id']) + 1
         title = xml_preset.find('Name').text
+        destinations = []
 
         if '@' in title:
             title, group = title.split('@')
@@ -144,10 +190,19 @@ class E2Presets:
 
         if group:
             group = self._load_group(group)
+        
+        for xml_screen_dest_col in xml_preset.findall('ScreenDestCol'):
+            for xml_screen_dest in xml_screen_dest_col.findall('ScreenDest'):
+                destinations.append(self._load_destination(**self.parse_xml_screen_dest(xml_screen_dest)))
+
+        for xml_aux_dest_col in xml_preset.findall('AuxDestCol'):
+            for xml_aux_dest in xml_aux_dest_col.findall('AuxDest'):
+                destinations.append(self._load_destination(**self.parse_xml_aux_dest(xml_aux_dest)))
 
         return { 
                 'preset': preset,
                 'group': group,
+                'destinations': destinations,
                 'title': title,
         }
 
@@ -162,6 +217,16 @@ class E2Presets:
         for xml_preset in xml.findall('Preset'):
             preset = self._load_preset(**self.parse_xml_preset(xml_preset))
 
+    def _load_destination (self, index, **item):
+        obj = self._destinations.get(index)
+
+        if obj is None:
+            log.info("%s: %s", index, item)
+
+            obj = self._destinations[index] = Destination(index, **item)
+
+        return obj
+
     def _load_group (self, title):
         group = self._groups.get(title.lower())
 
@@ -170,7 +235,7 @@ class E2Presets:
         
         return group
 
-    def _load_preset (self, preset, group=None, **opts):
+    def _load_preset (self, preset, group=None, destinations=(), **item):
         """
             Load the given series of { 'preset': int, **opts } into (unique) Preset items.
 
@@ -178,12 +243,12 @@ class E2Presets:
                 group: PresetGroup
         """
 
-        log.info("%s @ %s: %s", preset, group, opts)
+        log.info("%s @ %s: %s = %s", preset, group, item, ' + '.join(str(d) for d in destinations))
 
         if preset in self.presets:
             raise Error("Duplicate preset: {preset} = {item}".format(preset=preset, item=item))
 
-        obj = self.presets[preset] = Preset(preset, **opts)
+        obj = self.presets[preset] = Preset(preset, group=group, destinations=destinations, **item)
 
         if not group:
             group = self.default_group
