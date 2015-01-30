@@ -121,6 +121,9 @@ class E2Presets:
         self.preview = { } # Destination.index: Preset
         self.program = { }
 
+        # events
+        self._notify = set()
+
     def load_yaml (self, presets={ }, groups=[]):
         """
             Load user-editable metadata from the YAML object attributes given as keyword arguments.
@@ -252,6 +255,26 @@ class E2Presets:
 
         return obj
 
+    # events
+    def add_notify(self, func):
+        log.info("%s", func)
+
+        self._notify.add(func)
+
+    def del_notify(self, func):
+        log.info("%s", func)
+
+        self._notify.remove(func)
+
+    def notify(self):
+        log.info("")
+
+        for func in self._notify:
+            try:
+                func()
+            except Exception as error:
+                log.exception("%s: %s", func, error)
+
     # state
     def _load_db_preset (self, *key):
         index = self.db.get('/'.join(str(k) for k in key))
@@ -285,6 +308,8 @@ class E2Presets:
 
             destination.preview = self._store_db_preset(preset, 'preview', destination.index)
     
+        self.notify()
+
     def activate_program (self):
         preset = self.active
         
@@ -292,7 +317,14 @@ class E2Presets:
             log.info("%s: %s -> %s", destination, destination.program, preset)
 
             destination.program = self._store_db_preset(preset, 'program', destination.index)
-
+        
+        self.notify()
+ 
+    def close(self):
+        if self.db:
+            self.db.close()
+   
+    # query
     @property
     def groups (self):
         yield self.default_group
@@ -311,8 +343,4 @@ class E2Presets:
 
     def __getitem__ (self, key):
         return self.presets[key]
-
-    def close(self):
-        if self.db:
-            self.db.close()
 
