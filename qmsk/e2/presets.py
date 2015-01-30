@@ -134,7 +134,7 @@ class E2Presets:
     
     def parse_xml_aux_dest (self, xml):
         return {
-            'index': int(xml.find('OutCfgIndex').text),
+            'index': (int(xml.find('OutCfgIndex').text), ),
             'title': xml.find('Name').text,
         }
         
