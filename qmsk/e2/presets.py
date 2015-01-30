@@ -252,7 +252,7 @@ class E2Presets:
         index = self.db.get('/'.join(str(k) for k in key))
 
         if index:
-            return self._presets[int(index)]
+            return self.presets[int(index)]
         else:
             return None
 
