@@ -1,0 +1,160 @@
+/*.btn {
+	border: 3px solid white;
+}
+
+.btn-success {
+	border-color: #6f6;
+}*/
+
+
+button {
+    width: 120px;
+    height: 120px;
+
+    margin: 1em;
+    padding: 0.5em;
+
+    border: none;
+    border-radius: 4px;
+    background-color: #133337;
+    color: #ffffff;
+}
+
+#container {
+    background-color: #aaa;
+    padding: 0px;
+
+    /* space for bottom status */
+    margin-bottom: 2em;
+}
+
+#header {
+    background-color: #448844;
+
+    padding: 0.5em;
+}
+
+#header h1 {
+    margin: 0;
+}
+
+#presets {
+
+}
+
+#presets h3 {
+    margin: 0;
+    padding: 0.5em 1em;
+    background-color: #ccc;
+}
+
+#presets button {
+    margin: 1em;
+}
+
+#presets button.preview {
+    border: 4px solid #9f9;
+}
+
+#presets button.program {
+    border: 4px solid #f55;
+}
+
+#presets button.active {
+    border-style: dotted;
+    background-color: #26666e;
+}
+
+#tools {
+    background-color: #444;
+    padding: 1em;
+}
+
+#tools button {
+    background-color: #000000;
+
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+/* Styles for Landscape screen */
+@media all and (orientation:landscape) {
+    #tools {
+        position: fixed;
+        top: 0px;
+        bottom: 0px;
+        right: 0px;
+        width: 20%;
+
+    }
+
+    #tools button {
+        width: 100%;
+        display: block;
+        margin: 1em auto;
+    }
+}
+
+
+/* Styles for Portrait screen */
+@media all and (orientation:portrait) {
+    #tools {
+        position: fixed;
+        top: 0px;
+        width: 100%;
+        height: 150px;
+    }
+
+    #tools button {
+        display: inline;
+        float: left;
+        margin: 0.2em 0.5em;
+    }
+    
+    #header {
+        margin-top: 150px;
+    }
+}
+
+#tools button#cut {
+    color: #00ffff;
+}
+
+#tools button#autotrans {
+    color: #ffff00;
+}
+
+#status {
+	overflow: auto;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    height: 3em;
+
+    padding: 0.2em 0.5em;
+    
+    background-color: #0f0f0f;
+    color: #44ff44;
+    font-family: monospace;
+}
+
+#status p {
+    margin: 0;
+}
+
+.txtProgram {
+	color: #f55;
+}
+
+.txtPreview {
+	color: #9f9;
+}
+
+.txtInactive {
+	color: #444;
+}
+
+.inputDest {
+	font-style: italic;
+	font-size: smaller;
+}
