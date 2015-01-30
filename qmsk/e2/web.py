@@ -178,9 +178,13 @@ class APIPreset(APIBase):
         except KeyError as error:
             raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
 
-        if self.request.method == 'POST':
+        post = self.request_post()
+
+        log.info("content_type=%s, post=%r", self.request.mimetype, post)
+
+        if post is not None:
             try:
-                self.transition = yield from self.app.process(self.preset, self.request.form)
+                self.transition = yield from self.app.process(self.preset, post)
             except qmsk.e2.client.Error as error:
                 self.error = werkzeug.exceptions.InternalServerError
 
