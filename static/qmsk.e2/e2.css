@@ -56,8 +56,21 @@ button {
     border: 4px solid #8f8;
 }
 
+.presets button.preview.active {
+
+}
+
 .presets button.program {
     border: 4px solid #f55;
+}
+
+.presets button.program.active {
+
+}
+
+.presets button.active {
+    background-color: #26666e;
+    border-style: dotted;
 }
 
 #tools {

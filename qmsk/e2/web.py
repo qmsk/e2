@@ -126,6 +126,9 @@ class HTMLPresets(HTMLBase):
             if preset == destination.program:
                 css.add('program')
 
+            if preset == presets.active:
+                css.add('active')
+
         return html.button(
                 type    = 'submit',
                 name    = 'preset',
@@ -233,6 +236,9 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
 
             if status:
                 out[status] = True
+
+            if preset == self.app.presets.active:
+                out['active'] = True
         
         return out
 

@@ -74,6 +74,10 @@ class DBProperty:
         del obj.db[self.name]
 
 class E2Presets:
+    """
+        Load the Encore2 Presets database and implement a state machine for recalling/transitioning Presets.
+    """
+
     @classmethod
     def load (cls, xml_dir, yaml_file, db=None):
         obj = cls()
@@ -113,6 +117,7 @@ class E2Presets:
 
         # persistence
         self.db = None
+        self.active = None # Preset
         self.preview = { } # Destination.index: Preset
         self.program = { }
 
@@ -259,36 +264,34 @@ class E2Presets:
     def _store_db_preset (self, preset, *key):
         self.db['/'.join(str(k) for k in key)] = str(preset.preset)
 
+        return preset
+
     def load_db (self, db):
         self.db = db
+
+        self.active = self._load_db_preset('active')
 
         for destination in self._destinations.values():
             destination.preview = self._load_db_preset('preview', destination.index)
             destination.program = self._load_db_preset('program', destination.index)
 
     def activate_preview (self, preset):
-        self.preview = preset
+        self.active = preset
+
+        self.active = self._store_db_preset(preset, 'active')
 
         for destination in preset.destinations:
             log.info("%s: %s -> %s", destination, destination.preview, preset)
 
-            destination.preview = preset
-
-            self._store_db_preset(preset, 'preview', destination.index)
+            destination.preview = self._store_db_preset(preset, 'preview', destination.index)
     
-    def activate_program (self, preset=None):
-        if preset is None:
-            preset = self.preview
-            self.preview = None
+    def activate_program (self):
+        preset = self.active
         
-        self.program = preset
-
         for destination in preset.destinations:
             log.info("%s: %s -> %s", destination, destination.program, preset)
 
-            destination.program = preset
-
-            self._store_db_preset(preset, 'program', destination.index)
+            destination.program = self._store_db_preset(preset, 'program', destination.index)
 
     @property
     def groups (self):
