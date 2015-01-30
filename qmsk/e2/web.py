@@ -132,6 +132,8 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
 class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
     CORS_ORIGIN = '*'
     CORS_METHODS = ('GET', 'POST')
+    CORS_HEADERS = ('Content-Type', 'Authorization')
+    CORS_CREDENTIALS = True
 
     def render_preset(self, preset):
         presets = self.app.presets
