@@ -69,7 +69,7 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
         presets = self.app.presets
         css = set(['preset'])
 
-        log.info("preset=%s preview=%s program=%s", preset, presets.preview, presets.program)
+        log.debug("preset=%s preview=%s program=%s", preset, presets.preview, presets.program)
 
         if preset == presets.preview:
             css.add('preview')
@@ -193,7 +193,9 @@ class APIPreset(APIBase):
         if self.error is not None:
             out['error'] = self.error
 
-        return out
+        return {
+            'preset': out,
+        }
 
 class E2Web(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
