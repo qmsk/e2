@@ -63,8 +63,9 @@ class E2Presets:
         self.db = db
         self.groups = [ ]
         self.presets = { }
-
-        self.groups.append(PresetGroup(list(self._init_presets(presets)), title=None))
+        
+        if presets:
+            self.groups.append(PresetGroup(list(self._init_presets(presets)), title=None))
         
         for item in groups:
             presets = list(self._init_presets(item.pop('presets')))
