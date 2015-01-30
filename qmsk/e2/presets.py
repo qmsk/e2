@@ -20,15 +20,25 @@ class Preset:
 
     def __eq__ (self, preset):
         return isinstance(preset, Preset) and preset.preset == self.preset
+    
+    def __lt__ (self, preset):
+        return self.title < preset.title 
 
     def __str__ (self):
         return "{self.preset}: {self.title}".format(self=self)
 
 class PresetGroup:
     def __init__ (self, *, title):
-        self.presets = []
+        self._presets = []
         
         self.title = title
+
+    def _add_preset (self, preset):
+        self._presets.append(preset)
+
+    @property
+    def presets (self):
+        return tuple(sorted(self._presets))
 
     def __str__ (self):
         return self.title
@@ -91,7 +101,7 @@ class E2Presets:
         self.presets = { }
 
         self.default_group = PresetGroup(title=None)
-        self._groups = { None: self.default_group }
+        self._groups = { }
 
         if db is None:
             # no presistence
@@ -178,7 +188,7 @@ class E2Presets:
         if not group:
             group = self.default_group
 
-        group.presets.append(obj)
+        group._add_preset(obj)
 
         return obj
 
@@ -196,8 +206,10 @@ class E2Presets:
 
     @property
     def groups (self):
-        # TODO: sort
-        return self._groups.values()
+        yield self.default_group
+
+        for name, group in sorted(self._groups.items()):
+            yield group
 
     def __iter__ (self):
         for preset in self.presets.values():
