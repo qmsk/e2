@@ -291,8 +291,6 @@ class APIPreset(APIBase):
 
         post = self.request_post()
 
-        log.info("content_type=%s, post=%r", self.request.mimetype, post)
-
         if post is not None:
             try:
                 self.transition = yield from self.app.process(self.preset, post)
@@ -348,9 +346,9 @@ class E2Web(qmsk.web.async.Application):
         """
        
         # preset -> preview?
-        log.info("preset: %s", preset)
-
         if preset:
+            log.info("preset: %s", preset)
+
             yield from self.client.PRESET_recall(preset.preset)
             
             self.presets.activate_preview(preset)
@@ -365,12 +363,14 @@ class E2Web(qmsk.web.async.Application):
         else:
             transition = None 
         
-        log.info("transition: %s", transition)
-
         if transition is not None:
+            log.info("transition: %s", transition)
+
             yield from self.client.ATRN(transition)
             
             self.presets.activate_program()
+        
+        log.debug("preset=%s params=%s -> transition=%s", preset, params, transition)
 
         return transition
 

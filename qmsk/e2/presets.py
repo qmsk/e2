@@ -21,7 +21,7 @@ class Destination:
         return self.title < preset.title 
    
     def __str__ (self):
-        return "{self.index}: {self.title}".format(self=self)
+        return "{self.title}".format(self=self)
 
 class Preset:
     def __init__ (self, preset, group, destinations, *, title):
@@ -35,7 +35,7 @@ class Preset:
         return self.title < preset.title 
 
     def __str__ (self):
-        return "{self.preset}: {self.title} @ {self.group}".format(self=self)
+        return "{self.title} @ {self.group}".format(self=self)
 
 class PresetGroup:
     def __init__ (self, *, title):
