@@ -169,14 +169,16 @@ class APIIndex(APIBase):
 
 class APIPreset(APIBase):
     def init(self):
+        self.preset = None
         self.transition = self.error = None
 
     @asyncio.coroutine
-    def process_async(self, preset):
-        try:
-            self.preset = self.app.presets[preset]
-        except KeyError as error:
-            raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
+    def process_async(self, preset=None):
+        if preset:
+            try:
+                self.preset = self.app.presets[preset]
+            except KeyError as error:
+                raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
 
         post = self.request_post()
 
@@ -189,7 +191,10 @@ class APIPreset(APIBase):
                 self.error = werkzeug.exceptions.InternalServerError
 
     def render_json(self):
-        out = self.render_preset(self.preset)
+        out = { }
+
+        if self.preset:
+            out['preset'] = self.render_preset(self.preset)
         
         if self.transition is not None:
             out['transition'] = self.transition
@@ -197,14 +202,13 @@ class APIPreset(APIBase):
         if self.error is not None:
             out['error'] = self.error
 
-        return {
-            'preset': out,
-        }
+        return out
 
 class E2Web(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
         '/':                            Index,
         '/api/v1/':                     APIIndex,
+        '/api/v1/preset/':              APIPreset,
         '/api/v1/preset/<int:preset>':  APIPreset,
     })
 
