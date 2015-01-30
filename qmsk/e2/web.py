@@ -161,8 +161,8 @@ class APIIndex(APIBase):
 
     def render_json(self):
         return {
-            'presets': [self.render_preset(preset) for preset in self.presets],
-            'groups': [self.render_group(group) for group in self.presets.groups],
+                'presets': {preset.preset: self.render_preset(preset) for preset in self.presets},
+                'groups': [self.render_group(group) for group in self.presets.groups],
         }
 
 class APIPreset(APIBase):
