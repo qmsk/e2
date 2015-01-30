@@ -13,6 +13,12 @@ import qmsk.web.urls
 
 html = qmsk.web.html.html5
 
+class Index(qmsk.web.async.Handler):
+    CLIENT = '/static/client/e2.html'
+
+    def process(self):
+        return werkzeug.redirect(self.CLIENT)
+
 class BaseHandler(qmsk.web.async.Handler):
     def init(self):
         self.preset = self.transition = self.error = None
@@ -306,7 +312,8 @@ class APIPreset(APIBase):
 
 class E2Web(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
-        '/':                            HTMLPresets,
+        '/':                            Index,
+        '/presets':                     HTMLPresets,
         '/destinations':                HTMLDestinations,
         '/api/v1/':                     APIIndex,
         '/api/v1/preset/':              APIPreset,
