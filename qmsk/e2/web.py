@@ -49,16 +49,16 @@ class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
     TITLE = "Encore2 Control"
 
     CSS = (
-        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
-        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css',
-        
+        '/static/lib/bootstrap.min.css',
+        '/static/lib/bootstrap-theme.min.css',
+
         # de-cache
         '/static/qmsk.e2/e2.css?' + str(time.time()),
     )
 
     JS = (
-        '//code.jquery.com/jquery-1.11.2.min.js',
-        'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js',
+        '/static/lib/jquery-1.11.2.min.js',
+        '/static/lib/bootstrap.min.js',
     )
 
     HEAD = (
