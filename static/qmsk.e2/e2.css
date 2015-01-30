@@ -21,12 +21,15 @@ button {
 
 #header {
     background-color: #448844;
-
-    padding: 0.5em;
 }
 
-#header h1 {
-    margin: 0;
+#header a {
+    color: #000;
+    font-size: x-large;
+}
+
+#header .active a {
+    font-weight: bold;
 }
 
 #presets {
