@@ -150,20 +150,30 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
     CORS_CREDENTIALS = True
 
     def render_preset(self, preset):
-        presets = self.app.presets
-
+        destinations = dict()
+        
         out = {
             'preset': preset.preset,
+            'destinations': destinations,
             'title': preset.title,
+            'group': preset.group.title,
         }
-        
+       
         for destination in preset.destinations:
-            if preset == destination.preview:
-                out['preview'] = True
-
             if preset == destination.program:
-                out['program'] = True
+                status = 'program'
 
+            elif preset == destination.preview:
+                status = 'preview'
+
+            else:
+                status = None
+
+            destinations[destination.title] = status
+
+            if status:
+                out[status] = True
+        
         return out
 
 class APIIndex(APIBase):
@@ -176,10 +186,19 @@ class APIIndex(APIBase):
                 'presets': [preset.preset for preset in group.presets],
         }
 
+    def render_destination (self, destination):
+        return {
+                'outputs': destination.index,
+                'title': destination.title,
+                'preview': destination.preview.preset if destination.preview else None,
+                'program': destination.program.preset if destination.program else None,
+        }
+
     def render_json(self):
         return {
                 'presets': {preset.preset: self.render_preset(preset) for preset in self.presets},
                 'groups': [self.render_group(group) for group in self.presets.groups],
+                'destinations': [self.render_destination(destination) for destination in self.presets.destinations],
         }
 
 class APIPreset(APIBase):

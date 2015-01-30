@@ -297,6 +297,11 @@ class E2Presets:
         for name, group in sorted(self._groups.items()):
             yield group
 
+    @property
+    def destinations (self):
+        for name, obj in sorted(self._destinations.items()):
+            yield obj
+
     def __iter__ (self):
         for preset in self.presets.values():
             yield preset
