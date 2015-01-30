@@ -21,7 +21,9 @@ class Server:
     @asyncio.coroutine
     def start (self, args):
         try:
-            self.client = yield from qmsk.e2.client.E2Client.connect(args.e2_host)
+            self.client = yield from qmsk.e2.client.E2Client.connect(args.e2_host,
+                    safe    = args.e2_safe,
+            )
         except qmsk.net.tcp.Error as error:
             log.error("%s: failed to connect: %s", args.e2_host, error)
             return 1
@@ -72,6 +74,8 @@ def main (argv):
     parser = qmsk.cli.parser()
     parser.add_argument('--e2-host', metavar='HOST',
         help="Encore2 host address")
+    parser.add_argument('--e2-safe', action='store_true',
+        help="Encore2 safe mode")
     parser.add_argument('--e2-web-listen', metavar='ADDR',
         help="Web server listen address")
     parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=8080,

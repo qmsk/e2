@@ -9,11 +9,15 @@ class CommandError(Error):
     pass
 
 class E2Client:
+    """
+        safe:bool   only send safe commands (preview-only), noop program commands
+    """
+
     PORT = 9878
 
     @classmethod
     @asyncio.coroutine
-    def connect (cls, host, port=PORT):
+    def connect (cls, host, port=PORT, **opts):
         """
             Raises qmsk.net.tcp.Error
         """
@@ -22,20 +26,26 @@ class E2Client:
         
         log.info("%s: connected: %s", host, stream)
 
-        return cls(stream)
+        return cls(stream, **opts)
 
-    def __init__ (self, stream):
+    def __init__ (self, stream, safe=None):
         self.stream = stream
+
+        self.safe = safe # safe mode
         
         # only one command at any time
         self.lock = asyncio.Lock()
 
     @asyncio.coroutine
-    def cmd (self, cmd, *args):
+    def cmd (self, cmd, *args, safe=False):
         """
             Raises qmsk.net.tcp.Error, CommandError
         """
-        
+
+        if self.safe and not safe:
+            log.warn("%s: noop unsafe", cmd)
+            return
+ 
         # XXX: implement timeouts to ensure livelyness
         with (yield from self.lock):
             line = ' '.join([cmd] + [str(arg) for arg in args])
@@ -78,14 +88,14 @@ class E2Client:
             preset:int      0-1000 
         """
 
-        yield from self.cmd('PRESET', '-r', preset)
+        yield from self.cmd('PRESET', '-r', preset, safe=True)
 
     @asyncio.coroutine
     def ATRN (self, transTime=True):
         """
             transTime:int   frames or True
         """
-        
+       
         if transTime is True:
             yield from self.cmd('ATRN')
         else:
