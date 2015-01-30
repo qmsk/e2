@@ -20,7 +20,5 @@
         --e2-host 192.168.0.201 \
         --e2-presets-xml etc/xml/ \
         --e2-presets-db var/e2.db \
-        --e2-web-port 8081 \
-        --e2-web-static static/ \
         -v --debug-module qmsk.net.e2.presets
 

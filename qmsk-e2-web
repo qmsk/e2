@@ -11,6 +11,9 @@ import qmsk.e2.websocket
 import qmsk.net.tcp
 import signal
 
+WEB_PORT = 8081
+WEBSOCKET_PORT = 8082
+STATIC = './static'
 
 class Server:
     def __init__ (self, loop):
@@ -87,11 +90,11 @@ def main (argv):
         help="Encore2 safe mode")
     parser.add_argument('--e2-web-listen', metavar='ADDR',
         help="Web server listen address")
-    parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=8081,
+    parser.add_argument('--e2-web-port', metavar='PORT', type=int, default=WEB_PORT,
         help="Web server port")
-    parser.add_argument('--e2-web-static', metavar='PATH', default='static',
+    parser.add_argument('--e2-web-static', metavar='PATH', default=STATIC,
         help="Web server /static path")
-    parser.add_argument('--e2-websocket-port', metavar='PORT', type=int, default=8082,
+    parser.add_argument('--e2-websocket-port', metavar='PORT', type=int, default=WEBSOCKET_PORT,
         help="WebSocket server port")
     parser.add_argument('--e2-presets-xml', metavar='PATH',
         help="Load presets from XML backup dump directory")
