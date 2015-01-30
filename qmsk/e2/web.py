@@ -65,6 +65,16 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
         else:
             return 200
 
+    def render_preset_destination(self, preset, destination):
+        if preset == destination.program:
+            format = "<{title}>"
+        elif preset == destination.preview:
+            format = "[{title}]"
+        else:
+            format = "({title})"
+
+        return format.format(title=destination.title)
+
     def render_preset(self, preset):
         presets = self.app.presets
         css = set(['preset'])
@@ -83,7 +93,10 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
                 name    = 'preset',
                 value   = preset.preset,
                 class_  = ' '.join(css) if css else None,
-                id      = 'preset-{preset}'.format(preset=preset.preset)
+                id      = 'preset-{preset}'.format(preset=preset.preset),
+                title   = ' + '.join(
+                    self.render_preset_destination(preset, destination) for destination in preset.destinations
+                ),
         )(preset.title)
 
     def render_preset_group (self, group):
