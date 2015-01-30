@@ -1,7 +1,7 @@
 import logging; log = logging.getLogger('qmsk.e2.presets')
 import os
 import os.path
-import shelve
+import dbm
 import yaml
 
 from xml.etree import ElementTree
@@ -18,9 +18,6 @@ class Destination:
 
         self.title = title
 
-    def __eq__ (self, destination):
-        return isinstance(destination, Destination) and destination.index == self.index
-    
     def __lt__ (self, preset):
         return self.title < preset.title 
    
@@ -35,9 +32,6 @@ class Preset:
 
         self.title = title
 
-    def __eq__ (self, preset):
-        return isinstance(preset, Preset) and preset.preset == self.preset
-    
     def __lt__ (self, preset):
         return self.title < preset.title 
 
@@ -80,17 +74,9 @@ class DBProperty:
         del obj.db[self.name]
 
 class E2Presets:
-    preview = DBProperty('preview')
-    program = DBProperty('program')
-
     @classmethod
     def load (cls, xml_dir, yaml_file, db=None):
-        if db:
-            db = shelve.open(db, 'c')
-        else:
-            db = None
-
-        obj = cls(db)
+        obj = cls()
 
         if xml_dir:
             xml_settings = os.path.join(xml_dir, 'settings_backup.xml')
@@ -111,20 +97,24 @@ class E2Presets:
         if yaml_file:
             obj.load_yaml(**yaml.safe_load(yaml_file))
 
+        if db:
+            db = dbm.open(db, 'c')
+
+            obj.load_db(db)
+
         return obj
 
-    def __init__ (self, db):
-        self.db = db
+    def __init__ (self):
         self._destinations = { }
         self.presets = { }
 
         self.default_group = PresetGroup(title=None)
         self._groups = { }
 
-        if db is None:
-            # no presistence
-            self.preview = None
-            self.program = None
+        # persistence
+        self.db = None
+        self.preview = { } # Destination.index: Preset
+        self.program = { }
 
     def load_yaml (self, presets={ }, groups=[]):
         """
@@ -257,17 +247,48 @@ class E2Presets:
 
         return obj
 
+    # state
+    def _load_db_preset (self, *key):
+        index = self.db.get('/'.join(str(k) for k in key))
+
+        if index:
+            return self._presets[int(index)]
+        else:
+            return None
+
+    def _store_db_preset (self, preset, *key):
+        self.db['/'.join(str(k) for k in key)] = str(preset.preset)
+
+    def load_db (self, db):
+        self.db = db
+
+        for destination in self._destinations.values():
+            destination.preview = self._load_db_preset('preview', destination.index)
+            destination.program = self._load_db_preset('program', destination.index)
+
     def activate_preview (self, preset):
-        log.info("%s -> %s", self.preview, preset)
         self.preview = preset
+
+        for destination in preset.destinations:
+            log.info("%s: %s -> %s", destination, destination.preview, preset)
+
+            destination.preview = preset
+
+            self._store_db_preset(preset, 'preview', destination.index)
     
     def activate_program (self, preset=None):
         if preset is None:
             preset = self.preview
             self.preview = None
-
-        log.info("%s -> %s", self.program, preset)
+        
         self.program = preset
+
+        for destination in preset.destinations:
+            log.info("%s: %s -> %s", destination, destination.program, preset)
+
+            destination.program = preset
+
+            self._store_db_preset(preset, 'program', destination.index)
 
     @property
     def groups (self):

@@ -71,11 +71,12 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
 
         log.debug("preset=%s preview=%s program=%s", preset, presets.preview, presets.program)
 
-        if preset == presets.preview:
-            css.add('preview')
-        
-        if preset == presets.program:
-            css.add('program')
+        for destination in preset.destinations:
+            if preset == destination.preview:
+                css.add('preview')
+            
+            if preset == destination.program:
+                css.add('program')
 
         return html.button(
                 type    = 'submit',
@@ -142,12 +143,13 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
             'preset': preset.preset,
             'title': preset.title,
         }
+        
+        for destination in preset.destinations:
+            if preset == destination.preview:
+                out['preview'] = True
 
-        if preset == presets.preview:
-            out['preview'] = True
-
-        if preset == presets.program:
-            out['program'] = True
+            if preset == destination.program:
+                out['program'] = True
 
         return out
 
