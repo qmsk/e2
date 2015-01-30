@@ -5,3 +5,8 @@
 .DS_Store
 
 MANIFEST
+
+dist/
+etc/
+opt/
+var/
