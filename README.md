@@ -8,7 +8,9 @@ Encore2 Web Preset Manager
 ## Install
 
     apt-get install python3 libyaml-dev
+
     virtualenv -p python3 opt
+
     ./opt/bin/pip3 install -r requirements.txt
 
 ## Config
@@ -18,7 +20,8 @@ Encore2 Web Preset Manager
     curl -v http://192.168.0.201/backup-download | tar -C etc -xzv
 
 ## Usage
-
+    mkdir var
+    
     PYTHONPATH=../qmsk-dmx ./opt/bin/python3 ./qmsk-e2-web \
         --e2-host 192.168.0.201 \
         --e2-presets-xml etc/xml/ \
