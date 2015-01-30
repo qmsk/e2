@@ -1,0 +1,10 @@
+syntax: glob
+
+.*.swo
+.*.swp
+
+__pycache__/
+
+etc/
+opt/
+var/
