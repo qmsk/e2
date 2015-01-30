@@ -14,27 +14,7 @@
 
     curl -v http://192.168.0.201/backup-download | tar -C etc -xzv
 
-### `etc/presets.yaml`
-    groups:
-      - title: "@ ALL"
-        presets:
-          - preset: 6
-            title: ISK1
-          - preset: 5
-            title: ISK2
-          - preset: 4
-            title: ISK3
-
-      - title: "@ AUX"
-        presets:
-          - preset: 9
-            title: ISK1
-          - preset: 8
-            title: ISK2
-          - preset: 7
-            title: ISK3
-
-# Running
+# Usage
 
     PYTHONPATH=../qmsk-dmx ./opt/bin/python3 ./qmsk-e2-web \
         --e2-host 192.168.0.201 \

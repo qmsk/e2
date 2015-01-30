@@ -31,7 +31,6 @@ class Server:
 
         self.presets = qmsk.e2.presets.E2Presets.load(
             xml_dir     = args.e2_presets_xml,
-            yaml_file   = args.e2_presets_yaml,
             db          = args.e2_presets_db,
         )
 
@@ -96,8 +95,6 @@ def main (argv):
         help="WebSocket server port")
     parser.add_argument('--e2-presets-xml', metavar='PATH',
         help="Load presets from XML backup dump directory")
-    parser.add_argument('--e2-presets-yaml', metavar='PATH', type=argparse.FileType('r'),
-        help="Load presets from YAML")
     parser.add_argument('--e2-presets-db', metavar='PATH',
         help="Store preset state in db")
     

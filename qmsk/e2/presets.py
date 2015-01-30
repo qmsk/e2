@@ -2,7 +2,6 @@ import logging; log = logging.getLogger('qmsk.e2.presets')
 import os
 import os.path
 import dbm
-import yaml
 
 from xml.etree import ElementTree
 
@@ -79,7 +78,7 @@ class E2Presets:
     """
 
     @classmethod
-    def load (cls, xml_dir, yaml_file, db=None):
+    def load (cls, xml_dir, db=None):
         obj = cls()
 
         if xml_dir:
@@ -98,9 +97,6 @@ class E2Presets:
 
                 obj.load_xml_preset(ElementTree.parse(xml_preset).getroot())
         
-        if yaml_file:
-            obj.load_yaml(**yaml.safe_load(yaml_file))
-
         if db:
             db = dbm.open(db, 'c')
 
@@ -124,22 +120,6 @@ class E2Presets:
         # events
         self._notify = set()
 
-    def load_yaml (self, presets={ }, groups=[]):
-        """
-            Load user-editable metadata from the YAML object attributes given as keyword arguments.
-        """
-
-        for preset, item in presets.items():
-            self._load_presets(preset, group=None, **item)
-        
-        for item in groups:
-            presets = item.pop('presets')
-
-            group = self._load_group(**item)
-            
-            for item in presets:
-                self._load_preset(group=group, **item)
-    
     def parse_xml_aux_dest (self, xml):
         return {
             'index': (int(xml.find('OutCfgIndex').text), ),
