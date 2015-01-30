@@ -351,7 +351,7 @@ class E2Web(qmsk.web.async.Application):
         log.info("preset: %s", preset)
 
         if preset:
-            yield from self.client.PRESET_recall(preset)
+            yield from self.client.PRESET_recall(preset.preset)
             
             self.presets.activate_preview(preset)
 

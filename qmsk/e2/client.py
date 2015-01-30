@@ -86,7 +86,12 @@ class E2Client:
     def PRESET_recall (self, preset):
         """
             preset:int      0-1000 
+
+            Raises ValueError, CommandError, qmsk.net.tcp.Error.
         """
+
+        if not isinstance(preset, int):
+            raise ValueError(preset)
 
         yield from self.cmd('PRESET', '-r', preset, safe=True)
 
@@ -94,11 +99,16 @@ class E2Client:
     def ATRN (self, transTime=True):
         """
             transTime:int   frames or True
+            
+            Raises ValueError, CommandError, qmsk.net.tcp.Error.
         """
        
         if transTime is True:
             yield from self.cmd('ATRN')
         else:
+            if not isinstance(preset, int):
+                raise ValueError(preset)
+
             yield from self.cmd('ATRN', transTime)
 
     def __str__ (self):
