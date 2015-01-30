@@ -33,21 +33,27 @@ button {
 
 }
 
-#presets h3 {
+.presets h3 {
     margin: 0;
     padding: 0.5em 1em;
     background-color: #ccc;
 }
 
-#presets button {
+.presets button {
     margin: 1em;
 }
 
-#presets button.preview {
+.presets button.empty {
+    background-color: #aaa;
+    
+    border: 4px solid #888;
+}
+
+.presets button.preview {
     border: 4px solid #8f8;
 }
 
-#presets button.program {
+.presets button.program {
     border: 4px solid #f55;
 }
 

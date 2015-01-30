@@ -38,8 +38,8 @@ class BaseHandler(qmsk.web.async.Handler):
             except qmsk.e2.client.Error as error:
                 self.error = error
                 return
- 
-class Index(qmsk.web.html.HTMLMixin, BaseHandler):
+
+class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
     TITLE = "Encore2 Control"
 
     CSS = (
@@ -60,10 +60,14 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
     )
 
     def status(self):
+        # TODO: 500 vs 400
         if self.error:
             return 400
         else:
             return 200
+
+class HTMLPresets(HTMLBase):
+    TITLE = "Encore2 Control - Presets"
 
     def render_preset_destination(self, preset, destination):
         if preset == destination.program:
@@ -133,12 +137,48 @@ class Index(qmsk.web.html.HTMLMixin, BaseHandler):
                         html.button(type='submit', name='cut', value='cut', id='cut')("Cut"),
                         html.button(type='submit', name='autotrans', value='autotrans', id='autotrans')("Auto Trans"),
                     ),
-                    html.div(id='presets')(
+                    html.div(id='presets', class_='presets')(
                         self.render_preset_group(group) for group in self.app.presets.groups
                     ),
                 ),
                 html.div(id='status')(
                     status or html.p("Ready")
+                ),
+            ),
+        )
+
+class HTMLDestinations(HTMLBase):
+    TITLE = "Encore2 Control - Destinations"
+
+    def render_destination_preset(self, preset, class_):
+        css = set(['preset'])
+
+        if preset:
+            css.add(class_)
+        else:
+            css.add('empty')
+
+        return html.button(class_=' '.join(css))(
+            preset.title if preset else None
+        )
+
+    def render_destination(self, destination):
+        return html.div(class_='destination')(
+                html.h3(destination.title),
+                self.render_destination_preset(destination.program, 'program'),
+                self.render_destination_preset(destination.preview, 'preview'),
+        )
+
+    def render(self):
+        return html.div(class_='container-fluid', id='container')(
+            html.div(
+                html.div(id='header')(
+                    html.h1(self.title()),
+                ),
+            ),
+            html.div(
+                html.div(id='destinations', class_='presets')(
+                    self.render_destination(destination) for destination in self.app.presets.destinations
                 ),
             ),
         )
@@ -240,7 +280,8 @@ class APIPreset(APIBase):
 
 class E2Web(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
-        '/':                            Index,
+        '/':                            HTMLPresets,
+        '/destinations':                HTMLDestinations,
         '/api/v1/':                     APIIndex,
         '/api/v1/preset/':              APIPreset,
         '/api/v1/preset/<int:preset>':  APIPreset,
