@@ -50,6 +50,11 @@ button {
      text-decoration: blink;
 }
 
+#header .safe-mode {
+     color: #444488;
+     font-size: x-large;
+}
+
 #presets {
 
 }

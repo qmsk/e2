@@ -3,7 +3,9 @@ var phonecatApp = angular.module('e2presets', [
 	'ui.bootstrap'
 ]);
 
-var backendUrl = 'http://192.168.0.16:8081/api/v1/'
+var server = document.location.hostname
+var backendUrl = 'http://' + server + ':8081/api/v1/'
+var websocketUrl = 'ws://' + server + ':8082';
 
 phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 
@@ -12,6 +14,7 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 	$scope.status = [];
 	$scope.seq = 0;
 	$scope.collapsedGroups = {};
+	$scope.server = server;
 
 	$scope.log = function (msg, data) {
 		console.log(msg, data);
@@ -19,7 +22,7 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 	};
 
 	var ws = $websocket.$new({
-		url: 'ws://192.168.0.16:8082',
+		url: websocketUrl,
 		reconnect: true
 	});
 

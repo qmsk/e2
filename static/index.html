@@ -45,7 +45,10 @@
 		</div> -->
 
         <p class="navbar-text navbar-right safe-mode" ng-if="safe">
-            SAFE MODE
+            SAFE MODE @ {{server}}
+        </p>
+        <p class="navbar-text navbar-right live-mode" ng-if="!safe">
+            LIVE @ {{server}}
         </p>
 	</div>
 
