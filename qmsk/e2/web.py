@@ -211,13 +211,11 @@ def apply (args, server, loop):
     fallback = werkzeug.exceptions.NotFound()
 
     static = werkzeug.wsgi.SharedDataMiddleware(fallback, {
-        '/':        os.path.join(args.e2_web_static, 'index.html'),
-        '/lib':     os.path.join(args.e2_web_static, 'lib'),
-        '/qmsk.e2': os.path.join(args.e2_web_static, 'qmsk.e2'),
+        '/':        args.e2_web_static,
     })
 
     application = werkzeug.wsgi.DispatcherMiddleware(static, {
-        '/api': api,
+        '/api':     api,
     })
     
     # aiohttp Server
