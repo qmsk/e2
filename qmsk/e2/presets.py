@@ -281,6 +281,12 @@ class E2Presets:
             destination.program = self._load_db_preset('program', destination.index)
 
     def activate_preview (self, preset):
+        """
+            Activate the given preset. Updates the preview for the preset's destinations, and the active preset for activate_program().
+
+            Returns the active preset
+        """
+
         self.active = preset
 
         self.active = self._store_db_preset(preset, 'active')
@@ -292,7 +298,14 @@ class E2Presets:
     
         self.notify()
 
+        return preset
+
     def activate_program (self):
+        """
+            Take the currently active preset (from activate_preview(preset)) to program for its destinations.
+            The currently active preset remains active.
+        """
+
         preset = self.active
         
         for destination in preset.destinations:
@@ -301,6 +314,8 @@ class E2Presets:
             destination.program = self._store_db_preset(preset, 'program', destination.index)
         
         self.notify()
+
+        return preset
  
     def close(self):
         if self.db:

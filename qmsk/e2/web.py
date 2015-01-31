@@ -43,7 +43,7 @@ class BaseHandler(qmsk.web.async.Handler):
 
         if self.request.method == 'POST':
             try:
-                self.transition = yield from self.app.process(self.preset, self.request.form)
+                self.preset, self.transition = yield from self.app.process(self.preset, self.request.form)
             except qmsk.e2.client.Error as error:
                 self.error = error
                 return
@@ -289,12 +289,14 @@ class APIPreset(APIBase):
                 self.preset = self.app.presets[preset]
             except KeyError as error:
                 raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
+        else:
+            self.preset = self.app.presets.active
 
         post = self.request_post()
 
         if post is not None:
             try:
-                self.transition = yield from self.app.process(self.preset, post)
+                self.preset, self.transition = yield from self.app.process(self.preset, post)
             except qmsk.e2.client.Error as error:
                 self.error = werkzeug.exceptions.InternalServerError
 
@@ -354,6 +356,8 @@ class E2Web(qmsk.web.async.Application):
         log.debug("enter")
         
         with (yield from self.lock):
+            active = self.presets.active
+
             # seq
             if 'seq' in params:
                 seq = float(params['seq'])
@@ -377,7 +381,7 @@ class E2Web(qmsk.web.async.Application):
 
                 yield from self.client.PRESET_recall(preset.preset)
                 
-                self.presets.activate_preview(preset)
+                active = self.presets.activate_preview(preset)
 
             # preview -> program?
             if 'cut' in params:
@@ -394,11 +398,11 @@ class E2Web(qmsk.web.async.Application):
 
                 yield from self.client.ATRN(transition)
                 
-                self.presets.activate_program()
+                active = self.presets.activate_program()
             
-            log.debug("preset=%s params=%s -> seq=%s transition=%s", preset, params, seq, transition)
+            log.debug("preset=%s params=%s -> seq=%s transition=%s preset=%s", preset, params, seq, transition)
 
-            return transition
+            return active, transition
         
         log.debug("exit")
 
