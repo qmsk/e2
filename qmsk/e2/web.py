@@ -6,6 +6,7 @@ import qmsk.e2.server
 import qmsk.web.async
 import qmsk.web.html
 import qmsk.web.json
+import qmsk.web.rewrite
 import qmsk.web.urls
 import werkzeug
 import werkzeug.exceptions
@@ -214,10 +215,14 @@ def apply (args, server, loop):
         '/':        args.e2_web_static,
     })
 
-    application = werkzeug.wsgi.DispatcherMiddleware(static, {
+    dispatcher = werkzeug.wsgi.DispatcherMiddleware(static, {
         '/api':     api,
     })
-    
+
+    application = qmsk.web.rewrite.RewriteMiddleware(dispatcher, {
+        '/':        '/index.html',
+    })
+
     # aiohttp Server
     def server_factory():
         return aiohttp.wsgi.WSGIServerHttpProtocol(application,
