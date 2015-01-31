@@ -22,35 +22,47 @@ class Index(qmsk.web.async.Handler):
     def process(self):
         return werkzeug.redirect(self.CLIENT)
 
-class BaseHandler(qmsk.web.async.Handler):
+class PresetMixin:
+    """
+        preset: Preset              activated preset, or requested preset, or active preset
+        transition: True or int     activated transition
+        seq: float                  current sequence number
+    """
+
     def init(self):
-        self.preset = self.transition = self.error = None
+        self.preset = None
+        self.transition = self.error = None
         self.seq = self.app.server.seq
 
     @asyncio.coroutine
-    def process_async(self):
-        try:
-            preset = self.request.form.get('preset', type=int)
-        except ValueError as error:
-            self.error = error
-            return
-        
+    def process_preset(self, preset=None, post=None):
+        """
+            Raises werkzeug.exceptions.HTTPException.
+        """
+
         if preset:
             try:
-                self.preset = self.app.presets[preset]
+                preset = self.app.presets[preset]
             except KeyError as error:
-                self.error = error
-                return
+                raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
+        else:
+            preset = None
 
-        if self.request.method == 'POST':
+        if post is not None:
             try:
-                self.preset, self.transition, self.seq = yield from self.app.process(self.preset, self.request.form)
+                self.preset, self.transition, self.seq = yield from self.app.process(preset, post)
+            except qmsk.e2.server.SequenceError as error:
+                raise werkzeug.exceptions.BadRequest(error)
             except qmsk.e2.client.Error as error:
-                self.error = error
+                raise werkzeug.exceptions.InternalServerError(error)
             except qmsk.e2.server.Error as error:
-                self.error = werkzeug.exceptions.BadRequest()
+                raise werkzeug.exceptions.InternalServerError(error)
+        elif preset:
+            self.preset = preset
+        else:
+            self.preset = self.app.presets.active
 
-class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
+class HTMLBase(qmsk.web.html.HTMLMixin, qmsk.web.async.Handler):
     TITLE = "Encore2 Control"
 
     CSS = (
@@ -71,9 +83,8 @@ class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
     )
 
     def status(self):
-        # TODO: 500 vs 400
         if self.error:
-            return 400
+            return self.error.code
         else:
             return 200
 
@@ -111,8 +122,27 @@ class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
             ),
         )
 
-class HTMLPresets(HTMLBase):
+class HTMLPresets(PresetMixin, HTMLBase):
     PAGE_TITLE = "Presets"
+
+    def init(self):
+        super().init()
+        self.error = None
+        self.presets = self.app.presets
+
+    @asyncio.coroutine
+    def process_async(self):
+        try:
+            preset = self.request.form.get('preset', type=int)
+        except ValueError as error:
+            self.error = werkzeug.exceptions.BadRequest(error)
+            return
+        
+        try:
+            yield from self.process_preset(preset, self.request_post())
+        except werkzeug.exceptions.HTTPException as error:
+            self.error = error
+            return
 
     def render_preset_destination(self, preset, destination):
         if preset == destination.program:
@@ -125,10 +155,9 @@ class HTMLPresets(HTMLBase):
         return format.format(title=destination.title)
 
     def render_preset(self, preset):
-        presets = self.app.presets
         css = set(['preset'])
 
-        log.debug("preset=%s preview=%s program=%s", preset, presets.preview, presets.program)
+        log.debug("preset=%s preview=%s program=%s", preset, self.presets.preview, self.presets.program)
 
         for destination in preset.destinations:
             if preset == destination.preview:
@@ -137,7 +166,7 @@ class HTMLPresets(HTMLBase):
             if preset == destination.program:
                 css.add('program')
 
-            if preset == presets.active:
+            if preset == self.presets.active:
                 css.add('active')
 
         return html.button(
@@ -161,6 +190,7 @@ class HTMLPresets(HTMLBase):
                     self.render_preset(preset) for preset in group.presets
                 ],
         )
+
     def render_status(self):
         for value, message in (
                 (self.preset, "Recalled preset {}"),
@@ -178,7 +208,7 @@ class HTMLPresets(HTMLBase):
                     html.button(type='submit', name='autotrans', value='autotrans', id='autotrans')("Auto Trans"),
                 ),
                 html.div(id='presets', class_='presets')(
-                    self.render_preset_group(group) for group in self.app.presets.groups
+                    self.render_preset_group(group) for group in self.presets.groups
                 ),
             ),
         )
@@ -280,31 +310,13 @@ class APIIndex(APIBase):
                 'destinations': [self.render_destination(destination) for destination in self.presets.destinations],
         }
 
-class APIPreset(APIBase):
-    def init(self):
-        self.preset = None
-        self.transition = self.error = None
-        self.seq = self.app.server.seq
-
+class APIPreset(PresetMixin, APIBase):
     @asyncio.coroutine
     def process_async(self, preset=None):
-        if preset:
-            try:
-                self.preset = self.app.presets[preset]
-            except KeyError as error:
-                raise werkzeug.exceptions.BadRequest("Invalid preset={preset}".format(preset=preset))
-        else:
-            self.preset = self.app.presets.active
-
         post = self.request_post()
-
-        if post is not None:
-            try:
-                self.preset, self.transition, self.seq = yield from self.app.process(self.preset, post)
-            except qmsk.e2.client.Error as error:
-                self.error = werkzeug.exceptions.InternalServerError()
-            except qmsk.e2.server.Error as error:
-                self.error = werkzeug.exceptions.BadRequest()
+        
+        # raises HTTPException
+        yield from self.process_preset(preset, post)
 
     def render_json(self):
         out = {
@@ -316,9 +328,6 @@ class APIPreset(APIBase):
         
         if self.transition is not None:
             out['transition'] = self.transition
-
-        if self.error is not None:
-            out['error'] = str(self.error)
 
         return out
 
