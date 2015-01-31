@@ -271,6 +271,7 @@ class APIIndex(APIBase):
 
     def render_json(self):
         return {
+                'seq': self.app.seq,
                 'presets': {preset.preset: self.render_preset(preset) for preset in self.presets},
                 'groups': [self.render_group(group) for group in self.presets.groups],
                 'destinations': [self.render_destination(destination) for destination in self.presets.destinations],
@@ -298,7 +299,9 @@ class APIPreset(APIBase):
                 self.error = werkzeug.exceptions.InternalServerError
 
     def render_json(self):
-        out = { }
+        out = {
+            'seq': self.app.seq,
+        }
 
         if self.preset:
             out['preset'] = self.render_preset(self.preset)
@@ -329,6 +332,9 @@ class E2Web(qmsk.web.async.Application):
 
         self.client = client
         self.presets = presets
+
+        self.seq = time.time()
+        self.lock = asyncio.Lock()
     
     @asyncio.coroutine
     def process(self, preset, params):
@@ -344,35 +350,57 @@ class E2Web(qmsk.web.async.Application):
 
             Raises qmsk.e2.client.Error
         """
-       
-        # preset -> preview?
-        if preset:
-            log.info("preset: %s", preset)
 
-            yield from self.client.PRESET_recall(preset.preset)
-            
-            self.presets.activate_preview(preset)
-
-        # preview -> program?
-        if 'cut' in params:
-            transition = 0
-        elif 'autotrans' in params:
-            transition = True
-        elif 'transition' in params:
-            transition = int(params['transition'])
-        else:
-            transition = None 
+        log.debug("enter")
         
-        if transition is not None:
-            log.info("transition: %s", transition)
+        with (yield from self.lock):
+            # seq
+            if 'seq' in params:
+                seq = float(params['seq'])
+            else:
+                seq = None
 
-            yield from self.client.ATRN(transition)
+            if seq is None:
+                pass
+            elif seq != self.seq:
+                raise werkzeug.exceptions.BadRequest("Sequence mismatch: {} != {}".format(seq, self.seq))
+            else:
+                pass
+
+            self.seq = time.time()
+
+            log.info("seq %s -> %s", seq, self.seq)
+           
+            # preset -> preview?
+            if preset:
+                log.info("preset: %s", preset)
+
+                yield from self.client.PRESET_recall(preset.preset)
+                
+                self.presets.activate_preview(preset)
+
+            # preview -> program?
+            if 'cut' in params:
+                transition = 0
+            elif 'autotrans' in params:
+                transition = True
+            elif 'transition' in params:
+                transition = int(params['transition'])
+            else:
+                transition = None 
             
-            self.presets.activate_program()
-        
-        log.debug("preset=%s params=%s -> transition=%s", preset, params, transition)
+            if transition is not None:
+                log.info("transition: %s", transition)
 
-        return transition
+                yield from self.client.ATRN(transition)
+                
+                self.presets.activate_program()
+            
+            log.debug("preset=%s params=%s -> seq=%s transition=%s", preset, params, seq, transition)
+
+            return transition
+        
+        log.debug("exit")
 
 import argparse
 
