@@ -166,8 +166,8 @@ class HTMLPresets(PresetMixin, HTMLBase):
             if preset == destination.program:
                 css.add('program')
 
-            if preset == self.presets.active:
-                css.add('active')
+        if preset == self.presets.active:
+            css.add('active')
 
         return html.button(
                 type    = 'submit',
@@ -192,16 +192,18 @@ class HTMLPresets(PresetMixin, HTMLBase):
         )
 
     def render_status(self):
-        for value, message in (
-                (self.preset, "Recalled preset {}"),
-                (self.transition, "Transitioned {}"),
-                (self.error, "Error: {}")
-        ):
-            if value is not None:
-                yield message.format(value)
+        if self.preset is not None:
+            yield "Recalled preset {preset}".format(preset=self.preset)
+
+        if self.transition is not None:
+            yield "Transitioned {transition}".format(transition=self.transition)
+
+        if self.error is not None:
+            yield "{error}: {description}".format(error=self.error, description=self.error.description)
 
     def render_content(self):
         return html.form(action='', method='POST')(
+            html.input(type='hidden', name='seq', value=self.seq),
             html.div(
                 html.div(id='tools')(
                     html.button(type='submit', name='cut', value='cut', id='cut')("Cut"),
