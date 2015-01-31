@@ -1,4 +1,7 @@
-var phonecatApp = angular.module('e2presets', ['ngWebsocket']);
+var phonecatApp = angular.module('e2presets', [
+	'ngWebsocket',
+	'ui.bootstrap'
+]);
 
 var backendUrl = 'http://192.168.0.16:8081/api/v1/'
 

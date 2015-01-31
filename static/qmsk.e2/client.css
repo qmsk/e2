@@ -1,7 +1,4 @@
 button {
-    width: 120px;
-    height: 120px;
-
     margin: 1em;
     padding: 0.5em;
 
@@ -42,13 +39,33 @@ button {
 
 }
 
-.presets h3 {
-    margin: 0;
-    padding: 0.5em 1em;
+.group {
+    margin-bottom: 0.5em;
+}
+
+.title {
     background-color: #ccc;
 }
 
-.presets button {
+.title h3 {
+    padding: 0.5em 1em;
+    margin: 0;
+}
+
+.title button {
+    margin: 0.25em 0.5em;
+    padding: 0.5em; 0.5em;
+    border: none;
+    float: right;
+}
+
+.title button span {
+    font-size: 24px; /* match h3 */
+}
+
+.presets button.preset {
+    width: 120px;
+    height: 120px;
     margin: 1em;
 }
 
@@ -94,6 +111,9 @@ button span.inactive {
 }
 
 #tools button {
+    width: 120px;
+    height: 120px;
+
     background-color: #000000;
 
     font-size: xx-large;
@@ -115,6 +135,10 @@ button span.inactive {
         width: 100%;
         display: block;
         margin: 1em auto;
+    }
+
+    #presets {
+	margin-right: 20%;
     }
 }
 

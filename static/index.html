@@ -20,6 +20,7 @@
 	<meta content="width=device-width, initial-scale=1" name="viewport" />
 
 	<script src="lib/ng-websocket.js"></script>
+	<script src="lib/ui-bootstrap-tpls-0.12.0.min.js"></script>
 
 	<link rel="stylesheet" href="qmsk.e2/client.css">
 	<script src="qmsk.e2/client.js"></script>
@@ -56,20 +57,30 @@
 
 	<div id="presets" class="presets">
 		<!-- ng-class="{'btn-success': preset == base.inPreview, 'btn-danger': preset == base.inPgm}" -->
-		<div ng-repeat="group in data.groups">
-			<h3 ng-if="group.presets.length > 0">{{group.title}}</h3>
-			<button type="button"
-					ng-repeat="preset in group.presets"
-					ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
-					ng-click="clickPreset(preset)">
-				{{data.presets[preset].title}}
-				<div ng-repeat="(dest, where) in data.presets[preset].destinations">
-					<span class="destination"
-					ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
-						{{dest}}
-					</span>
-				</div>
-			</button>
+		<div class="group" ng-repeat="group in data.groups" ng-if="group.presets.length > 0">
+			<div class="title" ng-click="collapse = !collapse">
+				<button type="button">
+					<span class="glyphicon"
+						ng-class="collapse ? 'glyphicon-plus' : 'glyphicon-minus'"
+					></span>
+				</button>
+				
+				<h3>{{group.title}}</h3>
+			</div>
+			<div collapse="collapse">
+				<button type="button" class="preset"
+						ng-repeat="preset in group.presets"
+						ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
+						ng-click="clickPreset(preset)">
+					{{data.presets[preset].title}}
+					<div ng-repeat="(dest, where) in data.presets[preset].destinations">
+						<span class="destination"
+						ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
+							{{dest}}
+						</span>
+					</div>
+				</button>
+			</div>
 		</div>
 	</div>
 		
