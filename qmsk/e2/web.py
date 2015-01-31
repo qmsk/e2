@@ -15,12 +15,6 @@ html = qmsk.web.html.html5
 WEB_PORT = 8081
 STATIC = './static'
 
-class Index(qmsk.web.async.Handler):
-    CLIENT = '/static/client/e2.html'
-
-    def process(self):
-        return werkzeug.redirect(self.CLIENT)
-
 class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
     CORS_ORIGIN = '*'
     CORS_METHODS = ('GET', 'POST')
