@@ -7,7 +7,6 @@ import qmsk.web.async
 import qmsk.web.html
 import qmsk.web.json
 import qmsk.web.urls
-import time
 import werkzeug
 import werkzeug.exceptions
 
@@ -69,8 +68,7 @@ class HTMLBase(qmsk.web.html.HTMLMixin, qmsk.web.async.Handler):
         '/static/lib/bootstrap.min.css',
         '/static/lib/bootstrap-theme.min.css',
 
-        # de-cache
-        '/static/qmsk.e2/e2.css?' + str(time.time()),
+        '/static/client/app.css',
     )
 
     JS = (

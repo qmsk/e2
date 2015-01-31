@@ -1,12 +1,3 @@
-/*.btn {
-	border: 3px solid white;
-}
-
-.btn-success {
-	border-color: #6f6;
-}*/
-
-
 button {
     width: 120px;
     height: 120px;
@@ -30,39 +21,53 @@ button {
 
 #header {
     background-color: #448844;
-
-    padding: 0.5em;
 }
 
-#header h1 {
+#header.navbar {
     margin: 0;
+    border-radius: 0;
+}
+
+#header a {
+    color: #000;
+    font-size: x-large;
+}
+
+#header .active a {
+    font-weight: bold;
 }
 
 #presets {
 
 }
 
-#presets h3 {
+.presets h3 {
     margin: 0;
     padding: 0.5em 1em;
     background-color: #ccc;
 }
 
-#presets button {
+.presets button {
     margin: 1em;
 }
 
-#presets button.preview {
+.presets button.empty {
+    background-color: #aaa;
+    
+    border: 4px solid #888;
+}
+
+.presets button.preview {
     border: 4px solid #9f9;
 }
 
-#presets button.program {
+.presets button.program {
     border: 4px solid #f55;
 }
 
-#presets button.active {
-    border-style: dotted;
+.presets button.active {
     background-color: #26666e;
+    border-style: dotted;
 }
 
 #tools {
@@ -125,7 +130,6 @@ button {
 }
 
 #status {
-	overflow: auto;
     position: fixed;
     bottom: 0px;
     width: 100%;
@@ -136,6 +140,8 @@ button {
     background-color: #0f0f0f;
     color: #44ff44;
     font-family: monospace;
+    
+    overflow: auto;
 }
 
 #status p {
