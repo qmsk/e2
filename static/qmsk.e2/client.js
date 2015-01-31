@@ -44,6 +44,7 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 		$http.get(backendUrl)
 			.success(function(data) {
 				$scope.data = data;
+                                $scope.safe = data.safe;
 				$scope.seq = data.seq;
 			}).error(function(err) {
 				$scope.log('error loading preset data');

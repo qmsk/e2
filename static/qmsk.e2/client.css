@@ -21,6 +21,10 @@ button {
     background-color: #448844;
 }
 
+#header.safe {
+    background-color: #aaaa44;
+}
+
 #header.navbar {
     margin-bottom: 0;
     border-radius: 0;
@@ -33,6 +37,17 @@ button {
 
 #header .active a {
     font-weight: bold;
+}
+
+#header .navbar-right {
+     /* override navbar-right margin-right: -15px */
+     margin: 15px 15px;
+}
+
+#header .safe-mode {
+     color: #884444;
+     font-size: x-large;
+     text-decoration: blink;
 }
 
 #presets {
@@ -139,8 +154,8 @@ button span.inactive {
         margin: 1em auto;
     }
 
-    #presets {
-	margin-right: 20%;
+    #header, #presets {
+        margin-right: 20%;
     }
 }
 

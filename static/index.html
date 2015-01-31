@@ -31,7 +31,7 @@
 
 <div class="container-fluid" id="container" ng-controller="PresetsCtrl">
 
-	<div id="header" class="navbar">
+    <div id="header" class="navbar" ng-class="{'safe': safe}">
 		<div class="navbar-header">
 			<a class="navbar-brand" href="/">
 				Encore2 Control
@@ -43,6 +43,10 @@
 
 			</ul>
 		</div> -->
+
+        <p class="navbar-text navbar-right safe-mode" ng-if="safe">
+            SAFE MODE
+        </p>
 	</div>
 
 	<div id="tools">

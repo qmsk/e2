@@ -56,6 +56,7 @@ class APIIndex(APIBase):
     def init(self):
         self.presets = self.app.presets
         self.seq = self.app.server.seq
+        self.safe = self.app.server.client.safe
 
     def render_group (self, group):
         return {
@@ -73,6 +74,7 @@ class APIIndex(APIBase):
 
     def render_json(self):
         return {
+                'safe': self.safe,
                 'seq': self.seq,
                 'presets': {preset.preset: self.render_preset(preset) for preset in self.presets},
                 'groups': [self.render_group(group) for group in self.presets.groups],
