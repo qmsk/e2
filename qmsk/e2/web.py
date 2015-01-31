@@ -141,12 +141,11 @@ class APIPreset(APIBase):
 
         return out
 
-class E2Web(qmsk.web.async.Application):
+class API(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
-        '/':                            Index,
-        '/api/v1/':                     APIIndex,
-        '/api/v1/preset/':              APIPreset,
-        '/api/v1/preset/<int:preset>':  APIPreset,
+        '/v1/':                     APIIndex,
+        '/v1/preset/':              APIPreset,
+        '/v1/preset/<int:preset>':  APIPreset,
     })
 
     def __init__ (self, server, presets):
@@ -195,6 +194,7 @@ class E2Web(qmsk.web.async.Application):
         return active, transition, seq
 
 import argparse
+import os.path
 
 def parser (parser):
     group = parser.add_argument_group("qmsk.e2.web Options")
@@ -210,14 +210,24 @@ def apply (args, server, loop):
     """
         server: qmsk.e2.server.Server
     """
+    
+    # API
+    api = API(server, server.presets)
+    
+    # WSGI stack
+    fallback = werkzeug.exceptions.NotFound()
 
-    application = E2Web(server, server.presets)
+    static = werkzeug.wsgi.SharedDataMiddleware(fallback, {
+        '/':        os.path.join(args.e2_web_static, 'index.html'),
+        '/lib':     os.path.join(args.e2_web_static, 'lib'),
+        '/qmsk.e2': os.path.join(args.e2_web_static, 'qmsk.e2'),
+    })
 
-    if args.e2_web_static:
-        application = werkzeug.wsgi.SharedDataMiddleware(application, {
-            '/static':  args.e2_web_static,
-        })
-
+    application = werkzeug.wsgi.DispatcherMiddleware(static, {
+        '/api': api,
+    })
+    
+    # aiohttp Server
     def server_factory():
         return aiohttp.wsgi.WSGIServerHttpProtocol(application,
                 readpayload = True,
