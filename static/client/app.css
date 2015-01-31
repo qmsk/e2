@@ -20,11 +20,12 @@ button {
 }
 
 #header {
+    margin: 0;
     background-color: #448844;
 }
 
 #header.navbar {
-    margin: 0;
+    margin-bottom: 0;
     border-radius: 0;
 }
 
