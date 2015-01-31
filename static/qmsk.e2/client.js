@@ -11,6 +11,7 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 	$scope.base.inPreview = null;
 	$scope.status = [];
 	$scope.seq = 0;
+	$scope.collapsedGroups = {};
 
 	$scope.log = function (msg, data) {
 		console.log(msg, data);

@@ -58,16 +58,16 @@
 	<div id="presets" class="presets">
 		<!-- ng-class="{'btn-success': preset == base.inPreview, 'btn-danger': preset == base.inPgm}" -->
 		<div class="group" ng-repeat="group in data.groups" ng-if="group.presets.length > 0">
-			<div class="title" ng-click="collapse = !collapse">
+			<div class="title" ng-click="collapsedGroups[group.title] = !collapsedGroups[group.title]">
 				<button type="button">
 					<span class="glyphicon"
-						ng-class="collapse ? 'glyphicon-plus' : 'glyphicon-minus'"
+						ng-class="collapsedGroups[group.title] ? 'glyphicon-plus' : 'glyphicon-minus'"
 					></span>
 				</button>
 				
 				<h3>{{group.title}}</h3>
 			</div>
-			<div collapse="collapse">
+			<div collapse="collapsedGroups[group.title]">
 				<button type="button" class="preset"
 						ng-repeat="preset in group.presets"
 						ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
