@@ -49,7 +49,7 @@
 	<div id="presets" class="presets">
 		<!-- ng-class="{'btn-success': preset == base.inPreview, 'btn-danger': preset == base.inPgm}" -->
 		<div ng-repeat="group in data.groups">
-			<h3>{{group.title}}</h3>
+			<h3 ng-if="group.presets.length > 0">{{group.title}}</h3>
 			<button type="button"
 					ng-repeat="preset in group.presets"
 					ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
