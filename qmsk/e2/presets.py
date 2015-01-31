@@ -84,7 +84,7 @@ class E2Presets:
         if xml_dir:
             xml_settings = os.path.join(xml_dir, 'settings_backup.xml')
 
-            log.info("%s", xml_settings)
+            log.debug("%s", xml_settings)
 
             obj.load_xml_settings(ElementTree.parse(xml_settings).getroot())
             
@@ -93,11 +93,13 @@ class E2Presets:
             for name in os.listdir(xml_presets):
                 xml_preset = os.path.join(xml_presets, name)
 
-                log.info("%s", xml_preset)
+                log.debug("%s", xml_preset)
 
                 obj.load_xml_preset(ElementTree.parse(xml_preset).getroot())
         
         if db:
+            log.debug("%s", db)
+
             db = dbm.open(db, 'c')
 
             obj.load_db(db)
