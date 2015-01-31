@@ -35,7 +35,7 @@ class Server:
 
         self.presets = qmsk.e2.presets.apply(args)
 
-        if not self.presets.presets:
+        if len(self.presets) == 0:
             log.error("no presets given")
             return 1
         
@@ -77,7 +77,7 @@ class Server:
             if preset:
                 log.info("preset: %s", preset)
 
-                yield from self.client.PRESET_recall(preset.preset)
+                yield from self.client.PRESET_recall(preset.index)
                 
                 active = self.presets.activate_preview(preset)
 

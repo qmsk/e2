@@ -26,7 +26,7 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
         destinations = dict()
         
         out = {
-            'preset': preset.preset,
+            'preset': preset.index,
             'destinations': destinations,
             'title': preset.title,
             'group': preset.group.title if preset.group else None,
@@ -61,22 +61,22 @@ class APIIndex(APIBase):
     def render_group (self, group):
         return {
                 'title': group.title,
-                'presets': [preset.preset for preset in group.presets],
+                'presets': [preset.index for preset in group.presets],
         }
 
     def render_destination (self, destination):
         return {
                 'outputs': destination.index,
                 'title': destination.title,
-                'preview': destination.preview.preset if destination.preview else None,
-                'program': destination.program.preset if destination.program else None,
+                'preview': destination.preview.index if destination.preview else None,
+                'program': destination.program.index if destination.program else None,
         }
 
     def render_json(self):
         return {
                 'safe': self.safe,
                 'seq': self.seq,
-                'presets': {preset.preset: self.render_preset(preset) for preset in self.presets},
+                'presets': {preset.index: self.render_preset(preset) for preset in self.presets},
                 'groups': [self.render_group(group) for group in self.presets.groups],
                 'destinations': [self.render_destination(destination) for destination in self.presets.destinations],
         }
