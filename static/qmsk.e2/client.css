@@ -108,6 +108,8 @@ button span.inactive {
 #tools {
     background-color: #444;
     padding: 1em;
+
+    z-index: 1000;
 }
 
 #tools button {
