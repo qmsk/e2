@@ -7,6 +7,13 @@ import qmsk.e2.presets
 import qmsk.e2.web
 import qmsk.e2.websocket
 import signal
+import time
+
+class Error(Exception):
+    pass
+
+class SequenceError(Error):
+    pass
 
 class Server:
     def __init__ (self, loop):
@@ -14,6 +21,9 @@ class Server:
 
         self.client = None
         self.presets = None
+        
+        self.seq = time.time()
+        self.lock = asyncio.Lock()
 
     @asyncio.coroutine
     def start (self, args):
@@ -29,9 +39,61 @@ class Server:
             log.error("no presets given")
             return 1
         
-        self.web = yield from qmsk.e2.web.apply(args, self.client, self.presets, self.loop)
+        self.web = yield from qmsk.e2.web.apply(args, self, self.loop)
 
         self.websocket = yield from qmsk.e2.websocket.apply(args, self.presets, self.loop)
+
+    @asyncio.coroutine
+    def activate(self, preset=None, transition=None, seq=None):
+        """
+            Activate presets.
+                preset: qmsk.e2.presets.Preset      activate given preset, placing it on preview for its destinations
+                transition: True or int             transition active preset to program on its destinations
+                seq: float or None                  serialize activate()'s between clients.
+
+            Returns active:Preset, seq:float
+
+            Raises qmsk.e2.client.Error, SequenceError.
+        """
+
+        log.debug("enter")
+        
+        with (yield from self.lock):
+            active = self.presets.active
+            
+            # seq
+            if seq is None:
+                pass
+            elif seq != self.seq:
+                raise SequenceError("Sequence mismatch: {} != {}".format(seq, self.seq))
+            else:
+                pass
+
+            new_seq = self.seq = time.time()
+
+            log.info("seq %s -> %s", seq, self.seq)
+           
+            # preset -> preview?
+            if preset:
+                log.info("preset: %s", preset)
+
+                yield from self.client.PRESET_recall(preset.preset)
+                
+                active = self.presets.activate_preview(preset)
+
+            # preview -> program?
+            if transition is not None:
+                log.info("%s: transition %s", active, transition)
+
+                yield from self.client.ATRN(transition)
+                
+                active = self.presets.activate_program()
+            
+            log.debug("preset=%s transition=%s seq=%s -> active=%s seq=%s", preset, transition, seq, active, new_seq)
+        
+            log.debug("exit")
+            
+        return active, new_seq
 
     @asyncio.coroutine
     def stop (self):

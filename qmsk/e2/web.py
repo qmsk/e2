@@ -1,15 +1,15 @@
 import asyncio
 import aiohttp.wsgi
 import logging; log = logging.getLogger('qmsk.e2.web')
-import qmsk.web
-import time
-import werkzeug
-import werkzeug.exceptions
-
+import qmsk.e2.client
+import qmsk.e2.server
 import qmsk.web.async
 import qmsk.web.html
 import qmsk.web.json
 import qmsk.web.urls
+import time
+import werkzeug
+import werkzeug.exceptions
 
 html = qmsk.web.html.html5
 
@@ -25,6 +25,7 @@ class Index(qmsk.web.async.Handler):
 class BaseHandler(qmsk.web.async.Handler):
     def init(self):
         self.preset = self.transition = self.error = None
+        self.seq = self.app.server.seq
 
     @asyncio.coroutine
     def process_async(self):
@@ -43,10 +44,11 @@ class BaseHandler(qmsk.web.async.Handler):
 
         if self.request.method == 'POST':
             try:
-                self.preset, self.transition = yield from self.app.process(self.preset, self.request.form)
+                self.preset, self.transition, self.seq = yield from self.app.process(self.preset, self.request.form)
             except qmsk.e2.client.Error as error:
                 self.error = error
-                return
+            except qmsk.e2.server.Error as error:
+                self.error = werkzeug.exceptions.BadRequest()
 
 class HTMLBase(qmsk.web.html.HTMLMixin, BaseHandler):
     TITLE = "Encore2 Control"
@@ -252,8 +254,9 @@ class APIBase (qmsk.web.json.JSONMixin, qmsk.web.async.Handler):
         return out
 
 class APIIndex(APIBase):
-    def process(self):
+    def init(self):
         self.presets = self.app.presets
+        self.seq = self.app.server.seq
 
     def render_group (self, group):
         return {
@@ -271,7 +274,7 @@ class APIIndex(APIBase):
 
     def render_json(self):
         return {
-                'seq': self.app.seq,
+                'seq': self.seq,
                 'presets': {preset.preset: self.render_preset(preset) for preset in self.presets},
                 'groups': [self.render_group(group) for group in self.presets.groups],
                 'destinations': [self.render_destination(destination) for destination in self.presets.destinations],
@@ -281,6 +284,7 @@ class APIPreset(APIBase):
     def init(self):
         self.preset = None
         self.transition = self.error = None
+        self.seq = self.app.server.seq
 
     @asyncio.coroutine
     def process_async(self, preset=None):
@@ -296,13 +300,15 @@ class APIPreset(APIBase):
 
         if post is not None:
             try:
-                self.preset, self.transition = yield from self.app.process(self.preset, post)
+                self.preset, self.transition, self.seq = yield from self.app.process(self.preset, post)
             except qmsk.e2.client.Error as error:
-                self.error = werkzeug.exceptions.InternalServerError
+                self.error = werkzeug.exceptions.InternalServerError()
+            except qmsk.e2.server.Error as error:
+                self.error = werkzeug.exceptions.BadRequest()
 
     def render_json(self):
         out = {
-            'seq': self.app.seq,
+            'seq': self.seq,
         }
 
         if self.preset:
@@ -312,7 +318,7 @@ class APIPreset(APIBase):
             out['transition'] = self.transition
 
         if self.error is not None:
-            out['error'] = self.error
+            out['error'] = str(self.error)
 
         return out
 
@@ -326,85 +332,50 @@ class E2Web(qmsk.web.async.Application):
         '/api/v1/preset/<int:preset>':  APIPreset,
     })
 
-    def __init__ (self, client, presets):
+    def __init__ (self, server, presets):
         """
-            client: qmsk.e2.client.E2Client
+            server: qmsk.e2.server.Server
+            presets: qmsk.e2.presets.E2Presets
         """
         super().__init__()
-
-        self.client = client
+        
+        self.server = server
         self.presets = presets
 
-        self.seq = time.time()
-        self.lock = asyncio.Lock()
-    
     @asyncio.coroutine
     def process(self, preset, params):
         """
             Process an action request
 
-            params: dict
-                preset: int
+            preset: Preset
+            params: {
                 cut: *
                 autotrans: *
+                transition: int
+                seq: float or None
+            }
+        
 
-            Returns transition value.
-
-            Raises qmsk.e2.client.Error
+            Raises qmsk.e2.client.Error, qmsk.e2.server.Error
         """
 
-        log.debug("enter")
-        
-        with (yield from self.lock):
-            active = self.presets.active
+        if 'seq' in params:
+            seq = float(params['seq'])
+        else:
+            seq = None
 
-            # seq
-            if 'seq' in params:
-                seq = float(params['seq'])
-            else:
-                seq = None
+        if 'cut' in params:
+            transition = 0
+        elif 'autotrans' in params:
+            transition = True
+        elif 'transition' in params:
+            transition = int(params['transition'])
+        else:
+            transition = None 
 
-            if seq is None:
-                pass
-            elif seq != self.seq:
-                raise werkzeug.exceptions.BadRequest("Sequence mismatch: {} != {}".format(seq, self.seq))
-            else:
-                pass
-
-            self.seq = time.time()
-
-            log.info("seq %s -> %s", seq, self.seq)
-           
-            # preset -> preview?
-            if preset:
-                log.info("preset: %s", preset)
-
-                yield from self.client.PRESET_recall(preset.preset)
-                
-                active = self.presets.activate_preview(preset)
-
-            # preview -> program?
-            if 'cut' in params:
-                transition = 0
-            elif 'autotrans' in params:
-                transition = True
-            elif 'transition' in params:
-                transition = int(params['transition'])
-            else:
-                transition = None 
+        active, seq = yield from self.server.activate(preset, transition, seq)
             
-            if transition is not None:
-                log.info("transition: %s", transition)
-
-                yield from self.client.ATRN(transition)
-                
-                active = self.presets.activate_program()
-            
-            log.debug("preset=%s params=%s -> seq=%s transition=%s preset=%s", preset, params, seq, transition)
-
-            return active, transition
-        
-        log.debug("exit")
+        return active, transition, seq
 
 import argparse
 
@@ -418,12 +389,12 @@ def parser (parser):
         help="Web server /static path")
 
 @asyncio.coroutine
-def apply (args, client, presets, loop):
+def apply (args, server, loop):
     """
-        client: qmsk.e2.client.E2Client
+        server: qmsk.e2.server.Server
     """
 
-    application = E2Web(client, presets)
+    application = E2Web(server, server.presets)
 
     if args.e2_web_static:
         application = werkzeug.wsgi.SharedDataMiddleware(application, {
