@@ -64,8 +64,8 @@
 					ng-click="clickPreset(preset)">
 				{{data.presets[preset].title}}
 				<div ng-repeat="(dest, where) in data.presets[preset].destinations">
-					<span class="inputDest"
-					ng-class="{'txtPreview': where == 'preview', 'txtProgram': where == 'program', 'txtInactive': where == undefined}">
+					<span class="destination"
+					ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
 						{{dest}}
 					</span>
 				</div>

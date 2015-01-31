@@ -52,23 +52,40 @@ button {
     margin: 1em;
 }
 
-.presets button.empty {
+button.empty {
     background-color: #aaa;
     
     border: 4px solid #888;
 }
 
-.presets button.preview {
+button.preview {
     border: 4px solid #9f9;
 }
 
-.presets button.program {
+button.program {
     border: 4px solid #f55;
 }
 
-.presets button.active {
+button.active {
     background-color: #26666e;
     border-style: dotted;
+}
+
+button span.destination {
+    font-style: italic;
+    font-size: smaller;
+}
+
+button span.program {
+    color: #f55;
+}
+
+button span.preview {
+    color: #9f9;
+}
+
+button span.inactive {
+    color: #444;
 }
 
 #tools {
@@ -147,21 +164,4 @@ button {
 
 #status p {
     margin: 0;
-}
-
-.txtProgram {
-	color: #f55;
-}
-
-.txtPreview {
-	color: #9f9;
-}
-
-.txtInactive {
-	color: #444;
-}
-
-.inputDest {
-	font-style: italic;
-	font-size: smaller;
 }
