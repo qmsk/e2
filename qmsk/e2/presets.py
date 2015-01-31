@@ -263,6 +263,7 @@ class Presets:
             self._load_preset(index, **item)
 
         # state
+        self.db = db
         self.db_presets = DB(db,
                 load    = lambda index: self._presets[int(index)],
                 dump    = lambda preset: str(preset.index),
