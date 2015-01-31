@@ -142,15 +142,14 @@ class API(qmsk.web.async.Application):
         '/v1/preset/<int:preset>':  APIPreset,
     })
 
-    def __init__ (self, server, presets):
+    def __init__ (self, server):
         """
             server: qmsk.e2.server.Server
-            presets: qmsk.e2.presets.E2Presets
         """
         super().__init__()
         
         self.server = server
-        self.presets = presets
+        self.presets = server.presets
 
     @asyncio.coroutine
     def process(self, preset, params):
@@ -206,7 +205,7 @@ def apply (args, server, loop):
     """
     
     # API
-    api = API(server, server.presets)
+    api = API(server)
     
     # WSGI stack
     fallback = werkzeug.exceptions.NotFound()
