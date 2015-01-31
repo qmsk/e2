@@ -20,8 +20,11 @@ class WebSocket(autobahn.asyncio.websocket.WebSocketServerProtocol):
         self.sendMessage('update'.encode('utf-8'))
 
     def onClose(self, wasClean, code, reason):
-        log.info("%s: %s", self, reason)
-        self.factory.clients.remove(self)
+        if self in self.factory.clients:
+                log.info("%s: %s", self, reason)
+                self.factory.clients.remove(self)
+        else:
+                log.warning("%s: unknown client close: %s", self, reason)
 
     def __str__(self):
         return str(self.peer)
