@@ -106,7 +106,7 @@ class E2Client:
         if transTime is True:
             yield from self.cmd('ATRN')
         else:
-            if not isinstance(preset, int):
+            if not isinstance(transTime, int):
                 raise ValueError(preset)
 
             yield from self.cmd('ATRN', transTime)
