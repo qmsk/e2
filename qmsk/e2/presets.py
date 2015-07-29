@@ -182,7 +182,7 @@ class Group:
 
     def __str__ (self):
         if self.title is None:
-            return ""    
+            return "Ungrouped"
         else: 
             return self.title
 

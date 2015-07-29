@@ -6,7 +6,10 @@
 
 MANIFEST
 
+static/bower_components/
+qmsk_e2.egg-info/
 dist/
+
 etc/
 opt/
 var/

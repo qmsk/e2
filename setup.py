@@ -12,7 +12,6 @@ setup(
     description = "Encore2 Web Preset Manager",
     url         = 'https://github.com/SpComb/qmsk-e2',
 
-    namespace_packages  = [ 'qmsk' ],
     packages    = [
         'qmsk.e2',
         'qmsk.net',
@@ -27,7 +26,8 @@ setup(
     ],
 
     data_files  = [
-        ('static/qmsk.e2', glob('static/qmsk.e2/*')),
-        ('static/client', glob('static/client/*')),
+        ('share/static/qmsk.e2', glob('static/qmsk.e2/*')),
+        ('share/static', glob('static/index.html')),
+        ('share/bower.json', glob('bower.json')),
     ],
 )
