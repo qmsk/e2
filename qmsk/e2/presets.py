@@ -147,6 +147,12 @@ class Destination:
         return "{self.title}".format(self=self)
 
 class Preset:
+    """
+        index:int                       E2's internal preset ID
+        group:Group                     grouped presets
+        destinations:[Destination]      Destinations included in this preset
+        title:string                    human-readable title
+    """
     def __init__ (self, index, group, destinations, *, title):
         self.index = index
         self.group = group
@@ -175,7 +181,10 @@ class Group:
         return tuple(sorted(self._presets))
 
     def __str__ (self):
-        return self.title
+        if self.title is None:
+            return ""    
+        else: 
+            return self.title
 
 class DBProperty:
     def __init__ (self, name):
@@ -269,7 +278,9 @@ class Presets:
                 dump    = lambda preset: str(preset.index),
         )
 
-        self.active = self.db_presets['active']
+        self.active = self.db_presets.get('active')
+
+        log.info("Active preset: %s", self.active)
 
         for destination in self._destinations.values():
             destination.preview = self.db_presets.get('preview', destination.index)
@@ -341,7 +352,7 @@ class Presets:
         """
             Activate the given preset. Updates the preview for the preset's destinations, and the active preset for activate_program().
 
-            Returns the active preset
+            Returns the active preset, or None if unknown.
         """
 
         self.active = self.db_presets['active'] = preset
