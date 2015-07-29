@@ -23,7 +23,7 @@ class Client:
         
         self.presets = qmsk.e2.presets.apply(args)
 
-        if not self.presets.presets:
+        if not self.presets:
             log.error("no presets given")
             return 1
 
@@ -32,11 +32,15 @@ class Client:
     @asyncio.coroutine
     def run (self, args):
         if args.preset is not None:
+            preset = self.presets[args.preset]
+
             try:
-                yield from self.client.PRESET_recall(args.preset)
+                yield from self.client.PRESET_recall(preset.index)
             except qmsk.e2.client.CommandError as error:
                 log.error("%s: PRESET_recall(%s): %s", self.client, args.preset, error)
                 return 1
+            else:
+                self.presets.activate_preview(preset)
 
         if args.transition is not None:
             try:
@@ -44,14 +48,37 @@ class Client:
             except qmsk.e2.client.CommandError as error:
                 log.error("%s: ATRN(%s): %s", self.client, args.transition, error)
                 return 1
-        
+            else:
+                self.presets.activate_program()
+
+        if args.list:
+            print("  {:5} {:12} {:15} {:}".format("Index", "Group", "Title", "Destinations"))
+            for preset in self.presets:
+                if preset == self.presets.active:
+                    flag = ">"
+                else:
+                    flag = ""
+
+                print("{flag:1} {preset.index:5d} {preset.group!s:12} {preset.title!s:15} {dests}".format(
+                    flag    = flag,
+                    preset  = preset,
+                    dests   = ' '.join(str(dest) for dest in preset.destinations),
+                ))
+       
         return 0
    
+    def close(self):
+        # store any changes
+        self.presets.close()
+
+
 def main (argv):
     parser = qmsk.cli.parser()
     qmsk.e2.client.parser(parser)
     qmsk.e2.presets.parser(parser)
 
+    parser.add_argument('--list', '-l',     action='store_true',
+            help="List presets")
     parser.add_argument('--preset',         metavar='PRESET', type=int,
             help="Recall preset")
     parser.add_argument('--cut',            dest='transition', action='store_const', const=0,
@@ -82,7 +109,7 @@ def main (argv):
             return out
     
     # run
-    do_start = asyncio.async(client.run(args))
+    do_run = asyncio.async(client.run(args))
 
     try:
         log.info("run event loop")
@@ -93,6 +120,8 @@ def main (argv):
         return 1
 
     else:
+        client.close()
+
         if out:
             return out
 
