@@ -76,8 +76,12 @@ class Server:
             # preset -> preview?
             if preset:
                 log.info("preset: %s", preset)
-
-                yield from self.client.PRESET_recall(preset.index)
+                
+                try:
+                    yield from self.client.PRESET_recall(preset.index)
+                except qmsk.e2.client.Error as error:
+                    log.error("Preset %s failed: %s", preset, error)
+                    raise
                 
                 active = self.presets.activate_preview(preset)
 
@@ -85,7 +89,11 @@ class Server:
             if transition is not None:
                 log.info("%s: transition %s", active, transition)
 
-                yield from self.client.ATRN(transition)
+                try:
+                    yield from self.client.ATRN(transition)
+                except qmsk.e2.client.Error as error:
+                    log.error("Transition %s failed: %s", transition, error)
+                    raise
                 
                 active = self.presets.activate_program()
             
