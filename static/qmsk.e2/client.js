@@ -26,7 +26,10 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 
 	var ws = $websocket.$new({
 		url: websocketUrl,
-		reconnect: true
+		reconnect: true,
+
+		// workaround https://github.com/wilk/ng-websocket/issues/11
+		protocols: []
 	});
 
     ws.$on('$open', function () {
