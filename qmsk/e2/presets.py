@@ -185,7 +185,7 @@ def load_xml_http (xml_path):
             break
         
         # retry...
-        time.sleep(1.0)
+        time.sleep(2.0)
     
     # XXX: cannot extract a tarfile stream's members in-place
     xml_buf = io.BytesIO(http_file.read())
@@ -211,10 +211,10 @@ def parse_xml (xml_path):
         ]
     
     elif xml_path.endswith('.tar.gz'):
-        xml_settings, xml_presets = load_xml_tar(open(xml_path))
+        xml_settings, xml_presets = load_xml_tar(open(xml_path, 'rb'))
 
     else:
-        raise XMLError("Unown xml path: %s" % (xml_path, ))
+        raise XMLError("Unknown xml path: %s" % (xml_path, ))
 
     # top-level
     if xml_settings:
