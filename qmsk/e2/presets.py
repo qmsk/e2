@@ -3,6 +3,7 @@ import dbm
 import logging; log = logging.getLogger('qmsk.e2.presets')
 import os
 import os.path
+import tarfile
 
 from xml.etree import ElementTree
 
@@ -112,24 +113,60 @@ def parse_xml_presets (xml):
     for xml_preset in xml.findall('Preset'):
         yield parse_xml_preset(xml_preset)
 
-def parse_xml (xml_dir):
+def parse_xml (xml_path):
+    """
+        Yield (type, id, **attrs) loaded from XML tree (path to E2Backup.tar.gz file, or extracted directory tree)
+    """
+
     # settings
-    xml_settings = os.path.join(xml_dir, 'settings_backup.xml')
+    if os.path.isdir(xml_path):
+        xml_presets_path = os.path.join(xml_path, 'presets')
 
-    log.debug("%s", xml_settings)
+        xml_settings_file = open(os.path.join(xml_path, 'settings_backup.xml'))
+        xml_presets_files = [open(os.path.join(xml_presets_path, name)) for name in os.listdir(xml_presets_path)]
+    
+    elif xml_path.endswith('.tar.gz'):
+        xml_file = open(xml_path)
 
-    for item in parse_xml_settings(ElementTree.parse(xml_settings).getroot()):
-        yield item
+        log.info("Load tarfile: %s", xml_path)
+
+        tar = tarfile.open(xml_path)
+
+        xml_settings_file = None
+        xml_presets_files = []
+
+        for path in tar.getnames():
+            parts = os.path.normpath(path).split('/')
+
+            if parts == ['xml', 'settings_backup.xml']:
+                log.info("Load tarfile settings file: %s", path)
+
+                xml_settings_file = tar.extractfile(path)
+                
+            elif parts[0:2] == ['xml', 'presets'] and len(parts) == 3:
+                log.info("Load tarfile preset file: %s", path)
+
+                xml_presets_files.append(tar.extractfile(path))
+
+            else:
+                log.info("Skip tarfile: %s", '/'.join(parts))
+    else:
+        raise XMLError("Unown xml path: %s" % (xml_path, ))
+
+    # top-level
+    if xml_settings_file:
+        log.debug("%s", xml_settings_file)
+
+        for item in parse_xml_settings(ElementTree.parse(xml_settings_file).getroot()):
+            yield item
+    else:
+        raise XMLError("Missing xml_settings.xml file")
     
     # presets
-    xml_presets = os.path.join(xml_dir, 'presets')
+    for xml_preset_file in xml_presets_files:
+        log.debug("%s", xml_preset_file)
 
-    for name in os.listdir(xml_presets):
-        xml_preset = os.path.join(xml_presets, name)
-
-        log.debug("%s", xml_preset)
-
-        for item in parse_xml_presets(ElementTree.parse(xml_preset).getroot()):
+        for item in parse_xml_presets(ElementTree.parse(xml_preset_file).getroot()):
             yield item
 
 class Destination:
@@ -237,10 +274,10 @@ class Presets:
     """
 
     @classmethod
-    def load (cls, xml_dir, db=None):
+    def load (cls, xml_path, db=None):
         data = collections.defaultdict(lambda: collections.defaultdict(list))
     
-        for type, index, item in parse_xml(xml_dir):
+        for type, index, item in parse_xml(xml_path):
             log.debug("%s @ %s = %s", type, index, item)
 
             items = data[type]
@@ -415,13 +452,13 @@ import argparse
 def parser (parser):
     group = parser.add_argument_group("qmsk.e2.presets Options")
     group.add_argument('--e2-presets-xml', metavar='PATH',
-        help="Load presets from XML backup dump directory")
+        help="Load XML presets from E2Backup.tar.gz or extracted dump directory")
     group.add_argument('--e2-presets-db', metavar='PATH',
         help="Store preset state in db")
 
 def apply (args):
     presets = Presets.load(
-        xml_dir     = args.e2_presets_xml,
+        xml_path    = args.e2_presets_xml,
         db          = args.e2_presets_db,
     )
 
