@@ -77,8 +77,16 @@ def parse_xml_preset (xml):
     """
         Parse XML dump <Preset> and return { }
     """
+    
+    preset_sno = xml.find('presetSno')
+    if preset_sno is None:
+        index = 0, (int(xml.attrib['id']) + 1)
+    else:
+        # new major.minor preset ID
+        index_1, index_2 = preset_sno.text.split('.')
 
-    index = int(xml.attrib['id']) + 1
+        index = (int(index_1), int(index_2))
+
     title = xml.find('Name').text
     destinations = []
 
@@ -240,17 +248,31 @@ class Destination:
 
 class Preset:
     """
-        index:int                       E2's internal preset ID
+        _index:(int, int)               E2's internal preset ID
+                                        old presets will use (0, id)
+                                        new ordered presets will use (X, Y) with X > 0
+
         group:Group                     grouped presets
         destinations:[Destination]      Destinations included in this preset
         title:string                    human-readable title
     """
     def __init__ (self, index, group, destinations, *, title):
-        self.index = index
+        self._index = index
         self.group = group
         self.destinations = destinations
 
         self.title = title
+
+    @property
+    def index (self):
+        """
+            Index in string form, as used in the E2
+        """
+
+        if self._index[0] > 0:
+            return '%d.%d' % self._index
+        else:
+            return '%d' % self._index[1]
 
     def __lt__ (self, preset):
         return self.title < preset.title 
@@ -366,8 +388,8 @@ class Presets:
         # state
         self.db = db
         self.db_presets = DB(db,
-                load    = lambda index: self._presets[int(index)],
-                dump    = lambda preset: str(preset.index),
+                load    = lambda index: self._presets[index.decode('ascii')],
+                dump    = lambda preset: preset.index,
         )
 
         self.active = self.db_presets.get('active')
@@ -413,7 +435,8 @@ class Presets:
 
         destinations = [self._destinations[index] for index in destinations]
         
-        preset = self._presets[index] = Preset(index, group=group, destinations=destinations, **item)
+        preset = Preset(index, group=group, destinations=destinations, **item)
+        self._presets[preset.index] = preset # in str format
 
         group._add_preset(preset)
 
