@@ -32,6 +32,9 @@ class E2Client:
         self.stream = stream
 
         self.safe = safe # safe mode
+
+        if self.safe:
+            log.info("Using safe mode")
         
         # only one command at any time
         self.lock = asyncio.Lock()
