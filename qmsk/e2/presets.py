@@ -275,7 +275,8 @@ class Preset:
             return '%d' % self._index[1]
 
     def __lt__ (self, preset):
-        return self.title < preset.title 
+        # sort using index major.minor ordering
+        return self._index < preset._index
 
     def __str__ (self):
         return "{self.title} @ {self.group}".format(self=self)
