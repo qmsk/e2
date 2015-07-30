@@ -6,6 +6,8 @@ import logging; log = logging.getLogger('qmsk.e2.presets')
 import os
 import os.path
 import tarfile
+import time
+import urllib.error
 import urllib.request
 
 from xml.etree import ElementTree
@@ -169,10 +171,13 @@ def load_xml_http (xml_path):
     while True:
         try:
             http_file = urllib.request.urlopen(xml_path)
-        except http.client.BadStatusLine as error:
+        except (http.client.BadStatusLine, urllib.error.HTTPError) as error:
             log.exception("Retry XML from network")
         else:
             break
+        
+        # retry...
+        time.sleep(1.0)
     
     # XXX: cannot extract a tarfile stream's members in-place
     xml_buf = io.BytesIO(http_file.read())
