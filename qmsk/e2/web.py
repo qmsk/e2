@@ -98,7 +98,7 @@ class APIPreset(APIBase):
         """
             Raises werkzeug.exceptions.HTTPException.
 
-                preset: int         - preset from URL
+                preset      preset from URL
         """
 
         if preset:
@@ -142,7 +142,7 @@ class API(qmsk.web.async.Application):
     URLS = qmsk.web.urls.rules({
         '/v1/':                     APIIndex,
         '/v1/preset/':              APIPreset,
-        '/v1/preset/<int:preset>':  APIPreset,
+        '/v1/preset/<preset>':      APIPreset,
     })
 
     def __init__ (self, server):
