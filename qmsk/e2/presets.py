@@ -170,7 +170,7 @@ def load_xml_http (xml_path):
         try:
             http_file = urllib.request.urlopen(xml_path)
         except http.client.BadStatusLine as error:
-            log.warning("Retry XML from network: %s", error)
+            log.exception("Retry XML from network")
         else:
             break
     
