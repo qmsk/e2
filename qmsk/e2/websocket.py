@@ -8,7 +8,7 @@ class WebSocket(autobahn.asyncio.websocket.WebSocketServerProtocol):
     def onConnect(self, request):
         self.peer = request.peer
 
-        log.info("%s: %s", self, request)
+        log.info("%s", self)
 
     def onOpen(self):
         log.info("%s", self)
