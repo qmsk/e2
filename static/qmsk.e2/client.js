@@ -3,9 +3,12 @@ var phonecatApp = angular.module('e2presets', [
 	'ui.bootstrap'
 ]);
 
-var server = document.location.hostname
-var backendUrl = 'http://' + server + ':8081/api/v1/'
-var websocketUrl = 'ws://' + server + ':8082';
+var server = document.location.hostname;
+var apiPort = parseInt(document.location.port);
+var wsPort = apiPort + 1;
+
+var backendUrl = 'http://' + server + ':' + apiPort + '/api/v1/';
+var websocketUrl = 'ws://' + server + ':' + wsPort + '';
 
 phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 
@@ -47,7 +50,7 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 		$http.get(backendUrl)
 			.success(function(data) {
 				$scope.data = data;
-                                $scope.safe = data.safe;
+				$scope.safe = data.safe;
 				$scope.seq = data.seq;
 			}).error(function(err) {
 				$scope.log('error loading preset data');
