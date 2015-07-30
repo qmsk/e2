@@ -1,4 +1,4 @@
-var phonecatApp = angular.module('e2presets', [
+var e2client = angular.module('e2client', [
 	'ngWebsocket',
 	'ui.bootstrap'
 ]);
@@ -10,8 +10,7 @@ var wsPort = apiPort + 1;
 var backendUrl = 'http://' + server + ':' + apiPort + '/api/v1/';
 var websocketUrl = 'ws://' + server + ':' + wsPort + '';
 
-phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
-
+e2client.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 	$scope.base = {};
 	$scope.base.inPreview = null;
 	$scope.status = [];
@@ -23,7 +22,8 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 		console.log(msg, data);
 		$scope.status.unshift({msg: msg, data: data});
 	};
-
+	
+	// Websocket
 	var ws = $websocket.$new({
 		url: websocketUrl,
 		reconnect: true,
@@ -32,63 +32,75 @@ phonecatApp.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 		protocols: []
 	});
 
-    ws.$on('$open', function () {
-        $scope.log('websocket opened');
-        ws.$emit('ping', 'hello');
-        $scope.loadPresets(); // reload to get current seq
-    });
+	ws.$on('$open', function () {
+		$scope.log('websocket opened');
+		ws.$emit('ping', 'hello');
+		$scope.loadPresets(); // reload to get current seq
+	});
 
-    ws.$on('$message', function (data) {
-        $scope.log('websocket data: ', data);
-        $scope.loadPresets();
-    });
+	ws.$on('$message', function (data) {
+		$scope.log('websocket message', data);
+		$scope.loadPresets();
+	});
 
-    ws.$on('$close', function () {
-        $scope.log('websocket closed');
-    });
-
-    var fff = false;
-
+	ws.$on('$close', function () {
+		$scope.log('websocket closed');
+	});
+	
+	// Presets
 	$scope.loadPresets = function() {
+		$scope.log("presets load");
+
 		$http.get(backendUrl)
 			.success(function(data) {
+				$scope.log("presets update", {seq: data.seq, presets_length: Object.keys(data.presets).length});
 				$scope.data = data;
 				$scope.safe = data.safe;
 				$scope.seq = data.seq;
 			}).error(function(err) {
-				$scope.log('error loading preset data');
+				$scope.log('presets error', err);
 			});
 	};
-	$scope.loadPresets();
-
 
 	$scope.clickPreset = function(id) {
+		$scope.log("preset click", {id: id, seq: $scope.seq});
+
 		$http.post(backendUrl + 'preset/' + id, {seq: $scope.seq})
 			.success(function(data) {
-				$scope.log('preset clicked:', data);
+				$scope.log('preset success', data);
+				$scope.seq = data.seq;
 			}).error(function(err) {
-				$scope.log('error when selecting preset');
+				$scope.log('preset error', err);
 				$scope.loadPresets(); // reload to get current seq
 			});
 		return false;
 	};
-
+	
+	// Commands
 	$scope.autotrans = function() {
-		return $scope.setInPgm({autotrans: true, seq: $scope.seq});
+		return $scope.setInPgm({autotrans: true});
 	}
 
 	$scope.cut = function() {
-		return $scope.setInPgm({cut: true, seq: $scope.seq});
+		return $scope.setInPgm({cut: true});
 	}
 
 	$scope.setInPgm = function(data) {
+		data.seq = $scope.seq;
+		
+		$scope.log("transition click", data);
+
 		$http.post(backendUrl + 'preset/', data)
 			.success(function(data) {
-				$scope.log('transition clicked: ', data);
+				$scope.log('transition success', data);
+				$scope.seq = data.seq;
 			}).error(function(err) {
-				$scope.log('error with transition');
+				$scope.log('transition error');
 				$scope.loadPresets(); // reload to get current seq
 			});
 		return false;
 	}
+
+	// Initialize
+	$scope.loadPresets();
 });
