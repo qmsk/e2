@@ -28,6 +28,6 @@ setup(
     data_files  = [
         ('share/static/qmsk.e2', glob('static/qmsk.e2/*')),
         ('share/static', glob('static/index.html')),
-        ('share/bower.json', glob('bower.json')),
+        #('share/bower.json', glob('bower.json')),
     ],
 )
