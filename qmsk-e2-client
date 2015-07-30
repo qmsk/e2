@@ -59,7 +59,7 @@ class Client:
                 else:
                     flag = ""
 
-                print("{flag:1} {preset.index:5d} {preset.group!s:12} {preset.title!s:15} {dests}".format(
+                print("{flag:1} {preset.index!s:5} {preset.group!s:12} {preset.title!s:15} {dests}".format(
                     flag    = flag,
                     preset  = preset,
                     dests   = ' '.join(str(dest) for dest in preset.destinations),
@@ -79,7 +79,7 @@ def main (argv):
 
     parser.add_argument('--list', '-l',     action='store_true',
             help="List presets")
-    parser.add_argument('--preset',         metavar='PRESET', type=int,
+    parser.add_argument('--preset',         metavar='PRESET',
             help="Recall preset")
     parser.add_argument('--cut',            dest='transition', action='store_const', const=0,
             help="Cut transition")
