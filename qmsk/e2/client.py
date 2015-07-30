@@ -48,7 +48,7 @@ class E2Client:
  
         # XXX: implement timeouts to ensure livelyness
         with (yield from self.lock):
-            line = ' '.join([cmd] + [str(arg) for arg in args])
+            line = ' '.join([cmd] + list(args))
 
             log.info("%s: %s", self, line)
             
@@ -85,12 +85,16 @@ class E2Client:
     @asyncio.coroutine
     def PRESET_recall (self, preset):
         """
-            preset:int      0-1000 
+            preset:         int 0-1000, or str '%d.%d'
 
             Raises ValueError, CommandError, qmsk.net.tcp.Error.
         """
 
-        if not isinstance(preset, int):
+        if isinstance(preset, int):
+            preset = '%d' % preset
+        elif all(c in '0123456789.' for c in preset):
+            preset = preset
+        else:
             raise ValueError(preset)
 
         yield from self.cmd('PRESET', '-r', preset, safe=True)
@@ -105,11 +109,10 @@ class E2Client:
        
         if transTime is True:
             yield from self.cmd('ATRN')
+        elif isinstance(transTime, int):
+            yield from self.cmd('ATRN', str(transTime))
         else:
-            if not isinstance(transTime, int):
-                raise ValueError(preset)
-
-            yield from self.cmd('ATRN', transTime)
+            raise ValueError(preset)
 
     def __str__ (self):
         return str(self.stream)
