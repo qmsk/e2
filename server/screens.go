@@ -12,7 +12,7 @@ type Screens struct {
 }
 
 func (screens *Screens) load(client *client.Client) error {
-    apiScreens, err := client.ListScreens()
+    apiScreens, err := client.ListScreenDestinations()
     if err != nil {
         return err
     }
