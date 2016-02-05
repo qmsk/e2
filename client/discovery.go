@@ -11,7 +11,9 @@ const DISCOVERY_PORT = "40961"
 const DISCOVERY_SEND = "\x3f\x00"
 
 type DiscoveryOptions struct {
-    Address         string              `long:"discovery-address" default:"255.255.255.255:40961"`
+    Address         string              `long:"discovery-address" default:""`
+    Interface       string              `long:"discovery-interface"`
+
     Interval        time.Duration       `long:"discovery-interval" default:"10s"`
 }
 
@@ -28,7 +30,17 @@ func (options DiscoveryOptions) Discovery() (*Discovery, error) {
         discovery.udpConn = udpConn
     }
 
-    if options.Address == "" {
+    if options.Address != "" {
+
+    } else if options.Interface != "" {
+        if ip, err := lookupInterfaceBroadcast(options.Interface); err != nil {
+            return nil, err
+        } else {
+            options.Address = ip.String()
+
+            log.Printf("Discovery: using interface %v broadcast address: %v\n", options.Interface, options.Address)
+        }
+    } else {
         options.Address = DISCOVERY_ADDR
     }
 
