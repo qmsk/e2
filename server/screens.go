@@ -77,8 +77,8 @@ func (self Screen) String() string {
 type ScreenState struct {
     Screen
 
-    Program     []string        `json:"program_sources"`
-    Preview     []string        `json:"preview_sources"`
+    ProgramSources  []string        `json:"program_sources"`
+    PreviewSources  []string        `json:"preview_sources"`
 }
 
 func (screenState *ScreenState) load(client *client.Client) error {
@@ -93,10 +93,10 @@ func (screenState *ScreenState) load(client *client.Client) error {
         }
 
         if layer.PgmMode > 0 {
-            screenState.Program = append(screenState.Program, fmt.Sprintf("%d", layer.LastSrcIdx))
+            screenState.ProgramSources = append(screenState.ProgramSources, fmt.Sprintf("%d", layer.LastSrcIdx))
         }
         if layer.PvwMode > 0 {
-            screenState.Preview = append(screenState.Preview, fmt.Sprintf("%d", layer.LastSrcIdx))
+            screenState.PreviewSources = append(screenState.PreviewSources, fmt.Sprintf("%d", layer.LastSrcIdx))
         }
     }
 
