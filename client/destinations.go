@@ -48,6 +48,23 @@ func (client *Client) ListDestinations() (result ListDestinations, err error) {
     }
 }
 
+func (client *Client) ListScreens() ([]ScreenDestination, error) {
+    var result ListDestinations
+
+    request := Request{
+        Method:     "listDestinations",
+        Params:     listDestinations{
+            Type:           listDestinationsTypeScreen,
+        },
+    }
+
+    if err := client.doResult(&request, &result); err != nil {
+        return nil, err
+    } else {
+        return result.ScreenDestinations, nil
+    }
+}
+
 // Screen Content
 type listContent struct {
     ID      int     `json:"id"`
