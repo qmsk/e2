@@ -15,7 +15,7 @@ func init() {
 func (cmd *ScreenList) Execute(args []string) error {
     if client, err := options.ClientOptions.Client(); err != nil {
         return err
-    } else if screenDestinations, err := client.ScreenDestinations(); err != nil {
+    } else if screenDestinations, err := client.ListScreenDestinations(); err != nil {
         return err
     } else {
         fmt.Printf("%-8s %s\n", "Screen", "Name")

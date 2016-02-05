@@ -15,7 +15,7 @@ func init() {
 func (cmd *AuxList) Execute(args []string) error {
     if client, err := options.ClientOptions.Client(); err != nil {
         return err
-    } else if auxDestinations, err := client.AuxDestinations(); err != nil {
+    } else if auxDestinations, err := client.ListAuxDestinations(); err != nil {
         return err
     } else {
         fmt.Printf("%-8s %s\n", "Aux", "Name")

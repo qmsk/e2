@@ -1,21 +1,35 @@
 package main
 
 import (
+    "github.com/qmsk/e2/client"
     "fmt"
 )
 
-type ShowScreen struct {
+type ScreenShow struct {
     ID      int     `long:"screen-id" required:"true"`
 }
 
 func init() {
-    parser.AddCommand("show-screen", "Show screen content", "", &ShowScreen{})
+    parser.AddCommand("screen-show", "Show screen content", "", &ScreenShow{})
 }
 
-func (cmd *ShowScreen) Execute(args []string) error {
-    if client, err := options.ClientOptions.Client(); err != nil {
+func (cmd *ScreenShow) Execute(args []string) error {
+    c, err := options.ClientOptions.Client()
+    if err != nil {
         return err
-    } else if content, err := client.ListContent(cmd.ID); err != nil {
+    }
+
+    sourceMap := make(map[int]client.Source)
+
+    if sourceList, err := c.ListSources(); err != nil {
+        return err
+    } else {
+        for _, source := range sourceList {
+            sourceMap[source.ID] = source
+        }
+    }
+
+    if content, err := c.ListContent(cmd.ID); err != nil {
         return err
     } else {
         fmt.Printf("Screen %d: %s\n", content.ID, content.Name)
@@ -37,8 +51,8 @@ func (cmd *ShowScreen) Execute(args []string) error {
 
             if layer.LastSrcIdx < 0 {
 
-            } else if source, err := client.Source(layer.LastSrcIdx); err != nil {
-                fmt.Printf("\t\tSource %d: error=%v\n", layer.LastSrcIdx, err)
+            } else if source, found := sourceMap[layer.LastSrcIdx]; !found {
+                fmt.Printf("\t\tSource %d: \n", layer.LastSrcIdx)
             } else {
                 fmt.Printf("\t\tSource %d: name=%v\n", layer.LastSrcIdx, source.Name)
             }
