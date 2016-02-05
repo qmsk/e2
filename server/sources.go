@@ -29,8 +29,8 @@ func (sources *Sources) load(client *client.Client) error {
             },
         }
 
-        if apiSource.InputCfgIndex >= 0 {
-            source.Status = apiSource.InputVideoStatus.String()
+        if source.Type == "input" {
+            source.InputStatus = apiSource.InputVideoStatus.String()
         }
 
         sources.sourceMap[source.String()] = source
@@ -55,7 +55,7 @@ type Source struct {
     ID          int         `json:"id"`
     Name        string      `json:"name"`
     Type        string      `json:"type"`
-    Status      string      `json:"status,omitempty"`
+    InputStatus string      `json:"input_status,omitempty"`
     Dimensions  Dimensions  `json:"dimensions"`
 }
 
