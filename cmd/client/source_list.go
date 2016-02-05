@@ -4,15 +4,15 @@ import (
     "fmt"
 )
 
-type ListSources struct {
+type SourceList struct {
 
 }
 
 func init() {
-    parser.AddCommand("list-sources", "List sources", "", &ListSources{})
+    parser.AddCommand("source-list", "List sources", "", &SourceList{})
 }
 
-func (cmd *ListSources) Execute(args []string) error {
+func (cmd *SourceList) Execute(args []string) error {
     if client, err := options.ClientOptions.Client(); err != nil {
         return err
     } else if sourceList, err := client.Sources(); err != nil {
