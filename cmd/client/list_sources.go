@@ -18,7 +18,7 @@ func (cmd *ListSources) Execute(args []string) error {
     } else if sourceList, err := client.ListSources(); err != nil {
         return err
     } else {
-        fmt.Printf("%8s %-8s %-20s %s\n", "Type", "ID", "Name", "Status")
+        fmt.Printf("%8s %-8s %-20s %s\n", "ID", "Type", "Name", "Status")
 
         for _, source := range sourceList {
             status := ""
@@ -27,7 +27,7 @@ func (cmd *ListSources) Execute(args []string) error {
                 status = fmt.Sprintf("size=%4dx%-4d video=%-8v", source.HSize, source.VSize, source.InputVideoStatus)
             }
 
-            fmt.Printf("%8v %-8d %-20s %s\n", source.Type, source.ID, source.Name, status)
+            fmt.Printf("%8d %-8v %-20s %s\n", source.ID, source.Type, source.Name, status)
         }
     }
 
