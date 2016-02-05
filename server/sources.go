@@ -20,10 +20,12 @@ func (sources *Sources) update() error {
     sources.sourceMap = make(map[string]Source)
 
     for _, source := range clientSources {
-        sources.sourceMap[fmt.Sprintf("%d", source.ID)] = Source{
-            id:     source.ID,
+        source := Source{
+            ID:     source.ID,
             Name:   source.Name,
         }
+
+        sources.sourceMap[source.String()] = source
     }
 
     return nil
@@ -48,8 +50,12 @@ func (sources *Sources) Get() (interface{}, error) {
 }
 
 type Source struct {
-    id          int
+    ID          int         `json:"id"`
     Name        string      `json:"name"`
+}
+
+func (source Source) String() string {
+    return fmt.Sprintf("%d", source.ID)
 }
 
 func (source Source) Get() (interface{}, error) {
