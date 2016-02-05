@@ -15,21 +15,27 @@ func (options Options) Server(clientClient *client.Client) (*Server, error) {
         sources:    Sources{
             client:         clientClient,
         },
+        screens:    Screens{
+            client:         clientClient,
+        },
     }
 
     return server, nil
 }
 
 type Server struct {
-    client  *client.Client
+    client      *client.Client
 
-    sources Sources
+    sources     Sources
+    screens     Screens
 }
 
 func (server *Server) Index(name string) (apiResource, error) {
     switch name {
     case "sources":
         return &server.sources, nil
+    case "screens":
+        return &server.screens, nil
     default:
         return nil, nil
     }
