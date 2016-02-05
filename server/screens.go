@@ -11,7 +11,7 @@ type Screens struct {
     screenMap   map[string]Screen
 }
 
-func (screens *Screens) update() error {
+func (screens *Screens) load() error {
     apiScreens, err := screens.client.ListScreens()
     if err != nil {
         return err
@@ -39,7 +39,7 @@ func (screens *Screens) update() error {
 }
 
 func (screens *Screens) Get() (interface{}, error) {
-    if err := screens.update(); err != nil {
+    if err := screens.load(); err != nil {
         return nil, err
     } else {
         return screens.screenMap, nil
@@ -53,7 +53,7 @@ func (screens *Screens) Index(name string) (apiResource, error) {
         return nil, err
     }
 
-    if err := screenState.update(screens.client); err != nil {
+    if err := screenState.load(screens.client); err != nil {
         return screenState, err
     }
 
@@ -82,7 +82,7 @@ func (self ScreenState) String() string {
     return fmt.Sprintf("%d", self.ID)
 }
 
-func (screenState *ScreenState) update(client *client.Client) error {
+func (screenState *ScreenState) load(client *client.Client) error {
     screenContent, err := client.ListContent(screenState.ID)
     if err != nil {
         return err

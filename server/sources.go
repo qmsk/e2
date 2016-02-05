@@ -11,7 +11,7 @@ type Sources struct {
     sourceMap   map[string]Source
 }
 
-func (sources *Sources) update() error {
+func (sources *Sources) load() error {
     clientSources, err := sources.client.ListSources()
     if err != nil {
         return err
@@ -42,14 +42,14 @@ func (sources *Sources) update() error {
 }
 
 func (sources *Sources) Index(name string) (apiResource, error) {
-    if err := sources.update(); err != nil  {
+    if err := sources.load(); err != nil  {
         panic(err)
     } else if source, found := sources.sourceMap[name]; !found {
         return nil, nil
     } else {
         sourceState := SourceState{Source: source}
 
-        if err := sourceState.update(sources.client); err != nil {
+        if err := sourceState.load(sources.client); err != nil {
             panic(err)
         }
 
@@ -58,7 +58,7 @@ func (sources *Sources) Index(name string) (apiResource, error) {
 }
 
 func (sources *Sources) Get() (interface{}, error) {
-    if err := sources.update(); err != nil {
+    if err := sources.load(); err != nil {
         return nil, err
     } else {
        return sources.sourceMap, nil
@@ -89,7 +89,7 @@ type SourceState struct {
 }
 
 // XXX: expensive
-func (sourceState *SourceState) update(client *client.Client) error {
+func (sourceState *SourceState) load(client *client.Client) error {
     listDestinations, err := client.ListDestinations()
     if err != nil {
         return err
