@@ -7,12 +7,15 @@ import (
 type SourceType int
 
 const SourceTypeInput       SourceType  = 0
+const SourceTypeStill       SourceType  = 1
 const SourceTypeDest        SourceType  = 2
 
 func (sourceType SourceType) String() string {
     switch sourceType {
     case SourceTypeInput:
         return "input"
+    case SourceTypeStill:
+        return "still"
     case SourceTypeDest:
         return "dest"
     default:
