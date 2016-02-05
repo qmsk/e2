@@ -22,12 +22,20 @@ func (cmd *ShowPreset) Execute(args []string) error {
 
         fmt.Printf("Aux Destinations: %d\n", len(preset.AuxDest))
         for _, auxDest := range preset.AuxDest {
-            fmt.Printf("\tAux %d\n", auxDest.ID)
+            if aux, err := client.AuxDestination(auxDest.ID); err != nil {
+                fmt.Printf("\tAux %d: error=%v\n", auxDest.ID, err)
+            } else {
+                fmt.Printf("\tAux %d: name=%v\n", auxDest.ID, aux.Name)
+            }
         }
 
         fmt.Printf("Screen Destinations: %d\n", len(preset.ScreenDest))
         for _, screenDest := range preset.ScreenDest {
-            fmt.Printf("\tScreen %d\n", screenDest.ID)
+            if screen, err := client.ScreenDestination(screenDest.ID); err != nil {
+                fmt.Printf("\tScreen %d: error=%v\n", screenDest.ID, err)
+            } else {
+                fmt.Printf("\tScreen %d: name=%v\n", screenDest.ID, screen.Name)
+            }
         }
     }
 
