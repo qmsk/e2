@@ -10,6 +10,7 @@ static/bower_components/
 qmsk_e2.egg-info/
 dist/
 
+bin/
 etc/
 opt/
 var/
