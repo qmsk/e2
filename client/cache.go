@@ -44,6 +44,7 @@ func (cacheMap *cacheMap) applyMap(updateMap cacheMap) {
     *cacheMap = updateMap
 }
 
+// Update cache set from `[]cacheObject`
 func (self *cacheMap) apply(set interface{}) {
     setValue := reflect.ValueOf(set)
 

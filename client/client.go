@@ -45,22 +45,13 @@ type Client struct {
     screenCache         cacheMap
 }
 
-func (client *Client) updateSources() error {
-    if sources, err := client.ListSources(); err != nil {
-        return err
+func (client *Client) getSources() (cacheMap, error) {
+    if client.sourceCache != nil {
+
+    } else if sources, err := client.ListSources(); err != nil {
+        return nil, err
     } else {
         client.sourceCache.apply(sources)
-    }
-
-    return nil
-}
-
-func (client *Client) getSources() (cacheMap, error) {
-    if client.sourceCache == nil {
-        // TODO: invalidate
-        if err := client.updateSources(); err != nil {
-            return nil, err
-        }
     }
 
     return client.sourceCache, nil
@@ -101,11 +92,10 @@ func (client *Client) updateDestinations() error {
 }
 
 func (client *Client) getAuxes() (cacheMap, error) {
-    if client.auxCache == nil {
+    if client.auxCache != nil {
         // TODO: invalidate
-        if err := client.updateDestinations(); err != nil {
-            return nil, err
-        }
+    } else if err := client.updateDestinations(); err != nil {
+        return nil, err
     }
 
     return client.auxCache, nil
@@ -134,11 +124,10 @@ func (client *Client) AuxDestination(id int) (ret AuxDestination, err error) {
 }
 
 func (client *Client) getScreens() (cacheMap, error) {
-    if client.screenCache == nil {
+    if client.screenCache != nil {
         // TODO: invalidate
-        if err := client.updateDestinations(); err != nil {
-            return nil, err
-        }
+    } else if err := client.updateDestinations(); err != nil {
+        return nil, err
     }
 
     return client.screenCache, nil
