@@ -46,12 +46,12 @@ type Source struct {
     VSize           int         `json:"VSize"`
     Type            SourceType  `json:"SrcType"`
 
-    InputCfgIndex   int         `json:"InputCfgIndex"`
+    InputCfgIndex   int         `json:"InputCfgIndex"`                      // -1 unless Type == SourceTypeInput
+    StillIndex      int         `json:"StillIndex"`                         // -1 unless Type == SourceTypeStill
+    DestIndex       int         `json:"DestIndex"`                          // -1 unless Type == SourceTypeDest
     UserKeyIndex    int         `json:"UserKeyIndex"`
-    StillIndex      int         `json:"StillIndex"`
-    DestIndex       int         `json:"DestIndex"`
 
-    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus"`    // 0 unless InputCfgIndex >= 0
+    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus"`    // 0 unless Type == SourceTypeInput
 }
 
 type listSources struct {
