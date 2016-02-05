@@ -42,5 +42,16 @@ func (server *Server) Index(name string) (apiResource, error) {
 }
 
 func (server *Server) Get() (interface{}, error) {
-    return "Hello World", nil
+    index := Index{}
+
+    if err := index.loadSources(&server.sources); err != nil {
+        return index, err
+    }
+
+    if err := index.loadScreens(&server.screens); err != nil {
+        return index, err
+    }
+
+    return index, nil
+
 }
