@@ -23,6 +23,11 @@ func (screens *Screens) update() error {
         screen := Screen{
             ID:     apiScreen.ID,
             Name:   apiScreen.Name,
+
+            Dimensions: Dimensions{
+                Width:      apiScreen.HSize,
+                Height:     apiScreen.VSize,
+            },
         }
 
         screenMap[screen.String()] = screen
@@ -56,8 +61,9 @@ func (screens *Screens) Index(name string) (apiResource, error) {
 }
 
 type Screen struct {
-    ID          int     `json:"id"`
-    Name        string  `json:"name"`
+    ID          int         `json:"id"`
+    Name        string      `json:"name"`
+    Dimensions  Dimensions  `json:"dimensions"`
 }
 
 func (self Screen) String() string {

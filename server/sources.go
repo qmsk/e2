@@ -24,6 +24,11 @@ func (sources *Sources) update() error {
             ID:     apiSource.ID,
             Name:   apiSource.Name,
             Type:   apiSource.Type.String(),
+
+            Dimensions: Dimensions{
+                Width:      apiSource.HSize,
+                Height:     apiSource.VSize,
+            },
         }
 
         if apiSource.InputCfgIndex >= 0 {
@@ -65,6 +70,7 @@ type Source struct {
     Name        string      `json:"name"`
     Type        string      `json:"type"`
     Status      string      `json:"status,omitempty"`
+    Dimensions  Dimensions  `json:"dimensions"`
 }
 
 func (source Source) String() string {
