@@ -44,7 +44,24 @@ func (client *Client) ListDestinations() (result ListDestinations, err error) {
     }
 }
 
-func (client *Client) ListScreens() ([]ScreenDestination, error) {
+func (client *Client) ListAuxDestinations() ([]AuxDestination, error) {
+    var result ListDestinations
+
+    request := Request{
+        Method:     "listDestinations",
+        Params:     listDestinations{
+            Type:           listDestinationsTypeAux,
+        },
+    }
+
+    if err := client.doResult(&request, &result); err != nil {
+        return nil, err
+    } else {
+        return result.AuxDestinations, nil
+    }
+}
+
+func (client *Client) ListScreenDestinations() ([]ScreenDestination, error) {
     var result ListDestinations
 
     request := Request{
