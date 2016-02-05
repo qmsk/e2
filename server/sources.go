@@ -6,13 +6,11 @@ import (
 )
 
 type Sources struct {
-    client      *client.Client
-
     sourceMap   map[string]Source
 }
 
-func (sources *Sources) load() error {
-    clientSources, err := sources.client.ListSources()
+func (sources *Sources) load(client *client.Client) error {
+    clientSources, err := client.ListSources()
     if err != nil {
         return err
     }
@@ -42,9 +40,7 @@ func (sources *Sources) load() error {
 }
 
 func (sources *Sources) Index(name string) (apiResource, error) {
-    if err := sources.load(); err != nil  {
-        panic(err)
-    } else if source, found := sources.sourceMap[name]; !found {
+    if source, found := sources.sourceMap[name]; !found {
         return nil, nil
     } else {
         return source, nil
@@ -52,11 +48,7 @@ func (sources *Sources) Index(name string) (apiResource, error) {
 }
 
 func (sources *Sources) Get() (interface{}, error) {
-    if err := sources.load(); err != nil {
-        return nil, err
-    } else {
-       return sources.sourceMap, nil
-    }
+   return sources.sourceMap, nil
 }
 
 type Source struct {

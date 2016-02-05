@@ -1,32 +1,32 @@
 package server
 
+import (
+    "github.com/qmsk/e2/client"
+)
+
 type Index struct {
-    sources     map[string]Source
+    sources     Sources
+    screens     Screens
+
     Screens     map[string]ScreenState  `json:"screens"`
 
     // built in Get()
     Sources     map[string]SourceState  `json:"sources"`
 }
 
-func (index *Index) loadSources(sources *Sources) error {
-    if err := sources.load(); err != nil {
+func (index *Index) load(client *client.Client) error {
+    if err := index.sources.load(client); err != nil {
         return err
     }
 
-    index.sources = sources.sourceMap
-
-    return nil
-}
-
-func (index *Index) loadScreens(screens *Screens) error {
-    if err := screens.load(); err != nil {
+    if err := index.screens.load(client); err != nil {
         return err
     }
 
     index.Screens = make(map[string]ScreenState)
 
-    for _, screen := range screens.screenMap {
-        if screenState, err := screen.state(screens.client); err != nil {
+    for _, screen := range index.screens.screenMap {
+        if screenState, err := screen.loadState(client); err != nil {
             return err
         } else {
             index.Screens[screenState.String()] = screenState
@@ -39,7 +39,7 @@ func (index *Index) loadScreens(screens *Screens) error {
 func (index Index) Get() (interface{}, error) {
     index.Sources = make(map[string]SourceState)
 
-    for sourceName, source := range index.sources {
+    for sourceName, source := range index.sources.sourceMap {
         index.Sources[sourceName] = source.buildState(index.Screens)
     }
 

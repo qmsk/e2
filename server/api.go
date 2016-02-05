@@ -7,55 +7,93 @@ import (
     "strings"
 )
 
+type apiError struct {
+    Status      int
+    Err         error
+}
+
+func (err apiError) Error() string {
+    if err.Err == nil {
+        return fmt.Sprintf("HTTP %d", err.Status)
+    } else {
+        return fmt.Sprintf("%v", err.Err)
+    }
+}
+
 type apiResource interface{}
 
+// apiResource that supports sub-resources
 type apiIndex interface {
-    // TODO: apiError instead of panic()
     Index(name string) (apiResource, error)
 }
 
+// apiResource that supports GET
 type apiGET interface {
+    // Perform any independent post-processing + JSON encoding in the request handler goroutine.
+    // Must be goroutine-safe!
     Get() (interface{}, error)
 }
 
-func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    path := strings.Split(r.URL.Path, "/")
-
+func (server *Server) apiLookup(path string) (apiResource, error) {
     // lookup from root
     var resource apiResource
 
     resource = server
 
-    for _, name := range path {
-        if name == "" {
-            continue
-        }
-
+    for _, name := range strings.Split(path, "/") {
         if indexResource, ok := resource.(apiIndex); !ok {
-           w.WriteHeader(http.StatusNotFound)
+            return resource, apiError{http.StatusNotFound, nil}
         } else if nextResource, err := indexResource.Index(name); err != nil {
-            w.WriteHeader(http.StatusBadRequest)
-            fmt.Fprintf(w, "%v\n", err)
+            return resource, err
+        } else if nextResource == nil {
+            return nil, apiError{http.StatusNotFound, nil}
         } else {
             resource = nextResource
-            continue
         }
-
-        return
     }
+
+    return resource, nil
+}
+
+func (server *Server) apiGet(path string) (apiGET, error) {
+    if resource, err := server.apiLookup(path); err != nil {
+        return nil, err
+    } else if getResource, ok := resource.(apiGET); !ok {
+        return nil, apiError{http.StatusMethodNotAllowed, nil}
+    } else {
+        return getResource, nil
+    }
+}
+
+func (server *Server) apiHandler(w http.ResponseWriter, r *http.Request) error {
+    path := r.URL.Path
 
     switch r.Method {
     case "GET":
-        if apiGET, ok := resource.(apiGET); !ok {
-            w.WriteHeader(http.StatusMethodNotAllowed)
-        } else if ret, err := apiGET.Get(); err != nil {
-            w.WriteHeader(http.StatusInternalServerError)
+        if getResource, err := server.apiGet(path); err != nil {
+            return err
+        } else if ret, err := getResource.Get(); err != nil {
+            return err
         } else if ret == nil {
-            w.WriteHeader(http.StatusNotFound)
+            return apiError{http.StatusNotFound, nil}
         } else {
             json.NewEncoder(w).Encode(ret)
+
+            return nil
         }
     default:
-        w.WriteHeader(http.StatusNotImplemented)
+        return apiError{http.StatusNotImplemented, nil}
+    }
+}
+
+func (server *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    if err := server.apiHandler(w, r); err == nil {
+
+    } else if apiError, ok := err.(apiError); !ok {
+        http.Error(w, err.Error(), 500)
+    } else if apiError.Err != nil {
+        http.Error(w, apiError.Err.Error(), apiError.Status)
+    } else {
+        http.Error(w, "", apiError.Status)
     }
 }

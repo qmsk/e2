@@ -11,8 +11,8 @@ type Screens struct {
     screenMap   map[string]Screen
 }
 
-func (screens *Screens) load() error {
-    apiScreens, err := screens.client.ListScreens()
+func (screens *Screens) load(client *client.Client) error {
+    apiScreens, err := client.ListScreens()
     if err != nil {
         return err
     }
@@ -39,19 +39,13 @@ func (screens *Screens) load() error {
 }
 
 func (screens *Screens) Get() (interface{}, error) {
-    if err := screens.load(); err != nil {
-        return nil, err
-    } else {
-        return screens.screenMap, nil
-    }
+    return screens.screenMap, nil
 }
 
 func (screens *Screens) Index(name string) (apiResource, error) {
-    if err := screens.load(); err != nil {
-        return nil, err
-    } else if screen, found := screens.screenMap[name]; !found {
+    if screen, found := screens.screenMap[name]; !found {
         return nil, nil
-    } else if screenState, err := screen.state(screens.client); err != nil {
+    } else if screenState, err := screen.loadState(screens.client); err != nil {
         return screenState, err
     } else {
         return screenState, nil
@@ -64,7 +58,7 @@ type Screen struct {
     Dimensions  Dimensions  `json:"dimensions"`
 }
 
-func (screen Screen) state(client *client.Client) (ScreenState, error) {
+func (screen Screen) loadState(client *client.Client) (ScreenState, error) {
     screenState := ScreenState{Screen: screen}
 
     return screenState, screenState.load(client)
