@@ -6,8 +6,6 @@ type AuxDestination struct {
     AuxStreamMode   int     `json:"AuxStreamMode"`
 }
 
-func (self AuxDestination) cacheID() int { return self.ID }
-
 type ScreenDestination struct {
     ID      int     `json:"id"`
     Name    string  `json:"name"`
@@ -17,8 +15,6 @@ type ScreenDestination struct {
 
     // DestOutMapCol
 }
-
-func (self ScreenDestination) cacheID() int { return self.ID }
 
 type listDestinations struct {
     Type    int     `json:"type"`

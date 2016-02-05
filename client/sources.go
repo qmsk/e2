@@ -51,8 +51,6 @@ type Source struct {
     InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus"`    // 0 unless InputCfgIndex >= 0
 }
 
-func (self Source) cacheID() int { return self.ID }
-
 type listSources struct {
     Type            int         `json:"type"`
 }

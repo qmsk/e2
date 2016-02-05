@@ -11,8 +11,6 @@ type Preset struct {
     Seq         float64 `json:"presetSno"`
 }
 
-func (self Preset) cacheID() int { return self.ID }
-
 // Filtering
 const listPresetsExclude = -2
 const listPresetsInclude = -1
