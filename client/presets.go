@@ -1,5 +1,9 @@
 package client
 
+import (
+    "fmt"
+)
+
 type Preset struct {
     ID          int     `json:"id"`
     Name        string  `json:"Name"`
@@ -46,4 +50,40 @@ func (client *Client) ListPresetsX(screenID int, auxID int) (presetList []Preset
     }
 }
 
+// Preset Destinations
+type PresetAuxDest struct {
+    ID      int     `json:"id"`
+}
+type PresetScreenDest struct {
+    ID      int     `json:"id"`
+}
 
+type PresetDestinations struct {
+    Preset
+
+    AuxDest     []PresetAuxDest     `json:"AuxDest"`
+    ScreenDest  []PresetScreenDest  `json:"ScreenDest"`
+}
+
+type listDestinationsForPreset struct {
+    ID      int     `json:"id"`
+}
+
+func (client *Client) ListDestinationsForPreset(presetID int) (result PresetDestinations, err error) {
+    if presetID < 0 {
+        return result, fmt.Errorf("Invalid Preset ID: %v", presetID)
+    }
+
+    request := Request{
+        Method:     "listDestinationsForPreset",
+        Params:     listDestinationsForPreset{
+            ID:     presetID,
+        },
+    }
+
+    if err := client.doResult(&request, &result); err != nil {
+        return result, err
+    } else {
+        return result, nil
+    }
+}

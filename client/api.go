@@ -24,6 +24,7 @@ func (client *Client) doResult(request *Request, data interface{}) error {
 
     //log.Printf("success=%v: %#v\n", result.Success, result.Response)
 
+    // TODO: decode as json.RawMessage to decode error string..
     if result.Success != 0 {
         return fmt.Errorf("Nonzero response: success=%v", result.Success)
     }
