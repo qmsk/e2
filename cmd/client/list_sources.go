@@ -18,10 +18,16 @@ func (cmd *ListSources) Execute(args []string) error {
     } else if sourceList, err := client.ListSources(); err != nil {
         return err
     } else {
-        fmt.Printf("%8s %-8s %s\n", "Type", "ID", "Name")
+        fmt.Printf("%8s %-8s %-20s %s\n", "Type", "ID", "Name", "Status")
 
         for _, source := range sourceList {
-            fmt.Printf("%8v %-8d %s\n", source.Type, source.ID, source.Name)
+            status := ""
+
+            if source.InputCfgIndex >= 0 {
+                status = fmt.Sprintf("size=%4dx%-4d video=%-8v", source.HSize, source.VSize, source.InputVideoStatus)
+            }
+
+            fmt.Printf("%8v %-8d %-20s %s\n", source.Type, source.ID, source.Name, status)
         }
     }
 
