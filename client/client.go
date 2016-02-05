@@ -3,7 +3,6 @@ package client
 import (
     "fmt"
     "net/http"
-    "log"
     "time"
 )
 
@@ -41,27 +40,12 @@ type Client struct {
     seq             int
 
     // internal state
-    sources         map[int]Source
-}
-
-func (client *Client) updateNew(class string, id int, value interface{}) {
-    log.Printf("New %s %d: %v\n", class, id, value)
-}
-
-func (client *Client) updateChange(class string, id int, value interface{}) {
-    log.Printf("Update %s %d: %v\n", class, id, value)
-}
-
-func (client *Client) updateRemove(class string, id int, value interface{}) {
-    log.Printf("Remove %s %d: %v\n", class, id, value)
+    sourceCache         cacheMap
+    auxCache            cacheMap
+    screenCache         cacheMap
 }
 
 func (client *Client) updateSources() error {
-    // TODO: invalidate
-    if client.sources != nil {
-        return nil
-    }
-
     // list
     sources, err := client.ListSources()
     if err != nil {
@@ -69,50 +53,136 @@ func (client *Client) updateSources() error {
     }
 
     // map
-    sourceMap := make(map[int]Source)
+    updateMap := make(cacheMap)
 
     for _, source := range sources {
-        sourceMap[source.ID] = source
+        updateMap[source.ID] = source
     }
 
-    // diff
-    for sourceID, source := range sourceMap {
-        if prev, exists := client.sources[sourceID]; !exists {
-            client.updateNew("source", sourceID, source)
-        } else if source != prev {
-            client.updateChange("source", sourceID, source)
-        }
-    }
-
-    for sourceID, source := range client.sources {
-        if _, exists := sourceMap[sourceID]; !exists {
-            client.updateRemove("source", sourceID, source)
-        }
-    }
-
-    client.sources = sourceMap
+    client.sourceCache.apply("source", updateMap)
 
     return nil
 }
 
+func (client *Client) getSources() (cacheMap, error) {
+    if client.sourceCache == nil {
+        // TODO: invalidate
+        if err := client.updateSources(); err != nil {
+            return nil, err
+        }
+    }
+
+    return client.sourceCache, nil
+}
+
 func (client *Client) Sources() (sources []Source, err error) {
-    if err := client.updateSources(); err != nil {
+    if cacheMap, err := client.getSources(); err != nil {
         return nil, err
-    }
+    } else {
+        for _, value := range cacheMap {
+            sources = append(sources, value.(Source))
+        }
 
-    for _, source := range client.sources {
-        sources = append(sources, source)
+        return sources, nil
     }
-
-    return
 }
 
 func (client *Client) Source(id int) (Source, error) {
-    if err := client.updateSources(); err != nil {
+    if cacheMap, err := client.getSources(); err != nil {
         return Source{}, err
-    } else if source, exists := client.sources[id]; !exists {
-        return source, NotFound{id}
+    } else if value, exists := cacheMap[id]; !exists {
+        return Source{}, NotFound{id}
     } else {
-        return source, nil
+        return value.(Source), nil
+    }
+}
+
+func (client *Client) updateDestinations() error {
+    // list
+    listDestinations, err := client.ListDestinations()
+    if err != nil {
+        return err
+    }
+
+    // map
+    auxMap := make(cacheMap)
+    screenMap := make(cacheMap)
+
+    for _, auxDestination := range listDestinations.AuxDestination {
+        auxMap[auxDestination.ID] = auxDestination
+    }
+    for _, screenDestination := range listDestinations.ScreenDestination {
+        screenMap[screenDestination.ID] = screenDestination
+    }
+
+    client.auxCache.apply("aux", auxMap)
+    client.screenCache.apply("screen", screenMap)
+
+    return nil
+}
+
+func (client *Client) getAuxes() (cacheMap, error) {
+    if client.auxCache == nil {
+        // TODO: invalidate
+        if err := client.updateDestinations(); err != nil {
+            return nil, err
+        }
+    }
+
+    return client.auxCache, nil
+}
+
+func (client *Client) AuxDestinations() (items []AuxDestination, err error) {
+    if cacheMap, err := client.getAuxes(); err != nil {
+        return nil, err
+    } else {
+        for _, value := range cacheMap {
+            items = append(items, value.(AuxDestination))
+        }
+
+        return items, nil
+    }
+}
+
+func (client *Client) AuxDestination(id int) (ret AuxDestination, err error) {
+    if cacheMap, err := client.getAuxes(); err != nil {
+        return ret, err
+    } else if value, exists := cacheMap[id]; !exists {
+        return ret, NotFound{id}
+    } else {
+        return value.(AuxDestination), nil
+    }
+}
+
+func (client *Client) getScreens() (cacheMap, error) {
+    if client.screenCache == nil {
+        // TODO: invalidate
+        if err := client.updateDestinations(); err != nil {
+            return nil, err
+        }
+    }
+
+    return client.screenCache, nil
+}
+
+func (client *Client) ScreenDestinations() (items []ScreenDestination, err error) {
+    if cacheMap, err := client.getScreens(); err != nil {
+        return nil, err
+    } else {
+        for _, value := range cacheMap {
+            items = append(items, value.(ScreenDestination))
+        }
+
+        return items, nil
+    }
+}
+
+func (client *Client) ScreenDestination(id int) (ret ScreenDestination, err error) {
+    if cacheMap, err := client.getScreens(); err != nil {
+        return ret, err
+    } else if value, exists := cacheMap[id]; !exists {
+        return ret, NotFound{id}
+    } else {
+        return value.(ScreenDestination), nil
     }
 }
