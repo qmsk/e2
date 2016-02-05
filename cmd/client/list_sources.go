@@ -15,7 +15,7 @@ func init() {
 func (cmd *ListSources) Execute(args []string) error {
     if client, err := options.ClientOptions.Client(); err != nil {
         return err
-    } else if sourceList, err := client.ListSources(); err != nil {
+    } else if sourceList, err := client.Sources(); err != nil {
         return err
     } else {
         fmt.Printf("%8s %-8s %-20s %s\n", "ID", "Type", "Name", "Status")

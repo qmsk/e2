@@ -33,7 +33,15 @@ func (cmd *ShowScreen) Execute(args []string) error {
 
         fmt.Printf("Layers: %d\n", len(content.Layers))
         for _, layer := range content.Layers {
-            fmt.Printf("\tLayer %d: pgm=%v pvw=%d source=%d\n", layer.ID, layer.PgmMode, layer.PvwMode, layer.LastSrcIdx)
+            fmt.Printf("\tLayer %d: pgm=%v pvw=%d\n", layer.ID, layer.PgmMode, layer.PvwMode)
+
+            if layer.LastSrcIdx < 0 {
+
+            } else if source, err := client.Source(layer.LastSrcIdx); err != nil {
+                fmt.Printf("\t\tSource %d: error=%v\n", layer.LastSrcIdx, err)
+            } else {
+                fmt.Printf("\t\tSource %d: name=%v\n", layer.LastSrcIdx, source.Name)
+            }
         }
     }
 
