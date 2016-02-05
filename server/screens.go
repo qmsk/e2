@@ -42,19 +42,17 @@ func (screens *Screens) Get() (interface{}, error) {
 }
 
 func (screens *Screens) Index(name string) (apiResource, error) {
-    if err := screens.update(); err != nil {
-        panic(err)
-    } else if screen, found := screens.screenMap[name]; !found {
-        return nil, nil
-    } else {
-        screenState := ScreenState{Screen: screen}
+    var screenState ScreenState
 
-        if err := screenState.update(screens.client); err != nil {
-            return screenState, err
-        }
-
-        return screenState, nil
+    if _, err := fmt.Sscanf(name, "%d", &screenState.ID); err != nil {
+        return nil, err
     }
+
+    if err := screenState.update(screens.client); err != nil {
+        return screenState, err
+    }
+
+    return screenState, nil
 }
 
 type Screen struct {
@@ -67,10 +65,15 @@ func (self Screen) String() string {
 }
 
 type ScreenState struct {
-    Screen
+    ID          int             `json:"id"`
+    Name        string          `json:"name"`
 
     Program     []string        `json:"program"`
     Preview     []string        `json:"preview`
+}
+
+func (self ScreenState) String() string {
+    return fmt.Sprintf("%d", self.ID)
 }
 
 func (screenState *ScreenState) update(client *client.Client) error {
@@ -78,6 +81,8 @@ func (screenState *ScreenState) update(client *client.Client) error {
     if err != nil {
         return err
     }
+
+    screenState.Name = screenContent.Name
 
     for _, layer := range screenContent.Layers {
         if layer.LastSrcIdx <0 {

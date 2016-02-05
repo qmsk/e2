@@ -82,6 +82,7 @@ type SourceState struct {
     Preview     []string        `json:"preview,omitempty"`
 }
 
+// XXX: expensive
 func (sourceState *SourceState) update(client *client.Client) error {
     listDestinations, err := client.ListDestinations()
     if err != nil {
