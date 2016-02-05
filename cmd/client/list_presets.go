@@ -2,7 +2,6 @@ package main
 
 import (
     "fmt"
-    "log"
 )
 
 type ListPresets struct {
@@ -14,8 +13,6 @@ func init() {
 }
 
 func (cmd *ListPresets) Execute(args []string) error {
-    log.Printf("list-presets: %v\n", args)
-
     if client, err := options.ClientOptions.Client(); err != nil {
         return err
     } else if presets, err := client.ListPresets(); err != nil {
