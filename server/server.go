@@ -52,6 +52,5 @@ func (server *Server) Get() (interface{}, error) {
         return index, err
     }
 
-    return index, nil
-
+    return index.Get()
 }

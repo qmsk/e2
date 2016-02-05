@@ -47,13 +47,7 @@ func (sources *Sources) Index(name string) (apiResource, error) {
     } else if source, found := sources.sourceMap[name]; !found {
         return nil, nil
     } else {
-        sourceState := SourceState{Source: source}
-
-        if err := sourceState.load(sources.client); err != nil {
-            panic(err)
-        }
-
-        return sourceState, nil
+        return source, nil
     }
 }
 
@@ -81,41 +75,31 @@ func (source Source) Get() (interface{}, error) {
     return source, nil
 }
 
+func (source Source) buildState(screens map[string]ScreenState) SourceState {
+    sourceState := SourceState{Source: source}
+
+    for screenName, screenState := range screens {
+        for _, sourceName := range screenState.ProgramSources {
+            if sourceName == source.String() {
+                sourceState.ProgramScreens = append(sourceState.ProgramScreens, screenName)
+            }
+        }
+        for _, sourceName := range screenState.PreviewSources {
+            if sourceName == source.String() {
+                sourceState.PreviewScreens = append(sourceState.PreviewScreens, screenName)
+            }
+        }
+    }
+
+    return sourceState
+}
+
+
 type SourceState struct {
     Source
 
-    Program     []string        `json:"program,omitempty"`
-    Preview     []string        `json:"preview,omitempty"`
-}
-
-// XXX: expensive
-func (sourceState *SourceState) load(client *client.Client) error {
-    listDestinations, err := client.ListDestinations()
-    if err != nil {
-        return err
-    }
-
-    for _, screenDest := range listDestinations.ScreenDestinations {
-        screenContent, err := client.ListContent(screenDest.ID)
-        if err != nil {
-            return err
-        }
-
-        for _, layer := range screenContent.Layers {
-            if layer.LastSrcIdx != sourceState.ID {
-                continue
-            }
-
-            if layer.PgmMode > 0 {
-                sourceState.Program = append(sourceState.Program, fmt.Sprintf("%d", screenDest.ID))
-            }
-            if layer.PvwMode > 0 {
-                sourceState.Preview = append(sourceState.Preview, fmt.Sprintf("%d", screenDest.ID))
-            }
-        }
-    }
-
-    return nil
+    ProgramScreens      []string        `json:"program_screens,omitempty"`
+    PreviewScreens      []string        `json:"preview_screens,omitempty"`
 }
 
 func (source SourceState) Get() (interface{}, error) {

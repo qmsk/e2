@@ -1,8 +1,11 @@
 package server
 
 type Index struct {
-    Sources     map[string]Source       `json:"sources"`
+    sources     map[string]Source
     Screens     map[string]ScreenState  `json:"screens"`
+
+    // built in Get()
+    Sources     map[string]SourceState  `json:"sources"`
 }
 
 func (index *Index) loadSources(sources *Sources) error {
@@ -10,7 +13,7 @@ func (index *Index) loadSources(sources *Sources) error {
         return err
     }
 
-    index.Sources = sources.sourceMap
+    index.sources = sources.sourceMap
 
     return nil
 }
@@ -34,5 +37,11 @@ func (index *Index) loadScreens(screens *Screens) error {
 }
 
 func (index Index) Get() (interface{}, error) {
+    index.Sources = make(map[string]SourceState)
+
+    for sourceName, source := range index.sources {
+        index.Sources[sourceName] = source.buildState(index.Screens)
+    }
+
     return index, nil
 }
