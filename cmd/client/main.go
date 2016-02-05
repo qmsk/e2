@@ -3,7 +3,6 @@ package main
 import (
     "github.com/qmsk/e2/client"
     "github.com/jessevdk/go-flags"
-    "fmt"
     "log"
 )
 
