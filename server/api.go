@@ -10,6 +10,7 @@ import (
 type apiResource interface{}
 
 type apiIndex interface {
+    // TODO: apiError instead of panic()
     Index(name string) (apiResource, error)
 }
 
