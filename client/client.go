@@ -84,8 +84,8 @@ func (client *Client) updateDestinations() error {
     if listDestinations, err := client.ListDestinations(); err != nil {
         return err
     } else {
-        client.auxCache.apply(listDestinations.AuxDestination)
-        client.screenCache.apply(listDestinations.ScreenDestination)
+        client.auxCache.apply(listDestinations.AuxDestinations)
+        client.screenCache.apply(listDestinations.ScreenDestinations)
 
         return nil
     }

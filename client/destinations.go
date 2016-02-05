@@ -29,8 +29,8 @@ const listDestinationsTypeScreen    = 1
 const listDestinationsTypeAux       = 2
 
 type ListDestinations struct {
-    AuxDestination          []AuxDestination        `json:"AuxDestination"`
-    ScreenDestination       []ScreenDestination     `json:"ScreenDestination"`
+    AuxDestinations         []AuxDestination        `json:"AuxDestination"`
+    ScreenDestinations      []ScreenDestination     `json:"ScreenDestination"`
 }
 
 func (client *Client) ListDestinations() (result ListDestinations, err error) {

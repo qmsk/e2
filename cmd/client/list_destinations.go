@@ -20,10 +20,10 @@ func (cmd *ListDestinations) Execute(args []string) error {
     } else {
         fmt.Printf("%8s %-8s %s\n", "Type", "ID", "Name")
 
-        for _, screenDestination := range listDestinations.ScreenDestination {
+        for _, screenDestination := range listDestinations.ScreenDestinations {
             fmt.Printf("%8s %-8d %s\n", "Screen", screenDestination.ID, screenDestination.Name)
         }
-        for _, auxDestination := range listDestinations.AuxDestination {
+        for _, auxDestination := range listDestinations.AuxDestinations {
             fmt.Printf("%8s %-8d %s\n", "Aux", auxDestination.ID, auxDestination.Name)
         }
     }
