@@ -46,20 +46,11 @@ type Client struct {
 }
 
 func (client *Client) updateSources() error {
-    // list
-    sources, err := client.ListSources()
-    if err != nil {
+    if sources, err := client.ListSources(); err != nil {
         return err
+    } else {
+        client.sourceCache.apply(sources)
     }
-
-    // map
-    updateMap := make(cacheMap)
-
-    for _, source := range sources {
-        updateMap[source.ID] = source
-    }
-
-    client.sourceCache.apply("source", updateMap)
 
     return nil
 }
@@ -99,26 +90,14 @@ func (client *Client) Source(id int) (Source, error) {
 
 func (client *Client) updateDestinations() error {
     // list
-    listDestinations, err := client.ListDestinations()
-    if err != nil {
+    if listDestinations, err := client.ListDestinations(); err != nil {
         return err
+    } else {
+        client.auxCache.apply(listDestinations.AuxDestination)
+        client.screenCache.apply(listDestinations.ScreenDestination)
+
+        return nil
     }
-
-    // map
-    auxMap := make(cacheMap)
-    screenMap := make(cacheMap)
-
-    for _, auxDestination := range listDestinations.AuxDestination {
-        auxMap[auxDestination.ID] = auxDestination
-    }
-    for _, screenDestination := range listDestinations.ScreenDestination {
-        screenMap[screenDestination.ID] = screenDestination
-    }
-
-    client.auxCache.apply("aux", auxMap)
-    client.screenCache.apply("screen", screenMap)
-
-    return nil
 }
 
 func (client *Client) getAuxes() (cacheMap, error) {
