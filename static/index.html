@@ -19,6 +19,7 @@
         <script src="bower_components/angular-resource/angular-resource.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-websocket/angular-websocket.js"></script>
+        <script src="bower_components/angular-scroll-glue/src/scrollglue.js"></script>
         
         <!-- qmsk.e2 -->
         <link rel="stylesheet" href="qmsk.e2/app.css">
@@ -63,8 +64,14 @@
 
         <div id="view" ng-view></div>
             
-        <div id="status">
-            <div ng-repeat="stat in status">{{stat.msg}} {{stat.data}}</div>
+        <div id="status" ng-controller="StatusCtrl" scroll-glue>
+            <div class="event" ng-repeat="event in events.events">{{event.line}}</div>
+            <div class="state" ng-class="{'open': events.open, 'error': events.error}">
+                WebSocket 
+                <span ng-if="!events.open">Closed</span>
+                <span ng-if="events.open">Open</span>
+                <span ng-if="events.error">Error: {{events.error}}</span>
+            </div>
         </div>
     </body>
 

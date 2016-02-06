@@ -65,14 +65,14 @@ body {
     padding: 0px;
 
     /* space for bottom status */
-    margin-bottom: 3em;
+    margin-bottom: 5em;
 }
 
 #status {
     position: fixed;
     bottom: 0px;
     width: 100%;
-    height: 3em;
+    height: 5em;
 
     padding: 0.2em 0.5em;
     
@@ -85,6 +85,21 @@ body {
 
 #status div {
     margin: 0;
+}
+
+#status .state {
+    float: right;
+    text-align: right;
+    
+    color: #888888;
+}
+
+#status .state.open {
+    color: #88ff88;
+}
+
+#status .state.error {
+    color: #ff4444;
 }
 
 /* XXX: customized styles */
