@@ -51,6 +51,11 @@ func (server *Server) Index(name string) (apiResource, error) {
 
         return &auxes, auxes.load(server.client)
 
+    case "presets":
+        presets := Presets{}
+
+        return &presets, presets.load(server.client)
+
     default:
         return nil, nil
     }
