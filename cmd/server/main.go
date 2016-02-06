@@ -45,9 +45,9 @@ func main() {
     http.Handle("/api/", http.StripPrefix("/api/", server))
 
     if options.HTTPStatic != "" {
-        log.Printf("Serve /static from %v\n", options.HTTPStatic)
+        log.Printf("Serve / from %v\n", options.HTTPStatic)
 
-        http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(options.HTTPStatic))))
+        http.Handle("/", http.FileServer(http.Dir(options.HTTPStatic)))
     }
 
     if options.HTTPListen == "" {

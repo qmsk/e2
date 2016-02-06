@@ -7,7 +7,7 @@ angular.module('qmsk.e2', [
 .config(function($routeProvider) {
     $routeProvider
         .when('/screens', {
-            templateUrl: '/static/qmsk.e2/screens.html',
+            templateUrl: 'qmsk.e2/screens.html',
             controller: 'ScreensCtrl',
         })
         .otherwise({
