@@ -26,6 +26,12 @@ func (server *Server) Index(name string) (apiResource, error) {
         index := Index{}
 
         return &index, index.load(server.client)
+    case "status":
+        status := Status{
+            client: server.client,
+        }
+
+        return &status, nil
 
     case "sources":
         sources := Sources{}
