@@ -21,6 +21,7 @@ angular.module('qmsk.e2.source', [
         restrict: 'AE',
         scope: {
             source: '=source',
+            detail: '=detail',
         },
         templateUrl: 'qmsk.e2/source/source.html',
     }

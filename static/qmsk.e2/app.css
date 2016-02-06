@@ -112,6 +112,12 @@ table.table tbody tr {
     border-radius: 4px;
 }
 
+/* Fix glyphicon label vertical alignment with text */
+.screen .label,
+.source .label {
+    font-size: inherit;
+}
+
 .inactive {
     background-color: #aaa;
     
