@@ -1,0 +1,9 @@
+<span class="pull-left label label-success" ng-if="source.type == 'input' && source.input_status == 'ok'"><span class="glyphicon glyphicon-ok" title="OK"></span></span>
+<span class="pull-left label label-danger" ng-if="source.type == 'input' && source.input_status == 'bad'"><span class="glyphicon glyphicon-warning-sign" title="Bad"></span></span>
+<span class="pull-left label label-primary" ng-if="source.type == 'dest'"><span class="glyphicon glyphicon-log-out" title="Screen"></span></span>
+<span class="pull-left label label-primary" ng-if="source.type == 'still'"><span class="glyphicon glyphicon-picture" title="Still"></span></span>
+
+<span>{{source.name}}</span>
+
+<span class="label label-info pull-right resolution">{{source.dimensions|dimensions}}</span>
+

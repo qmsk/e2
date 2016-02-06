@@ -1,4 +1,5 @@
 angular.module('qmsk.e2', [
+        'qmsk.e2.source',
         'ngResource',
         'ngRoute',
         'ngWebSocket',
@@ -57,20 +58,6 @@ angular.module('qmsk.e2', [
             Status.onError
         );
     };
-})
-
-.factory('Source', function($resource, Status) {
-    return $resource('/api/sources/:id', { }, {
-        get: {
-            method: 'GET',
-            interceptor:    Status.httpInterceptor,
-        },
-        query: {
-            method: 'GET',
-            isArray: false,
-            interceptor:    Status.httpInterceptor,
-        }
-    }, {stripTrailingSlashes: true});
 })
 
 .factory('Screen', function($resource, Status) {
