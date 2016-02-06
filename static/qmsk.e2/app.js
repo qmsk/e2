@@ -1,11 +1,16 @@
 angular.module('qmsk.e2', [
+        'ngResource',
         'ngRoute',
-	    'angular-websocket',
+        'ngWebSocket',
 	    'ui.bootstrap'
 ])
 
 .config(function($routeProvider) {
     $routeProvider
+        .when('/sources', {
+            templateUrl: 'qmsk.e2/sources.html',
+            controller: 'SourcesCtrl',
+        })
         .when('/screens', {
             templateUrl: 'qmsk.e2/screens.html',
             controller: 'ScreensCtrl',
@@ -15,6 +20,30 @@ angular.module('qmsk.e2', [
         });
 })
 
+.factory('Source', function($resource) {
+    return $resource('/api/sources/:id', { }, {
+        get: {
+            method: 'GET',
+        },
+        query: {
+            method: 'GET',
+            isArray: false, // XXX
+        }
+    }, {stripTrailingSlashes: true});
+})
+
+.factory('Screen', function($resource) {
+    return $resource('/api/screens/:id', { }, {
+        get: {
+            method: 'GET',
+        },
+        query: {
+            method: 'GET',
+            isArray: false, // XXX
+        }
+    }, {stripTrailingSlashes: true});
+})
+
 .controller('HeaderCtrl', function($scope, $location) {
     $scope.safe = false;
 
@@ -22,13 +51,12 @@ angular.module('qmsk.e2', [
         return $location.path().startsWith(prefix);
     };
 })
+.controller('SourcesCtrl', function($scope, Source) {
+    $scope.sources = Source.query();
+})
 
-.controller('ScreensCtrl', function($scope) {
-    $scope.screens = {
-        "0": {
-            name:   "test"
-        }
-    };
+.controller('ScreensCtrl', function($scope, Screen) {
+    $scope.screens = Screen.query();
 })
 
 ;

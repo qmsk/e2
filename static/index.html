@@ -10,14 +10,14 @@
 
         <!-- Bootstrap -->
         <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
 
         <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         
         <!-- Angular -->
         <script src="bower_components/angular/angular.js"></script>
-        <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script src="bower_components/angular-resource/angular-resource.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-websocket/angular-websocket.js"></script>
         
         <!-- qmsk.e2 -->
@@ -36,6 +36,9 @@
                 </div>
 
                 <ul class="nav navbar-nav">
+                    <li ng-class="{'active': isActive('/sources')}">
+                        <a href="#/sources">Sources</a>
+                    </li>
                     <li ng-class="{'active': isActive('/screens')}">
                         <a href="#/screens">Screens</a>
                     </li>

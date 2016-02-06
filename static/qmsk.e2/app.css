@@ -21,6 +21,11 @@ body {
     font-size: x-large;
 }
 
+#header a:hover,
+#header a:focus {
+    background-color: #446644;
+}
+
 #header .active a {
     font-weight: bold;
 }
@@ -63,8 +68,9 @@ body {
     margin: 0;
 }
 
-/* Content */
-button {
+/* XXX: customized styles */
+button,
+.list-group-item {
     margin: 1em;
     padding: 0.5em;
 
