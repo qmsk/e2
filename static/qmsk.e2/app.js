@@ -126,12 +126,17 @@ angular.module('qmsk.e2', [
     return $resource('/api/presets/:id', { }, {
         get: {
             method: 'GET',
+            url: '/api/presets',
+        },
+        all: {
+            method: 'GET',
+            isArray: true,
         },
         query: {
             method: 'GET',
             isArray: false,
         }
-    }, {stripTrailingSlashes: true});
+    }, {stripTrailingSlashes: false});
 })
 
 .factory('Events', function($location, $websocket, $rootScope) {
@@ -271,11 +276,14 @@ angular.module('qmsk.e2', [
     $scope.auxes = Aux.query();
 })
 
-.controller('PresetsCtrl', function($scope, Preset) {
+.controller('PresetsCtrl', function($scope, Preset, Screen, Aux) {
     $scope.collapseGroups = { };
+
+    $scope.screens = Screen.query();
+    $scope.auxes = Aux.query();
     
     // group
-    $scope.presets = Preset.query(function (presets) {
+    $scope.presets = Preset.all(function (presets) {
         var groups = { };
 
         $.each(presets, function(id, preset) {

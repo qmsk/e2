@@ -22,6 +22,13 @@
         <div ng-show="!collapseGroups[group.id]">
             <button type="button" class="preset" ng-repeat="preset in group.presets">
                 {{preset.name}}
+
+                <div ng-repeat="aux_id in preset.auxe">
+                    <span class="dest">{{auxes[aux_id].name}}</span>
+                </div>
+                <div ng-repeat="screen_id in preset.screens">
+                    <span class="dest">{{screens[screen_id].name}}</span>
+                </div>
             </button>
         </div>
     </div>
