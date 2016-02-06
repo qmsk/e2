@@ -48,7 +48,7 @@ func (client *Client) do(request *Request, response *Response) error {
     }
 
     // request
-    httpRequest, err := http.NewRequest("POST", client.url.String(), &requestBuffer)
+    httpRequest, err := http.NewRequest("POST", client.rpcURL.String(), &requestBuffer)
     if err != nil {
         return err
     }

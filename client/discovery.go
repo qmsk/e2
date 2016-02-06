@@ -9,7 +9,7 @@ import (
 // If there is no URL given, use Discovery to find any E2 systems.
 // Returns a new Options for the first E2 found.
 func (options Options) DiscoverClient(discoveryOptions discovery.Options) (Options, error) {
-    if !options.URL.Empty() {
+    if options.Address != "" {
         return options, nil
     } else if discovery, err := discoveryOptions.Discovery(); err != nil {
         return options, err
@@ -19,9 +19,9 @@ func (options Options) DiscoverClient(discoveryOptions discovery.Options) (Optio
         log.Printf("Discovering systems on %v...\n", discovery)
 
         for packet := range discovery.Run() {
-            options.URL = makeURL(packet.IP)
+            options.Address = packet.IP.String()
 
-            log.Printf("Discovered system: %v\n", options.URL)
+            log.Printf("Discovered system: %v\n", options.Address)
 
             return options, nil
         }
