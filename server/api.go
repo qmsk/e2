@@ -77,6 +77,8 @@ func (server *Server) apiHandler(w http.ResponseWriter, r *http.Request) error {
         } else if ret == nil {
             return apiError{http.StatusNotFound, nil}
         } else {
+            w.Header().Set("Content-Type", "application/json")
+
             json.NewEncoder(w).Encode(ret)
 
             return nil
