@@ -83,7 +83,7 @@
 
 /* Styles for Landscape screen */
 @media all and (orientation:landscape) {
-    #view {
+    #presets {
         margin-right: 20%;
     }
 
@@ -105,8 +105,6 @@
 /* Styles for Portrait screen */
 @media all and (orientation:portrait) {
     #tools {
-        position: fixed;
-        top: 0px;
         width: 100%;
         height: 150px;
     }
@@ -115,9 +113,5 @@
         display: inline;
         float: left;
         margin: 0.2em 0.5em;
-    }
-    
-    #header {
-        margin-top: 150px;
     }
 }
