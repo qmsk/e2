@@ -1,12 +1,12 @@
 package main
 
 import (
-    "github.com/qmsk/e2/client"
+    "github.com/qmsk/e2/discovery"
     "fmt"
 )
 
 type Discover struct {
-    DiscoveryOptions        client.DiscoveryOptions
+    DiscoveryOptions        discovery.Options
 }
 
 func init() {
