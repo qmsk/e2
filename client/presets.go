@@ -8,7 +8,7 @@ type Preset struct {
     ID          int     `json:"id"`
     Name        string  `json:"Name"`
     LockMode    int     `json:"LockMode"`
-    Seq         float64 `json:"presetSno"`
+    Sno         float64 `json:"presetSno"`
 }
 
 // Filtering

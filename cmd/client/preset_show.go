@@ -5,15 +5,15 @@ import (
     "fmt"
 )
 
-type ShowPreset struct {
+type PresetShow struct {
     ID      int     `long:"preset-id" required:"true"`
 }
 
 func init() {
-    parser.AddCommand("show-preset", "Show preset destinations", "", &ShowPreset{})
+    parser.AddCommand("preset-show", "Show preset destinations", "", &PresetShow{})
 }
 
-func (cmd *ShowPreset) Execute(args []string) error {
+func (cmd *PresetShow) Execute(args []string) error {
     c, err := options.ClientOptions.Client()
     if err != nil {
         return err
