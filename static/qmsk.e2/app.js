@@ -20,26 +20,63 @@ angular.module('qmsk.e2', [
         });
 })
 
-.factory('Source', function($resource) {
+.factory('Status', function($http) {
+    var Status = {};
+
+    // Used as a $http.get(...).then(..., Status.onError)
+    Status.onError = function(r){
+        Status.mode = 'error'
+        Status.error = r;
+    }
+    Status.httpInterceptor = {
+        responseError: Status.onError,
+    };
+
+    $http.get('/api/status').then(
+        function success(r) {
+            Status.error = null
+            Status.server = r.data.server;
+            Status.mode = r.data.mode;
+        },
+        Status.onError
+    );
+
+    return Status;
+})
+
+.factory('Index', function($http, Status) {
+    return $http.get('/api/').then(
+        function success(r) {
+            return r.data;
+        },
+        Status.onError
+    );
+})
+
+.factory('Source', function($resource, Status) {
     return $resource('/api/sources/:id', { }, {
         get: {
             method: 'GET',
+            interceptor:    Status.httpInterceptor,
         },
         query: {
             method: 'GET',
-            isArray: false, // XXX
+            isArray: false,
+            interceptor:    Status.httpInterceptor,
         }
     }, {stripTrailingSlashes: true});
 })
 
-.factory('Screen', function($resource) {
+.factory('Screen', function($resource, Status) {
     return $resource('/api/screens/:id', { }, {
         get: {
             method: 'GET',
+            interceptor:    Status.httpInterceptor,
         },
         query: {
             method: 'GET',
-            isArray: false, // XXX
+            isArray: false,
+            interceptor:    Status.httpInterceptor,
         }
     }, {stripTrailingSlashes: true});
 })
@@ -50,8 +87,9 @@ angular.module('qmsk.e2', [
     };
 })
 
-.controller('HeaderCtrl', function($scope, $location) {
+.controller('HeaderCtrl', function($scope, $location, Status) {
     $scope.safe = false;
+    $scope.status = Status
 
     $scope.isActive = function(prefix) {
         return $location.path().startsWith(prefix);

@@ -4,11 +4,17 @@ body {
 
 #header {
     margin: 0;
-    background-color: #448844;
+    background-color: #888888;
 }
 
+#header.live {
+    background-color: #448844;
+}
 #header.safe {
     background-color: #aaaa44;
+}
+#header.error {
+    background-color: #884444;
 }
 
 #header.navbar {
@@ -30,15 +36,20 @@ body {
     font-weight: bold;
 }
 
-#header .safe-mode {
-     color: #884444;
-     font-size: x-large;
-     text-decoration: blink;
+#header .navbar-text {
+    font-size: large;
+}
+     
+#header .live .navbar-text {
+    color: #000000;
 }
 
-#header .safe-mode {
+#header .safe .navbar-text {
      color: #444488;
-     font-size: x-large;
+}
+
+#header .error .navbar-text {
+
 }
 
 /* View */
