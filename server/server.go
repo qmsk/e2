@@ -52,7 +52,9 @@ func (server *Server) Index(name string) (apiResource, error) {
         return &auxes, auxes.load(server.client)
 
     case "presets":
-        presets := Presets{}
+        presets := Presets{
+            client:     server.client,
+        }
 
         return &presets, presets.load(server.client)
 

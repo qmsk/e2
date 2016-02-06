@@ -6,6 +6,8 @@ import (
 )
 
 type Presets struct {
+    client      *client.Client
+
     presetMap   map[string]Preset
 }
 
@@ -41,11 +43,32 @@ func (presets *Presets) Get() (interface{}, error) {
 }
 
 func (presets *Presets) Index(name string) (apiResource, error) {
-    if preset, found := presets.presetMap[name]; !found {
+    if name == "" {
+        var presetStates PresetStates
+
+        for _, preset := range presets.presetMap {
+            if presetState, err := preset.loadState(presets.client); err != nil {
+                return nil, err
+            } else {
+                presetStates = append(presetStates, presetState)
+            }
+        }
+
+        return presetStates, nil
+
+    } else if preset, found := presets.presetMap[name]; !found {
         return nil, nil
+    } else if presetState, err := preset.loadState(presets.client); err != nil {
+        return presetState, err
     } else {
-        return preset, nil
+        return presetState, nil
     }
+}
+
+type PresetStates []PresetState
+
+func (presetStates PresetStates) Get() (interface{}, error) {
+    return presetStates, nil
 }
 
 type Preset struct {
@@ -65,4 +88,41 @@ func (preset Preset) String() string {
 
 func (preset Preset) Get() (interface{}, error) {
     return preset, nil
+}
+
+func (preset Preset) loadState(client *client.Client) (PresetState, error) {
+    presetState := PresetState{Preset: preset}
+
+    return presetState, presetState.load(client)
+}
+
+type PresetState struct {
+    Preset
+
+    Screens     []string        `json:"screens"`
+    Auxes       []string        `json:"auxes"`
+}
+
+func (presetState *PresetState) load(client *client.Client) error {
+    if presetDestinations, err := client.ListDestinationsForPreset(presetState.ID); err != nil {
+        return err
+    } else {
+        for _, auxDest := range presetDestinations.AuxDest {
+            auxID := fmt.Sprintf("%d", auxDest.ID)
+
+            presetState.Auxes = append(presetState.Auxes, auxID)
+        }
+
+        for _, screenDest := range presetDestinations.ScreenDest {
+            screenID := fmt.Sprintf("%d", screenDest.ID)
+
+            presetState.Screens = append(presetState.Screens, screenID)
+        }
+
+        return nil
+    }
+}
+
+func (presetState PresetState) Get() (interface{}, error) {
+    return presetState, nil
 }
