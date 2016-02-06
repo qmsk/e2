@@ -7,6 +7,10 @@ angular.module('qmsk.e2', [
 
 .config(function($routeProvider) {
     $routeProvider
+        .when('/main', {
+            templateUrl: 'qmsk.e2/main.html',
+            controller: 'MainCtrl',
+        })
         .when('/sources', {
             templateUrl: 'qmsk.e2/sources.html',
             controller: 'SourcesCtrl',
@@ -16,7 +20,7 @@ angular.module('qmsk.e2', [
             controller: 'ScreensCtrl',
         })
         .otherwise({
-            redirectTo: '/screens',
+            redirectTo: '/main',
         });
 })
 
@@ -45,12 +49,14 @@ angular.module('qmsk.e2', [
 })
 
 .factory('Index', function($http, Status) {
-    return $http.get('/api/').then(
-        function success(r) {
-            return r.data;
-        },
-        Status.onError
-    );
+    return function() {
+        return $http.get('/api/').then(
+            function success(r) {
+                return r.data;
+            },
+            Status.onError
+        );
+    };
 })
 
 .factory('Source', function($resource, Status) {
@@ -95,6 +101,13 @@ angular.module('qmsk.e2', [
         return $location.path().startsWith(prefix);
     };
 })
+
+.controller('MainCtrl', function($scope, Index) {
+    Index().then(function success(index) {
+        $scope.index = index;
+    });
+})
+
 .controller('SourcesCtrl', function($scope, Source) {
     $scope.sources = Source.query();
 })

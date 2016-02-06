@@ -1,0 +1,24 @@
+<div id="main">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Source</th>
+                <th>Preview</th>
+                <th>Program</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="source in index.sources">
+                <td>
+                    <div class="source">{{source.name}}</div>
+                </td>
+                <td>
+                    <div ng-repeat="screen in source.preview_screens" class="screen preview">{{index.screens[screen].name}}</div>
+                </td>
+                <td>
+                    <div ng-repeat="screen in source.program_screens" class="screen program">{{index.screens[screen].name}}</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
