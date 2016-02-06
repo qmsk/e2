@@ -90,7 +90,16 @@ angular.module('qmsk.e2', [
     };
 })
 
-.controller('MainCtrl', function($scope, $location, Index) {
+.controller('MainCtrl', function($scope, $location, Index, $interval) {
+    $scope.reload = function() {
+        Index().then(function success(index) {
+            $scope.screens = index.screens
+            $scope.sources = $.map(index.sources, function(source, id){
+                return source;
+            });
+        });
+    };
+
     $scope.selectOrder = function(order) {
         $scope.order = order;
         $scope.orderBy = function(){
@@ -98,9 +107,9 @@ angular.module('qmsk.e2', [
             case 'source':
                 return ['-type', 'name'];
             case 'preview':
-                return ['preview_screens'];
+                return ['preview_screens', 'program_screens'];
             case 'program':
-                return ['program_screens'];
+                return ['program_screens', 'preview_screens'];
             default:
                 return [];
             }
@@ -110,14 +119,21 @@ angular.module('qmsk.e2', [
     };
     $scope.selectOrder($location.search().order);
 
-    $scope.reload = function() {
-        Index().then(function success(index) {
-            $scope.screens = index.screens
-            $scope.sources = $.map(index.sources, function(source, id){
-                return source;
-            });
-        });
+    $scope.selectRefresh = function(refresh) {
+        $scope.refresh = refresh;
+
+        if ($scope.refreshTimer) {
+            $interval.cancel($scope.refreshTimer);
+            $scope.refreshTimer = null;
+        }
+
+        if (refresh) {
+            $scope.refreshTimer = $interval($scope.reload, refresh * 1000);
+        }
+
+        $location.search('refresh', refresh || '');
     };
+    $scope.selectRefresh($location.search().refresh);
 
     $scope.reload();
 })
