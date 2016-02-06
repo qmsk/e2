@@ -9,8 +9,12 @@ import (
 )
 
 type xmlPacket struct {
+    XMLName     xml.Name    `xml:"System"`
+
     ID          int         `xml:"id,attr"`
-    GUID        string      `xml:"GuiId"`
+    GUID        *string     `xml:"GuiId"`
+    Type        *int        `xml:"XMLType"`
+    Resp        *int        `xml:"Resp"`
 
     // SrcMgr
     DestMgr     *DestMgr    `xml:"DestMgr"`
@@ -52,45 +56,73 @@ func (client *Client) xmlClient() (*xmlClient, error) {
     return &xmlClient, nil
 }
 
-func (xmlClient *xmlClient) read() (*xmlPacket, error) {
-    var packet xmlPacket
+func (xmlClient *xmlClient) read(packet *xmlPacket) error {
+    // applies to the complete XML packet read by the decoder..?
+    if err := xmlClient.conn.SetReadDeadline(time.Now().Add(xmlClient.timeout)); err != nil {
+        return err
+    }
 
-    if err := xml.NewDecoder(xmlClient.conn).Decode(&packet); err != nil {
-        return nil, err
+    if err := xml.NewDecoder(xmlClient.conn).Decode(packet); err != nil {
+        return err
     } else {
-        return &packet, nil
+        return nil
     }
 }
 
-func (xmlClient *xmlClient) write(packet *xmlPacket) error {
+func (xmlClient *xmlClient) write(packet xmlPacket) error {
+    if err := xmlClient.conn.SetWriteDeadline(time.Now().Add(xmlClient.timeout)); err != nil {
+        return err
+    }
+
     return xml.NewEncoder(xmlClient.conn).Encode(packet)
+}
+
+func (xmlClient *xmlClient) writePing() error {
+    return xmlClient.write(xmlPacket{})
 }
 
 func (xmlClient *xmlClient) reader() {
     defer close(xmlClient.readChan)
 
     for {
-        if packet, err := xmlClient.read(); err != nil {
+        var packet xmlPacket
+
+        if err := xmlClient.read(&packet); err != nil {
             log.Printf("xmlClient.read: %v\n", err)
             return
         } else {
-            xmlClient.readChan <- *packet
+            xmlClient.readChan <- packet
         }
     }
 }
 
 func (xmlClient *xmlClient) run() {
+    if xmlClient.listenChan != nil {
+        defer close(xmlClient.listenChan)
+    }
     timer := time.NewTimer(xmlClient.timeout / 2)
 
     for {
         select {
         case <-timer.C:
-            // TODO: ping
+            if err := xmlClient.writePing(); err != nil {
+                log.Printf("xmlClient.write: %v\n", err)
+                return
+            }
 
-        case xmlPacket := <-xmlClient.readChan:
+            // fast-ping
+            timer.Reset(xmlClient.timeout / 8)
+
+        case xmlPacket, ok := <-xmlClient.readChan:
+            if !ok {
+                return
+            }
+
             timer.Reset(xmlClient.timeout / 2)
 
-            xmlClient.listenChan <- xmlPacket
+            if xmlClient.listenChan != nil {
+                xmlClient.listenChan <- xmlPacket
+            }
         }
     }
 }

@@ -80,6 +80,7 @@ func (event ScreenLayerEvent) String() string {
 type ScreenTransitionEvent struct {
     ScreenID        int
 
+    // Done if !InProgress
     InProgress      bool
     Auto            bool
 }
@@ -97,6 +98,8 @@ type Event interface {
 }
 
 func (client *Client) listenEvents(xmlClient *xmlClient, eventChan chan Event) {
+    defer close(eventChan)
+
     for xmlPacket := range xmlClient.listenChan {
         if xmlPacket.DestMgr != nil {
             for _, auxDest := range xmlPacket.DestMgr.AuxDest {
