@@ -139,6 +139,8 @@ angular.module('qmsk.e2', [
         var event = JSON.parse(message.data);
     
         Events.events.push(event);
+
+        $rootScope.$broadcast('qmsk.e2.event', event);
     });
 
     return Events;
@@ -236,6 +238,11 @@ angular.module('qmsk.e2', [
     $scope.selectRefresh($location.search().refresh);
 
     $scope.reload();
+
+    $scope.$on('qmsk.e2.event', function($e, event){
+        // dumb :)
+        $scope.reload();
+    });
 })
 
 .controller('SourcesCtrl', function($scope, Source) {
