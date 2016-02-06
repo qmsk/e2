@@ -26,25 +26,55 @@ angular.module('qmsk.e2', [
         });
 })
 
+// track global http state
+.factory('httpState', function($q) {
+    var httpState = {
+        error:  null,
+        busy:   0,
+
+        request: function(config) {
+            httpState.busy++;
+
+            return config;
+        },
+        requestError: function(err) {
+            console.log("Request Error: " + err);
+
+            httpState.busy--;
+
+            return $q.reject(err);
+        },
+
+        response: function(r) {
+            httpState.busy--;
+
+            return r;
+        },
+        responseError: function(e) {
+            console.log("Response Error: " + e);
+
+            httpState.busy--;
+            httpState.error = e;
+
+            return $q.reject(e);
+        },
+    };
+
+    return httpState
+})
+
+.config(function($httpProvider) {
+    $httpProvider.interceptors.push('httpState');
+})
+
 .factory('Status', function($http) {
     var Status = {};
 
-    // Used as a $http.get(...).then(..., Status.onError)
-    Status.onError = function(r){
-        Status.mode = 'error'
-        Status.error = r;
-    }
-    Status.httpInterceptor = {
-        responseError: Status.onError,
-    };
-
     $http.get('/api/status').then(
         function success(r) {
-            Status.error = null
             Status.server = r.data.server;
             Status.mode = r.data.mode;
-        },
-        Status.onError
+        }
     );
 
     return Status;
@@ -55,8 +85,7 @@ angular.module('qmsk.e2', [
         return $http.get('/api/').then(
             function success(r) {
                 return r.data;
-            },
-            Status.onError
+            }
         );
     };
 })
@@ -65,39 +94,57 @@ angular.module('qmsk.e2', [
     return $resource('/api/screens/:id', { }, {
         get: {
             method: 'GET',
-            interceptor:    Status.httpInterceptor,
         },
         query: {
             method: 'GET',
             isArray: false,
-            interceptor:    Status.httpInterceptor,
         }
     }, {stripTrailingSlashes: true});
 })
 
 .filter('dimensions', function() {
     return function(dimensions) {
-        return dimensions.width + "x" + dimensions.height;
+        if (dimensions && dimensions.width && dimensions.height) {
+            return dimensions.width + "x" + dimensions.height;
+        } else {
+            return null;
+        }
     };
 })
 
-.controller('HeaderCtrl', function($scope, $location, Status) {
-    $scope.safe = false;
-    $scope.status = Status
+.controller('HeaderCtrl', function($scope, $location, Status, httpState) {
+    $scope.status = Status;
+    $scope.state = httpState;
 
     $scope.isActive = function(prefix) {
         return $location.path().startsWith(prefix);
     };
+
 })
 
 .controller('MainCtrl', function($scope, $location, Index, $interval) {
+    var busy = false;
+
     $scope.reload = function() {
-        Index().then(function success(index) {
-            $scope.screens = index.screens
-            $scope.sources = $.map(index.sources, function(source, id){
-                return source;
-            });
-        });
+        if (busy) {
+            return;
+        } else {
+            busy = true;
+        }
+
+        Index().then(
+            function success(index) {
+                busy = false;
+
+                $scope.screens = index.screens
+                $scope.sources = $.map(index.sources, function(source, id){
+                    return source;
+                });
+            },
+            function error() {
+                busy = false;
+            }
+        );
     };
 
     $scope.selectOrder = function(order) {
@@ -121,17 +168,18 @@ angular.module('qmsk.e2', [
 
     $scope.selectRefresh = function(refresh) {
         $scope.refresh = refresh;
+        var refreshInterval = refresh * 1000;
 
         if ($scope.refreshTimer) {
             $interval.cancel($scope.refreshTimer);
             $scope.refreshTimer = null;
         }
 
-        if (refresh) {
-            $scope.refreshTimer = $interval($scope.reload, refresh * 1000);
+        if (refreshInterval) {
+            $scope.refreshTimer = $interval($scope.reload, refreshInterval);
         }
 
-        $location.search('refresh', refresh || '');
+        $location.search('refresh', refresh);
     };
     $scope.selectRefresh($location.search().refresh);
 

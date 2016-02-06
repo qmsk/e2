@@ -28,7 +28,7 @@
     </head>
 
     <body>
-        <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'live': status.mode == 'live', 'safe': status.mode == 'safe', 'error': status.mode == 'error'}">
+        <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'live': status.mode == 'live', 'safe': status.mode == 'safe', 'error': state.error}">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="/">
@@ -45,14 +45,18 @@
                     </li>
                 </ul>
 
+                <p class="navbar-text navbar-right state-error" ng-if="state.error">
+                    ERROR
+                </p>
+
                 <p class="navbar-text navbar-right" ng-if="status.mode == 'live'">
                     LIVE @ {{status.server}}
                 </p>
                 <p class="navbar-text navbar-right" ng-if="status.mode == 'safe'">
                     SAFE MODE @ {{status.server}}
                 </p>
-                <p class="navbar-text navbar-right" ng-if="status.mode == 'error'">
-                    ERROR @ {{status.server}}
+                <p class="navbar-text navbar-right" ng-show="state.busy">
+                    <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
                 </p>
             </div>
         </div>
