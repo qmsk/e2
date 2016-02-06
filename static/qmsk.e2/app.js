@@ -110,12 +110,16 @@ angular.module('qmsk.e2', [
     };
     $scope.selectOrder($location.search().order);
 
-    Index().then(function success(index) {
-        $scope.screens = index.screens
-        $scope.sources = $.map(index.sources, function(source, id){
-            return source;
+    $scope.reload = function() {
+        Index().then(function success(index) {
+            $scope.screens = index.screens
+            $scope.sources = $.map(index.sources, function(source, id){
+                return source;
+            });
         });
-    });
+    };
+
+    $scope.reload();
 })
 
 .controller('SourcesCtrl', function($scope, Source) {
