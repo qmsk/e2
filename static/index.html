@@ -44,17 +44,15 @@
                     </li>
                 </ul>
 
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="navbar-text live-mode" ng-if="status.mode == 'live'">
-                        LIVE @ {{status.server}}
-                    </li>
-                    <li class="navbar-text safe-mode" ng-if="status.mode == 'safe'">
-                        SAFE MODE @ {{status.server}}
-                    </li>
-                    <li class="navbar-text error-mode" ng-if="status.mode == 'error'">
-                        ERROR @ {{status.server}}
-                    </li>
-                </ul>
+                <p class="navbar-text navbar-right" ng-if="status.mode == 'live'">
+                    LIVE @ {{status.server}}
+                </p>
+                <p class="navbar-text navbar-right" ng-if="status.mode == 'safe'">
+                    SAFE MODE @ {{status.server}}
+                </p>
+                <p class="navbar-text navbar-right" ng-if="status.mode == 'error'">
+                    ERROR @ {{status.server}}
+                </p>
             </div>
         </div>
 

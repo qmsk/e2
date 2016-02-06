@@ -36,10 +36,10 @@ body {
     font-weight: bold;
 }
 
-#header .navbar-text {
-    font-size: large;
+#header .navbar-text.navbar-right {
+    margin-right: 0px; /* override margin-right: -15px */
 }
-     
+
 #header .live .navbar-text {
     color: #000000;
 }
