@@ -44,6 +44,12 @@ func main() {
 
     http.Handle("/api/", http.StripPrefix("/api/", server))
 
+    if events, err := server.Events(); err != nil {
+        log.Fatalf("Server.Events: %v\n", err)
+    } else {
+        http.Handle("/events", events)
+    }
+
     if options.HTTPStatic != "" {
         log.Printf("Serve / from %v\n", options.HTTPStatic)
 
