@@ -89,7 +89,7 @@
 
     #tools {
         position: fixed;
-        top: 1em;  /* header */
+        top: 50px;  /* header */
         bottom: 5em; /* status */
         right: 0px;
         width: 20%;
