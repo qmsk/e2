@@ -22,7 +22,7 @@ type Layer struct {
     PgmZOrder   int     `json:"PgmZOrder"`  // XXX: xml?
     PvwZOrder   int     `json:"PvwZOrder"`  // XXX: xml?
 
-    Source      *Source `xml:"LayerCfg>Source"`      // XXX: JSON is different!
+    Source      *Source `json:"-" xml:"LayerCfg>Source"`      // XXX: JSON is different!
     // Window
     // Mask
 }
