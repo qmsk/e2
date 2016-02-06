@@ -3,7 +3,6 @@ angular.module('qmsk.e2', [
         'ngResource',
         'ngRoute',
         'ngWebSocket',
-	    'ui.bootstrap'
 ])
 
 .config(function($routeProvider) {
@@ -123,26 +122,31 @@ angular.module('qmsk.e2', [
 })
 
 .controller('MainCtrl', function($scope, $location, Index, $interval) {
-    var busy = false;
+    $scope.busy = false;
+    $scope.error = null;
 
     $scope.reload = function() {
-        if (busy) {
+        if ($scope.busy) {
             return;
         } else {
-            busy = true;
+            $scope.busy = true;
         }
 
         Index().then(
             function success(index) {
-                busy = false;
+                $scope.busy = false;
+                $scope.error = null;
 
                 $scope.screens = index.screens
                 $scope.sources = $.map(index.sources, function(source, id){
                     return source;
                 });
             },
-            function error() {
-                busy = false;
+            function error(err) {
+                console.log("MainCtrl: Index Error: " + err);
+
+                $scope.busy = false;
+                $scope.error = err;
             }
         );
     };
@@ -162,12 +166,13 @@ angular.module('qmsk.e2', [
             }
         }();
 
-        $location.search('order', order);
+        $location.search('order', order || '');
     };
     $scope.selectOrder($location.search().order);
 
     $scope.selectRefresh = function(refresh) {
         $scope.refresh = refresh;
+
         var refreshInterval = refresh * 1000;
 
         if ($scope.refreshTimer) {
@@ -179,7 +184,7 @@ angular.module('qmsk.e2', [
             $scope.refreshTimer = $interval($scope.reload, refreshInterval);
         }
 
-        $location.search('refresh', refresh);
+        $location.search('refresh', refresh || '');
     };
     $scope.selectRefresh($location.search().refresh);
 

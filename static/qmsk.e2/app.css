@@ -52,6 +52,14 @@ body {
 
 }
 
+#header .glyphicon {
+    font-size: large;;
+}
+
+#header .glyphicon-alert {
+    color: #ffffff;
+}
+
 /* View */
 #view {
     padding: 0px;

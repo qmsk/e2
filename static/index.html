@@ -45,8 +45,8 @@
                     </li>
                 </ul>
 
-                <p class="navbar-text navbar-right state-error" ng-if="state.error">
-                    ERROR
+                <p class="navbar-text navbar-right state-error" ng-show="state.error">
+                    <span class="glyphicon glyphicon-alert"></span>
                 </p>
 
                 <p class="navbar-text navbar-right" ng-if="status.mode == 'live'">
