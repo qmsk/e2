@@ -219,24 +219,6 @@ angular.module('qmsk.e2', [
     };
     $scope.selectOrder($location.search().order || 'source');
 
-    $scope.selectRefresh = function(refresh) {
-        $scope.refresh = refresh;
-
-        var refreshInterval = refresh * 1000;
-
-        if ($scope.refreshTimer) {
-            $interval.cancel($scope.refreshTimer);
-            $scope.refreshTimer = null;
-        }
-
-        if (refreshInterval) {
-            $scope.refreshTimer = $interval($scope.reload, refreshInterval);
-        }
-
-        $location.search('refresh', refresh || null); 
-    };
-    $scope.selectRefresh($location.search().refresh);
-
     $scope.reload();
 
     $scope.$on('qmsk.e2.event', function($e, event){
