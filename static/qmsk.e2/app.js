@@ -166,9 +166,9 @@ angular.module('qmsk.e2', [
             }
         }();
 
-        $location.search('order', order || '');
+        $location.search('order', order || null);
     };
-    $scope.selectOrder($location.search().order);
+    $scope.selectOrder($location.search().order || 'source');
 
     $scope.selectRefresh = function(refresh) {
         $scope.refresh = refresh;
@@ -184,7 +184,7 @@ angular.module('qmsk.e2', [
             $scope.refreshTimer = $interval($scope.reload, refreshInterval);
         }
 
-        $location.search('refresh', refresh || '');
+        $location.search('refresh', refresh || null); 
     };
     $scope.selectRefresh($location.search().refresh);
 
