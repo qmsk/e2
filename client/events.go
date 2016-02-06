@@ -2,7 +2,7 @@ package client
 
 import (
     "fmt"
-    "log"
+    // "log"
 )
 
 type PresetRecallEvent struct {
@@ -44,13 +44,63 @@ func (event AuxProgramEvent) String() string {
     return fmt.Sprintf("aux=%d program source=%d", event.AuxID, event.SourceID)
 }
 
-type Event interface {}
+type ScreenActiveEvent struct {
+    ScreenID        int
+    Active          bool
+}
+
+func (event ScreenActiveEvent) String() string {
+    return fmt.Sprintf("screen=%d active=%v", event.ScreenID, event.Active)
+}
+
+type ScreenLayerSourceEvent struct {
+    ScreenID        int
+    LayerID         int
+    SourceID        int
+
+    Source          Source
+}
+
+func (event ScreenLayerSourceEvent) String() string {
+    return fmt.Sprintf("screen=%d layer=%d source=%d", event.ScreenID, event.LayerID, event.SourceID)
+}
+
+type ScreenLayerEvent struct {
+    ScreenID        int
+    LayerID         int
+
+    Program         bool
+    Preview         bool
+}
+
+func (event ScreenLayerEvent) String() string {
+    return fmt.Sprintf("screen=%d layer=%d program=%v preview=%v", event.ScreenID, event.LayerID, event.Program, event.Preview)
+}
+
+type ScreenTransitionEvent struct {
+    ScreenID        int
+
+    InProgress      bool
+    Auto            bool
+}
+
+func (event ScreenTransitionEvent) String() string {
+    if !event.InProgress {
+        return fmt.Sprintf("screen=%d transition done", event.ScreenID)
+    } else {
+        return fmt.Sprintf("screen=%d transition auto=%v", event.ScreenID, event.Auto)
+    }
+}
+
+type Event interface {
+    String()    string
+}
 
 func (client *Client) listenEvents(xmlClient *xmlClient, eventChan chan Event) {
     for xmlPacket := range xmlClient.listenChan {
         if xmlPacket.DestMgr != nil {
             for _, auxDest := range xmlPacket.DestMgr.AuxDest {
-                log.Printf("Client.listenEvents: DestMgr.AuxDest %#v\n", auxDest)
+                // log.Printf("Client.listenEvents: DestMgr.AuxDest %#v\n", auxDest)
 
                 if auxDest.IsActive != nil {
                     eventChan <- AuxActiveEvent{auxDest.ID, *auxDest.IsActive > 0}
@@ -70,12 +120,64 @@ func (client *Client) listenEvents(xmlClient *xmlClient, eventChan chan Event) {
             }
 
             for _, screenDest := range xmlPacket.DestMgr.ScreenDest {
-                log.Printf("Client.listenEvents: DestMgr.ScreenDest %#v\n", screenDest)
+                // log.Printf("Client.listenEvents: DestMgr.ScreenDest %#v\n", screenDest)
+
+                if screenDest.IsActive != nil {
+                    eventChan <- ScreenActiveEvent{screenDest.ID, *screenDest.IsActive > 0}
+                }
+
+                for _, layer := range screenDest.Layer {
+                    if layer.Source != nil && layer.LastSrcIdx != nil {
+                        source := *layer.Source
+                        source.ID= *layer.LastSrcIdx
+
+                        eventChan <- ScreenLayerSourceEvent{
+                            ScreenID:   screenDest.ID,
+                            LayerID:    layer.ID,
+                            SourceID:   *layer.LastSrcIdx,
+
+                            Source:     source,
+                        }
+                    }
+
+                    if layer.PvwMode != nil || layer.PgmMode != nil {
+                        eventChan <- ScreenLayerEvent{
+                            ScreenID:   screenDest.ID,
+                            LayerID:    layer.ID,
+
+                            Preview:    layer.PvwMode != nil && *layer.PvwMode > 0,
+                            Program:    layer.PgmMode != nil && *layer.PgmMode > 0,
+                        }
+                    }
+                }
+
+                for _, transition := range screenDest.Transition {
+                    if transition.TransInProg == nil {
+
+                    } else if *transition.TransInProg == 0 {
+                        eventChan <- ScreenTransitionEvent{
+                            ScreenID:   screenDest.ID,
+                        }
+                    } else if transition.AutoTransInProg != nil {
+                        eventChan <- ScreenTransitionEvent{
+                            ScreenID:   screenDest.ID,
+
+                            InProgress: true,
+                            Auto:       *transition.AutoTransInProg > 0,
+                        }
+                    } else {
+                        eventChan <- ScreenTransitionEvent{
+                            ScreenID:   screenDest.ID,
+
+                            InProgress: true,
+                        }
+                    }
+                }
             }
         }
 
         if xmlPacket.PresetMgr != nil {
-            log.Printf("Client.listenEvents: PresetMgr %#v\n", xmlPacket.PresetMgr)
+            // log.Printf("Client.listenEvents: PresetMgr %#v\n", xmlPacket.PresetMgr)
 
             if lastRecall := xmlPacket.PresetMgr.LastRecall; lastRecall != nil {
                 eventChan <- PresetRecallEvent{*lastRecall}

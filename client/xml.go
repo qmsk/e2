@@ -12,6 +12,7 @@ type xmlPacket struct {
     ID          int         `xml:"id,attr"`
     GUID        string      `xml:"GuiId"`
 
+    // SrcMgr
     DestMgr     *DestMgr    `xml:"DestMgr"`
     PresetMgr   *PresetMgr  `xml:"PresetMgr"`
 }
