@@ -44,6 +44,12 @@ angular.module('qmsk.e2', [
     }, {stripTrailingSlashes: true});
 })
 
+.filter('dimensions', function() {
+    return function(dimensions) {
+        return dimensions.width + "x" + dimensions.height;
+    };
+})
+
 .controller('HeaderCtrl', function($scope, $location) {
     $scope.safe = false;
 
