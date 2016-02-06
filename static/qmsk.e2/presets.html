@@ -1,4 +1,5 @@
-<div class="container-fluid" id="container" ng-controller="PresetsCtrl">
+<div id="presets">
+    <!--
     <div id="tools">
         <button name="cut" id="cut" type="submit" ng-click="cut()">
             Cut
@@ -7,33 +8,35 @@
             Auto Trans
         </button>
     </div>
+    -->
 
-    <div id="presets" class="presets">
-        <!-- ng-class="{'btn-success': preset == base.inPreview, 'btn-danger': preset == base.inPgm}" -->
-        <div class="group" ng-repeat="group in data.groups" ng-if="group.presets.length > 0">
-            <div class="title" ng-click="collapsedGroups[group.title] = !collapsedGroups[group.title]">
-                <button type="button">
-                    <span class="glyphicon"
-                        ng-class="collapsedGroups[group.title] ? 'glyphicon-plus' : 'glyphicon-minus'"
-                    ></span>
-                </button>
-                
-                <h3>{{group.title || '&nbsp;'}}</h3>
-            </div>
-            <div collapse="collapsedGroups[group.title]">
-                <button type="button" class="preset"
-                        ng-repeat="preset in group.presets"
-                        ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
-                        ng-click="clickPreset(preset)">
-                    {{data.presets[preset].title}}
-                    <div ng-repeat="(dest, where) in data.presets[preset].destinations">
-                        <span class="destination"
-                        ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
-                            {{dest}}
-                        </span>
-                    </div>
-                </button>
-            </div>
+    <div class="group" ng-repeat="group in groups">
+        <div class="title" ng-click="collapseGroups[group.id] = !collapseGroups[group.id]">
+            <button type="button">
+                <span class="glyphicon" ng-class="collapseGroups[group.id] ? 'glyphicon-plus' : 'glyphicon-minus'"></span>
+            </button>
+
+            <h3>{{group.id}}</h3>
+        </div>
+
+        <div ng-show="!collapseGroups[group.id]">
+            <button type="button" class="preset" ng-repeat="preset in group.presets">
+                {{preset.name}}
+            </button>
         </div>
     </div>
+<!--
+            <button type="button" class="preset"
+                    ng-repeat="preset in group.presets"
+                    ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
+                    ng-click="clickPreset(preset)">
+                {{data.presets[preset].title}}
+                <div ng-repeat="(dest, where) in data.presets[preset].destinations">
+                    <span class="destination"
+                    ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
+                        {{dest}}
+                    </span>
+                </div>
+            </button>
+-->
 </div>

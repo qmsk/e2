@@ -25,6 +25,10 @@ angular.module('qmsk.e2', [
             templateUrl: 'qmsk.e2/auxes.html',
             controller: 'AuxesCtrl',
         })
+        .when('/presets', {
+            templateUrl: 'qmsk.e2/presets.html',
+            controller: 'PresetsCtrl',
+        })
         .otherwise({
             redirectTo: '/main',
         });
@@ -108,6 +112,18 @@ angular.module('qmsk.e2', [
 
 .factory('Aux', function($resource) {
     return $resource('/api/auxes/:id', { }, {
+        get: {
+            method: 'GET',
+        },
+        query: {
+            method: 'GET',
+            isArray: false,
+        }
+    }, {stripTrailingSlashes: true});
+})
+
+.factory('Preset', function($resource) {
+    return $resource('/api/presets/:id', { }, {
         get: {
             method: 'GET',
         },
@@ -253,6 +269,34 @@ angular.module('qmsk.e2', [
 
 .controller('AuxesCtrl', function($scope, Aux) {
     $scope.auxes = Aux.query();
+})
+
+.controller('PresetsCtrl', function($scope, Preset) {
+    $scope.collapseGroups = { };
+    
+    // group
+    $scope.presets = Preset.query(function (presets) {
+        var groups = { };
+
+        $.each(presets, function(id, preset) {
+            // XXX: this is broken for non-array query()
+            if (id[0] == '$' || !preset.group) {
+                return;
+            }
+
+            var group = groups[preset.group];
+
+            if (!group) {
+                group = groups[preset.group] = [];
+            }
+
+            group.push(preset);
+        });
+
+        $scope.groups = $.map(groups, function(presets, id){
+            return {id: id, presets: presets};
+        });
+    });
 })
 
 ;
