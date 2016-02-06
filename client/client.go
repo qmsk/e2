@@ -39,3 +39,7 @@ type Client struct {
     httpClient      *http.Client
     seq             int
 }
+
+func (client *Client) String() string {
+    return client.url.String()
+}
