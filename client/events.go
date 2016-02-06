@@ -6,7 +6,7 @@ import (
 )
 
 type PresetRecallEvent struct {
-    PresetID        int
+    PresetID        int     `json:"preset_id"`
 }
 
 func (event PresetRecallEvent) String() string {
@@ -14,39 +14,33 @@ func (event PresetRecallEvent) String() string {
 }
 
 type AuxActiveEvent struct {
-    AuxID           int
-    Active          bool
+    AuxID           int     `json:"aux_id"`
+
+    Active          bool    `json:"active"`
 }
 
 func (event AuxActiveEvent) String() string {
     return fmt.Sprintf("aux=%d active=%v", event.AuxID, event.Active)
 }
 
-type AuxPreviewEvent struct {
-    AuxID           int
-    SourceID        int
+type AuxEvent struct {
+    AuxID           int     `json:"aux_id"`
+    SourceID        int     `json:"source_id"`
 
-    Source          Source
+    Program         bool    `json:"program"`
+    Preview         bool    `json:"preview"`
+
+    Source          Source  `json:"source"`
 }
 
-func (event AuxPreviewEvent) String() string {
-    return fmt.Sprintf("aux=%d preview source=%d", event.AuxID, event.SourceID)
-}
-
-type AuxProgramEvent struct {
-    AuxID           int
-    SourceID        int
-
-    Source          Source
-}
-
-func (event AuxProgramEvent) String() string {
-    return fmt.Sprintf("aux=%d program source=%d", event.AuxID, event.SourceID)
+func (event AuxEvent) String() string {
+    return fmt.Sprintf("aux=%d source=%d preview=%v program=%v", event.AuxID, event.SourceID, event.Program, event.Preview)
 }
 
 type ScreenActiveEvent struct {
-    ScreenID        int
-    Active          bool
+    ScreenID        int     `json:"screen_id"`
+
+    Active          bool    `json:"active"`
 }
 
 func (event ScreenActiveEvent) String() string {
@@ -54,11 +48,11 @@ func (event ScreenActiveEvent) String() string {
 }
 
 type ScreenLayerSourceEvent struct {
-    ScreenID        int
-    LayerID         int
-    SourceID        int
+    ScreenID        int     `json:"screen_id"`
+    LayerID         int     `json:"layer_id"`
+    SourceID        int     `json:"source_id"`
 
-    Source          Source
+    Source          Source  `json:"source"`
 }
 
 func (event ScreenLayerSourceEvent) String() string {
@@ -66,11 +60,11 @@ func (event ScreenLayerSourceEvent) String() string {
 }
 
 type ScreenLayerEvent struct {
-    ScreenID        int
-    LayerID         int
+    ScreenID        int     `json:"screen_id"`
+    LayerID         int     `json:"layer_id"`
 
-    Program         bool
-    Preview         bool
+    Program         bool    `json:"program"`
+    Preview         bool    `json:"preview"`
 }
 
 func (event ScreenLayerEvent) String() string {
@@ -78,11 +72,11 @@ func (event ScreenLayerEvent) String() string {
 }
 
 type ScreenTransitionEvent struct {
-    ScreenID        int
+    ScreenID        int     `json:"screen_id"`
 
     // Done if !InProgress
-    InProgress      bool
-    Auto            bool
+    InProgress      bool    `json:"transition_inprogress"`
+    Auto            bool    `json:"transition_auto"`
 }
 
 func (event ScreenTransitionEvent) String() string {
@@ -111,13 +105,29 @@ func (client *Client) listenEvents(xmlClient *xmlClient, eventChan chan Event) {
                 if auxDest.Source != nil {
                     source := *auxDest.Source
 
-                    if auxDest.PvwLastSrcIndex != nil {
+                    if auxDest.PvwLastSrcIndex != nil && *auxDest.PvwLastSrcIndex >= 0 {
                         source.ID = *auxDest.PvwLastSrcIndex
-                        eventChan <- AuxPreviewEvent{auxDest.ID, *auxDest.PvwLastSrcIndex, source}
+
+                        eventChan <- AuxEvent{
+                            AuxID:      auxDest.ID,
+                            SourceID:   source.ID,
+
+                            Preview:    true,
+
+                            Source:     source,
+                        }
                     }
-                    if auxDest.PgmLastSrcIndex != nil {
+                    if auxDest.PgmLastSrcIndex != nil && *auxDest.PgmLastSrcIndex >= 0 {
                         source.ID = *auxDest.PgmLastSrcIndex
-                        eventChan <- AuxProgramEvent{auxDest.ID, *auxDest.PgmLastSrcIndex, source}
+
+                        eventChan <- AuxEvent{
+                            AuxID:      auxDest.ID,
+                            SourceID:   source.ID,
+
+                            Program:    true,
+
+                            Source:     source,
+                        }
                     }
                 }
             }

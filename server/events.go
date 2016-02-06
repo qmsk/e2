@@ -2,7 +2,6 @@ package server
 
 import (
     "github.com/qmsk/e2/client"
-    "fmt"
     "net/http"
     "log"
     "golang.org/x/net/websocket"
@@ -11,7 +10,6 @@ import (
 const EVENTS_BUFFER = 100
 
 type Event struct {
-    Type        string      `json:"type"`
     Data        interface{} `json:"data"`
     Line        string      `json:"line"`
 }
@@ -71,7 +69,6 @@ func (events *Events) run() {
 
         case clientEvent := <-events.eventChan:
             event := Event{
-                Type:   fmt.Sprintf("%T", clientEvent),
                 Data:   clientEvent,
                 Line:   clientEvent.String(),
             }
