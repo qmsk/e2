@@ -20,16 +20,31 @@ func (clientSet clientSet) register(clientChan chan Event) {
     clientSet[clientChan] = true
 }
 func (clientSet clientSet) unregister(clientChan chan Event) {
+    // remove from set on behalf of client; the clientChan may already be closed
     delete(clientSet, clientChan)
 }
+func (clientSet clientSet) drop(clientChan chan Event) {
+    // close and remove a dead client
+    // the client may trigger .unregister() later, but that's okay
+    close(clientChan)
+    delete(clientSet, clientChan)
+}
+
 func (clientSet clientSet) publish(event Event) {
     for clientChan, _ := range clientSet {
         select {
         case clientChan <- event:
 
         default:
-            // dropped
+            // client dropped behind
+            clientSet.drop(clientChan)
         }
+    }
+}
+
+func (clientSet clientSet) close() {
+    for clientChan, _ := range clientSet {
+        clientSet.drop(clientChan)
     }
 }
 
@@ -56,8 +71,14 @@ func (server *Server) Events() (*Events, error) {
 
     return &events, nil
 }
+
 func (events *Events) run() {
     clients := make(clientSet)
+    defer clients.close()
+
+    // panics any subscribed clients
+    defer close(events.registerChan)
+    defer close(events.unregisterChan)
 
     for {
         select {
@@ -67,7 +88,12 @@ func (events *Events) run() {
         case clientChan := <-events.unregisterChan:
             clients.unregister(clientChan)
 
-        case clientEvent := <-events.eventChan:
+        case clientEvent, ok := <-events.eventChan:
+            if !ok {
+                // TODO: recover..
+                panic("Events died")
+            }
+
             event := Event{
                 Data:   clientEvent,
                 Line:   clientEvent.String(),
