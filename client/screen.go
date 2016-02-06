@@ -21,7 +21,7 @@ type Layer struct {
     PgmZOrder   int     `json:"PgmZOrder"`  // XXX: xml?
     PvwZOrder   int     `json:"PvwZOrder"`  // XXX: xml?
 
-    // Source
+    Source      *Source `xml:"Source"`      // XXX: JSON is different!
     // Window
     // Mask
 }
@@ -55,7 +55,7 @@ type Transition struct {
 type ScreenDest struct {
     ID                  int             `xml:"id,attr"`
 
-    IsActive            int             `xml:"IsActive"`
+    IsActive            *int            `xml:"IsActive"`
     BGLayer             BGLayer         `xml:"BGLyr"`
     Transition          []Transition    `xml:"Transition"`
     Layer               []Layer         `xml:"LayerCollection>Layer"`

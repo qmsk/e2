@@ -7,7 +7,16 @@ type AuxDestination struct {
 }
 
 type AuxDest struct {
-    ID      int     `xml:"id,attr"`
+    ID              int             `xml:"id,attr"`
+
+    IsActive        *int            `xml:"IsActive"`
+
+    Transition      *Transition     `xml:"Transition"`
+
+    PvwLastSrcIndex *int            `xml:"PvwLastSrcIndex"`
+    PgmLastSrcIndex *int            `xml:"PgmLastSrcIndex"`
+
+    Source          *Source         `xml:"Source"`
 }
 
 type AuxDestCol struct {

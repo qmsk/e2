@@ -40,18 +40,23 @@ func (vs InputVideoStatus) String() string {
 }
 
 type Source struct {
-    ID              int         `json:"id"`
-    Name            string      `json:"Name"`
-    HSize           int         `json:"HSize"`
-    VSize           int         `json:"VSize"`
-    Type            SourceType  `json:"SrcType"`
+    ID              int         `json:"id" xml:"id,attr"`
+    Name            string      `json:"Name" xml:"Name"`
+    HSize           int         `json:"HSize" xml:"AOIRect>HSize"`
+    VSize           int         `json:"VSize" xml:"AOIRect>VSize"`
+    Type            SourceType  `json:"SrcType" xml:"SrcType"`
 
-    InputCfgIndex   int         `json:"InputCfgIndex"`                      // -1 unless Type == SourceTypeInput
-    StillIndex      int         `json:"StillIndex"`                         // -1 unless Type == SourceTypeStill
-    DestIndex       int         `json:"DestIndex"`                          // -1 unless Type == SourceTypeDest
-    UserKeyIndex    int         `json:"UserKeyIndex"`
+    UserKeyIndex    int         `json:"UserKeyIndex", xml:"UserKeyIndex"`
 
-    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus"`    // 0 unless Type == SourceTypeInput
+    // -1 unless Type == SourceTypeInput
+    InputCfgIndex       int                 `json:"InputCfgIndex", xml"InputCfgIndex"`
+    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus"` // XXX: xml
+
+    // -1 unless Type == SourceTypeStill
+    StillIndex      int         `json:"StillIndex" xml:"StillIndex"`
+
+    // -1 unless Type == SourceTypeDest
+    DestIndex       int         `json:"DestIndex" xml:"DestIndex"`
 }
 
 type listSources struct {
