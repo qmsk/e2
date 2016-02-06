@@ -3,6 +3,7 @@ package server
 import (
     "github.com/qmsk/e2/client"
     "fmt"
+    "sort"
 )
 
 type Sources struct {
@@ -82,6 +83,9 @@ func (source Source) buildState(screens map[string]ScreenState) SourceState {
             }
         }
     }
+
+    sort.Strings(sourceState.ProgramScreens)
+    sort.Strings(sourceState.PreviewScreens)
 
     return sourceState
 }

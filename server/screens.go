@@ -3,6 +3,7 @@ package server
 import (
     "github.com/qmsk/e2/client"
     "fmt"
+    "sort"
 )
 
 type Screens struct {
@@ -93,6 +94,9 @@ func (screenState *ScreenState) load(client *client.Client) error {
             screenState.PreviewSources = append(screenState.PreviewSources, fmt.Sprintf("%d", layer.LastSrcIdx))
         }
     }
+
+    sort.Strings(screenState.ProgramSources)
+    sort.Strings(screenState.PreviewSources)
 
     return nil
 }
