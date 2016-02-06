@@ -23,7 +23,7 @@
             <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'">
                 {{preset.name}}
 
-                <div ng-repeat="aux_id in preset.auxe">
+                <div ng-repeat="aux_id in preset.auxes">
                     <span class="dest">{{auxes[aux_id].name}}</span>
                 </div>
                 <div ng-repeat="screen_id in preset.screens">
