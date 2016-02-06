@@ -71,10 +71,18 @@ type ListContent struct {
     ID          int             `json:"id"`
     Name        string          `json:"Name"`
 
-    Layers      []Layer         `json:"Layers"`
+    Layers      []*Layer        `json:"Layers"`
     BGLayers    []BGLayer       `json:"BgLyr"`
 
     // Transition
+}
+
+func (self *ListContent) fixup() {
+    for _, layer := range self.Layers {
+        if layer.LastSrcIdx != nil && *layer.LastSrcIdx < 0 {
+            layer.LastSrcIdx = nil
+        }
+    }
 }
 
 func (client *Client) ListContent(screenID int) (result ListContent, err error) {

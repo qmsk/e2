@@ -12,16 +12,17 @@ type ScreenDestination struct {
 
 type Layer struct {
     ID          int     `json:"id" xml:"id,attr"`
+    Name        string  `xml:"name"`
 
-    LastSrcIdx  int     `json:"LastSrcIdx" xml:"LastSrcIdx"`
+    LastSrcIdx  *int    `json:"LastSrcIdx" xml:"LastSrcIdx"`        // normalized to nil if -1
 
-    PgmMode     int     `json:"PgmMode" xml:"PgmMode"`
-    PvwMode     int     `json:"PvwMode" xml:"PvwMode"`
+    PgmMode     *int    `json:"PgmMode" xml:"PgmMode"`
+    PvwMode     *int    `json:"PvwMode" xml:"PvwMode"`
 
     PgmZOrder   int     `json:"PgmZOrder"`  // XXX: xml?
     PvwZOrder   int     `json:"PvwZOrder"`  // XXX: xml?
 
-    Source      *Source `xml:"Source"`      // XXX: JSON is different!
+    Source      *Source `xml:"LayerCfg>Source"`      // XXX: JSON is different!
     // Window
     // Mask
 }
@@ -46,10 +47,10 @@ type BGLayer struct {
 type Transition struct {
     ID                  int         `xml:"id,attr"`
 
-    ArmMode             int         `xml:"ArmMode"`
-    TransPos            int         `xml:"TransPos"`
-    AutoTransInProg     int         `xml:"AutoTransInProg"`
-    TransInProg         int         `xml:"TransInProg"`
+    ArmMode             *int        `xml:"ArmMode"`
+    TransPos            *int        `xml:"TransPos"`
+    AutoTransInProg     *int        `xml:"AutoTransInProg"`
+    TransInProg         *int        `xml:"TransInProg"`
 }
 
 type ScreenDest struct {
