@@ -2,21 +2,30 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Source</th>
-                <th>Preview</th>
-                <th>Program</th>
+                <th ng-click="selectOrder('source')">
+                    Source
+                    <span class="glyphicon glyphicon-chevron-down" ng-show="order == 'source'"></span>
+                </th>
+                <th ng-click="selectOrder('preview')">
+                    Preview
+                    <span class="glyphicon glyphicon-chevron-down" ng-show="order == 'preview'"></span>
+                </th>
+                <th ng-click="selectOrder('program')">
+                    Program
+                    <span class="glyphicon glyphicon-chevron-down" ng-show="order == 'program'"></span>
+                </th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="source in index.sources">
+            <tr ng-repeat="source in sources | orderBy:orderBy">
                 <td>
                     <div class="source" ng-class="{'preview': source.preview_screens, 'program': source.program_screens}" e2-source source="source" detail="false"></div>
                 </td>
                 <td>
-                    <div ng-repeat="screen in source.preview_screens" class="screen preview">{{index.screens[screen].name}}</div>
+                    <div ng-repeat="screen_id in source.preview_screens" class="screen preview">{{screens[screen_id].name}}</div>
                 </td>
                 <td>
-                    <div ng-repeat="screen in source.program_screens" class="screen program">{{index.screens[screen].name}}</div>
+                    <div ng-repeat="screen_id in source.program_screens" class="screen program">{{screens[screen_id].name}}</div>
                 </td>
             </tr>
         </tbody>
