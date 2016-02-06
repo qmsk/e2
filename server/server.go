@@ -46,6 +46,11 @@ func (server *Server) Index(name string) (apiResource, error) {
 
         return &screens, screens.load(server.client)
 
+    case "auxes":
+        auxes := Auxes{}
+
+        return &auxes, auxes.load(server.client)
+
     default:
         return nil, nil
     }
