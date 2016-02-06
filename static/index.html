@@ -1,101 +1,62 @@
-<html lang="en" ng-app="e2client">
+<html lang="en" ng-app="qmsk.e2">
+    <head>
+        <title>github.com/qmsk/e2</title>
 
-<head>
-	<title>Encore2 Control</title>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        
+        <!-- jQuery -->
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
 
-	<meta charset="utf-8">
-	<meta content="width=device-width, initial-scale=1" name="viewport" />
-	
-	<!-- jQuery -->
-	<script src="bower_components/jquery/dist/jquery.min.js"></script>
-    <!-- <script src="lib/jquery-migrate-1.2.1.min.js"></script> -->
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
 
-	<!-- Bootstrap -->
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        
+        <!-- Angular -->
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/angular-route/angular-route.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script src="bower_components/angular-websocket/angular-websocket.js"></script>
+        
+        <!-- qmsk.e2 -->
+        <link rel="stylesheet" href="qmsk.e2/app.css">
 
-	<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-	
-	<!-- Angular -->
-	<script src="bower_components/angular/angular.min.js"></script>
-	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+        <script src="qmsk.e2/app.js"></script>
+    </head>
 
-	<script src="bower_components/ng-websocket/ng-websocket.js"></script>
-	
-	<!-- qmsk-e2 -->
-	<link rel="stylesheet" href="qmsk.e2/client.css">
+    <body>
+        <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'safe': safe}">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">
+                        Encore2 Control
+                    </a>
+                </div>
 
-	<script src="qmsk.e2/client.js"></script>
-</head>
+                <ul class="nav navbar-nav">
+                    <li ng-class="{'active': isActive('/screens')}">
+                        <a href="#/screens">Screens</a>
+                    </li>
+                </ul>
 
-<body>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="navbar-text safe-mode" ng-if="safe">
+                        SAFE MODE @ {{server}}
+                    </li>
+                    <li class="navbar-text live-mode" ng-if="!safe">
+                        LIVE @ {{server}}
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-<div class="container-fluid" id="container" ng-controller="PresetsCtrl">
-
-    <div id="header" class="navbar" ng-class="{'safe': safe}">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="/">
-				Encore2 Control
-			</a>
-		</div>
-
-		<!-- <div class="navbar-collapse">
-			<ul class="nav navbar-nav">
-
-			</ul>
-		</div> -->
-
-        <p class="navbar-text navbar-right safe-mode" ng-if="safe">
-            SAFE MODE @ {{server}}
-        </p>
-        <p class="navbar-text navbar-right live-mode" ng-if="!safe">
-            LIVE @ {{server}}
-        </p>
-	</div>
-
-	<div id="tools">
-		<button name="cut" id="cut" type="submit" ng-click="cut()">
-			Cut
-		</button>
-		<button name="autotrans" id="autotrans" ng-click="autotrans()">
-			Auto Trans
-		</button>
-	</div>
-
-	<div id="presets" class="presets">
-		<!-- ng-class="{'btn-success': preset == base.inPreview, 'btn-danger': preset == base.inPgm}" -->
-		<div class="group" ng-repeat="group in data.groups" ng-if="group.presets.length > 0">
-			<div class="title" ng-click="collapsedGroups[group.title] = !collapsedGroups[group.title]">
-				<button type="button">
-					<span class="glyphicon"
-						ng-class="collapsedGroups[group.title] ? 'glyphicon-plus' : 'glyphicon-minus'"
-					></span>
-				</button>
-				
-				<h3>{{group.title || '&nbsp;'}}</h3>
-			</div>
-			<div collapse="collapsedGroups[group.title]">
-				<button type="button" class="preset"
-						ng-repeat="preset in group.presets"
-						ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
-						ng-click="clickPreset(preset)">
-					{{data.presets[preset].title}}
-					<div ng-repeat="(dest, where) in data.presets[preset].destinations">
-						<span class="destination"
-						ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
-							{{dest}}
-						</span>
-					</div>
-				</button>
-			</div>
-		</div>
-	</div>
-		
-	<div id="status">
-		<div ng-repeat="stat in status">{{stat.msg}} {{stat.data}}</div>
-	</div>
-</div>
-
-</body>
+        <div id="view" ng-view></div>
+            
+        <div id="status">
+            <div ng-repeat="stat in status">{{stat.msg}} {{stat.data}}</div>
+        </div>
+    </body>
 
 </html>

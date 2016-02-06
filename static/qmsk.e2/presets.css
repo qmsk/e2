@@ -1,60 +1,3 @@
-button {
-    margin: 1em;
-    padding: 0.5em;
-
-    border: none;
-    border-radius: 4px;
-    background-color: #133337;
-    color: #ffffff;
-}
-
-#container {
-    background-color: #aaa;
-    padding: 0px;
-
-    /* space for bottom status */
-    margin-bottom: 3em;
-}
-
-#header {
-    margin: 0;
-    background-color: #448844;
-}
-
-#header.safe {
-    background-color: #aaaa44;
-}
-
-#header.navbar {
-    margin-bottom: 0;
-    border-radius: 0;
-}
-
-#header a {
-    color: #000;
-    font-size: x-large;
-}
-
-#header .active a {
-    font-weight: bold;
-}
-
-#header .navbar-right {
-     /* override navbar-right margin-right: -15px */
-     margin: 15px 15px;
-}
-
-#header .safe-mode {
-     color: #884444;
-     font-size: x-large;
-     text-decoration: blink;
-}
-
-#header .safe-mode {
-     color: #444488;
-     font-size: x-large;
-}
-
 #presets {
 
 }
@@ -142,15 +85,26 @@ button span.inactive {
     font-weight: bold;
 }
 
+#tools button#cut {
+    color: #00ffff;
+}
+
+#tools button#autotrans {
+    color: #ffff00;
+}
+
 /* Styles for Landscape screen */
 @media all and (orientation:landscape) {
+    #header, #view {
+        margin-right: 20%;
+    }
+
     #tools {
         position: fixed;
         top: 0px;
         bottom: 0px;
         right: 0px;
         width: 20%;
-
     }
 
     #tools button {
@@ -158,12 +112,7 @@ button span.inactive {
         display: block;
         margin: 1em auto;
     }
-
-    #header, #presets {
-        margin-right: 20%;
-    }
 }
-
 
 /* Styles for Portrait screen */
 @media all and (orientation:portrait) {
@@ -183,31 +132,4 @@ button span.inactive {
     #header {
         margin-top: 150px;
     }
-}
-
-#tools button#cut {
-    color: #00ffff;
-}
-
-#tools button#autotrans {
-    color: #ffff00;
-}
-
-#status {
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
-    height: 3em;
-
-    padding: 0.2em 0.5em;
-    
-    background-color: #0f0f0f;
-    color: #44ff44;
-    font-family: monospace;
-    
-    overflow: auto;
-}
-
-#status p {
-    margin: 0;
 }
