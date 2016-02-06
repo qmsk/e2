@@ -67,7 +67,7 @@ func (client *Client) do(request *Request, response *Response) error {
     switch contentType := httpResponse.Header.Get("Content-Type"); contentType {
     case "application/json", "application/json-rpc":
         if err := json.NewDecoder(httpResponse.Body).Decode(response); err != nil {
-            return err
+            return fmt.Errorf("Invalid response JSON: %v", err)
         }
     default:
         return fmt.Errorf("Invalid response: Content-Type=%#v", contentType)

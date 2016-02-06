@@ -19,7 +19,7 @@ func (client *Client) doResult(request *Request, data interface{}) error {
     }
 
     if err := client.do(request, &response); err != nil {
-        return err
+        return fmt.Errorf("RPC %v error: %v", request.Method, err)
     }
 
     //log.Printf("success=%v: %#v\n", result.Success, result.Response)
