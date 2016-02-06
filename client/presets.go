@@ -2,6 +2,7 @@ package client
 
 import (
     "fmt"
+    "strings"
 )
 
 type Preset struct {
@@ -9,6 +10,18 @@ type Preset struct {
     Name        string  `json:"Name"`
     LockMode    int     `json:"LockMode"`
     Sno         float64 `json:"presetSno"`
+}
+
+func (preset Preset) ParseOrder() (group int, index int) {
+    // one awesome hack
+    sno := strings.Trim(fmt.Sprintf("%f", preset.Sno), "0")
+
+    if _, err := fmt.Sscanf(sno, "%d.%d", &group, &index); err != nil {
+        // 0.0 is invalid..
+        return 0, 0
+    }
+
+    return
 }
 
 // Filtering
