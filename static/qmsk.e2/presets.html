@@ -10,7 +10,7 @@
     -->
     </div>
 
-    <div class="group" ng-repeat="group in groups">
+    <div class="group" ng-repeat="group in groups | orderBy:'id'">
         <div class="title" ng-click="collapseGroups[group.id] = !collapseGroups[group.id]">
             <button type="button">
                 <span class="glyphicon" ng-class="collapseGroups[group.id] ? 'glyphicon-plus' : 'glyphicon-minus'"></span>
@@ -20,7 +20,7 @@
         </div>
 
         <div ng-show="!collapseGroups[group.id]">
-            <button type="button" class="preset" ng-repeat="preset in group.presets">
+            <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'">
                 {{preset.name}}
 
                 <div ng-repeat="aux_id in preset.auxe">
