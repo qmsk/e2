@@ -19,7 +19,8 @@ func (err NotFound) Error() string {
 type Options struct {
     Address     string          `long:"e2-address" value-name:"HOST"`
     JSONPort    string          `long:"e2-jsonrpc-port" value-name:"PORT" default:"9999"`
-    Timeout     time.Duration   `long:"e2-jsonrpc-timeout" default:"10s"`
+    XMLPort     string          `long:"e2-xml-port" value-name:"PORT" default:"9876"`
+    Timeout     time.Duration   `long:"e2-timeout" default:"10s"`
 }
 
 func (options Options) Client() (*Client, error) {
@@ -43,6 +44,8 @@ func (options Options) Client() (*Client, error) {
 
 type Client struct {
     options         Options
+
+    // JSON RPC
     rpcURL          url.URL
     httpClient      *http.Client
     seq             int

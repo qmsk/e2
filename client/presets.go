@@ -87,3 +87,10 @@ func (client *Client) ListDestinationsForPreset(presetID int) (result PresetDest
         return result, nil
     }
 }
+
+// XML
+type PresetMgr struct {
+    ID          int             `xml:"id,attr"`
+
+    LastRecall  *int            `xml:"LastRecall"`
+}
