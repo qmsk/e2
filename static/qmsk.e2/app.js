@@ -21,6 +21,10 @@ angular.module('qmsk.e2', [
             templateUrl: 'qmsk.e2/screens.html',
             controller: 'ScreensCtrl',
         })
+        .when('/auxes', {
+            templateUrl: 'qmsk.e2/auxes.html',
+            controller: 'AuxesCtrl',
+        })
         .otherwise({
             redirectTo: '/main',
         });
@@ -80,7 +84,7 @@ angular.module('qmsk.e2', [
     return Status;
 })
 
-.factory('Index', function($http, Status) {
+.factory('Index', function($http) {
     return function() {
         return $http.get('/api/').then(
             function success(r) {
@@ -90,8 +94,20 @@ angular.module('qmsk.e2', [
     };
 })
 
-.factory('Screen', function($resource, Status) {
+.factory('Screen', function($resource) {
     return $resource('/api/screens/:id', { }, {
+        get: {
+            method: 'GET',
+        },
+        query: {
+            method: 'GET',
+            isArray: false,
+        }
+    }, {stripTrailingSlashes: true});
+})
+
+.factory('Aux', function($resource) {
+    return $resource('/api/auxes/:id', { }, {
         get: {
             method: 'GET',
         },
@@ -233,6 +249,10 @@ angular.module('qmsk.e2', [
 
 .controller('ScreensCtrl', function($scope, Screen) {
     $scope.screens = Screen.query();
+})
+
+.controller('AuxesCtrl', function($scope, Aux) {
+    $scope.auxes = Aux.query();
 })
 
 ;

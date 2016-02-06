@@ -122,7 +122,8 @@ table.table tbody tr {
 
 /* Content */
 .source,
-.screen {
+.screen,
+.aux {
     text-align: center; 
 
     margin: 1em;
@@ -137,7 +138,8 @@ table.table tbody tr {
 
 /* Fix glyphicon label vertical alignment with text */
 .screen .label,
-.source .label {
+.source .label,
+.aux .label {
     font-size: inherit;
 }
 
