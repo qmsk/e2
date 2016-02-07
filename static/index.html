@@ -72,7 +72,7 @@
         <div id="view" ng-view></div>
             
         <div id="status" ng-controller="StatusCtrl" scroll-glue>
-            <div class="event" ng-repeat="event in events.events">{{event.line}}</div>
+            <pre class="event-state">{{events.state}}</pre>
             <div class="state" ng-class="{'open': events.open, 'error': events.error}">
                 WebSocket 
                 <span ng-if="!events.open">Closed</span>

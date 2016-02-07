@@ -145,7 +145,7 @@ angular.module('qmsk.e2', [
         open:   false,
         error:  null,
 
-        events: [],
+        state:  null,
     }
 
     var ws = $websocket(Events.url);
@@ -175,7 +175,7 @@ angular.module('qmsk.e2', [
     ws.onMessage(function(message){
         var event = JSON.parse(message.data);
     
-        Events.events.push(event);
+        Events.state = event.line;
 
         $rootScope.$broadcast('qmsk.e2.event', event);
     });
