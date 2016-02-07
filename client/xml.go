@@ -114,15 +114,6 @@ func (options Options) XMLClient() (*XMLClient, error) {
     return &xmlClient, nil
 }
 
-func (xmlClient *XMLClient) start() {
-    if xmlClient.readChan == nil {
-        xmlClient.readChan = make(chan xmlPacket)
-
-        go xmlClient.reader()
-        go xmlClient.run()
-    }
-}
-
 func (xmlClient *XMLClient) read(packet *xmlPacket) error {
     // applies to the complete XML packet read by the decoder..?
     if err := xmlClient.conn.SetReadDeadline(time.Now().Add(xmlClient.timeout)); err != nil {
@@ -154,6 +145,15 @@ func (xmlClient *XMLClient) writeReset() error {
 
 func (xmlClient *XMLClient) writePing() error {
     return xmlClient.write(xmlPing{})
+}
+
+func (xmlClient *XMLClient) start() {
+    if xmlClient.readChan == nil {
+        xmlClient.readChan = make(chan xmlPacket)
+
+        go xmlClient.reader()
+        go xmlClient.run()
+    }
 }
 
 func (xmlClient *XMLClient) reader() {
