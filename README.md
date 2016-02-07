@@ -3,11 +3,13 @@ E2 Client + REST + WebSocket Server + Web UI
 
 ## Server
 
-    go get github.com/qmsk/e2/cmd/server
+    go get ./cmd/server
+    
+    cd static && bower install
 
 Follow E2 status, providing a REST + WebSocket API, and a web UI:
 
-    ./bin/server --discovery-interface=eth0 --http-listen=:8284 --http-static=./src/github.com/qmsk/e2/static
+    $GOPATH/bin/server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
 
 ### API
 
@@ -15,7 +17,7 @@ TODO: examples
 
 #### *GET* `/api/`
 
-Combines both sources and screens. This is O(N) RPCs on the number of screen destinations.
+Combines both sources and screens, including cross-correlated program/preview state for both. This is `O(N)` RPCs on the number of screen destinations.
 
       {
         "sources": {
@@ -66,7 +68,7 @@ Combines both sources and screens. This is O(N) RPCs on the number of screen des
 
 #### *GET* `/api/screens/`
 
-Includes the detailed information for each screen. This is O(N) RPCs on the number of screen destinations.
+Includes the detailed information for each screen. This is `O(N)` RPCs on the number of screen destinations.
 
 #### *GET* `/api/screens/:id`
 
@@ -78,6 +80,8 @@ Includes the detailed information for each screen. This is O(N) RPCs on the numb
 
 #### *GET* `/api/presets/`
 
+Includes the detailed information for each preset. This is `O(N)` RPCs on the number of presets.
+
 #### *GET* `/api/presets/:id`
 
 ### Events
@@ -85,6 +89,12 @@ Includes the detailed information for each screen. This is O(N) RPCs on the numb
 TODO: examples
 
 #### `ws://.../events`
+
+TODO: support JSON encoding `Client.System`
+
+    {
+        "line": "...",
+    }
 
 ### Usage
     server [OPTIONS]
@@ -106,11 +116,19 @@ TODO: examples
 
 ## Client
     
-    go get github.com/qmsk/e2/cmd/client
+    go get ./cmd/server
 
 Useful for testing the client library:
 
-    ./bin/client --e2-address=192.168.0.100 listen
+    $GOPATH/bin/client --e2-address=192.168.0.100 listen
+
+### Support
+
+The client library (`github.com/qmsk/e2/client`) supports:
+    * The streaming XML API (read-only)
+    * The JSON-RPC API
+
+The discovery library (`github.com/qmsk/e2/discovery`) supports UDP broadcast discovery of connected E2 systems.
 
 ### Usage:
 
