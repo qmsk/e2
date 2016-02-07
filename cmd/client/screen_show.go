@@ -49,10 +49,10 @@ func (cmd *ScreenShow) Execute(args []string) error {
         for _, layer := range content.Layers {
             fmt.Printf("\tLayer %d: pgm=%v pvw=%d\n", layer.ID, layer.PgmMode, layer.PvwMode)
 
-            if layer.LastSrcIdx == nil {
+            if layer.LastSrcIdx < 0 {
 
-            } else if source, found := sourceMap[*layer.LastSrcIdx]; !found {
-                fmt.Printf("\t\tSource %d: \n", *layer.LastSrcIdx)
+            } else if source, found := sourceMap[layer.LastSrcIdx]; !found {
+                fmt.Printf("\t\tSource %d: \n", layer.LastSrcIdx)
             } else {
                 fmt.Printf("\t\tSource %d: name=%v\n", layer.LastSrcIdx, source.Name)
             }

@@ -1,5 +1,10 @@
 package client
 
+import (
+    "sort"
+    "encoding/xml"
+)
+
 type ScreenDestination struct {
     ID      int     `json:"id"`
     Name    string  `json:"name"`
@@ -7,57 +12,59 @@ type ScreenDestination struct {
     VSize   int     `json:"VSize"`
     Layers  int     `json:"Layers"`
 
-    // DestOutMapCol
-}
-
-type Layer struct {
-    ID          int     `json:"id" xml:"id,attr"`
-    Name        string  `xml:"name"`
-
-    LastSrcIdx  *int    `json:"LastSrcIdx" xml:"LastSrcIdx"`        // normalized to nil if -1
-
-    PgmMode     *int    `json:"PgmMode" xml:"PgmMode"`
-    PvwMode     *int    `json:"PvwMode" xml:"PvwMode"`
-
-    PgmZOrder   int     `json:"PgmZOrder"`  // XXX: xml?
-    PvwZOrder   int     `json:"PvwZOrder"`  // XXX: xml?
-
-    Source      *Source `json:"-" xml:"LayerCfg>Source"`      // XXX: JSON is different!
-    // Window
-    // Mask
-}
-
-type BGColor struct {
-    ID          int     `json:"id" xml:"id,attr"`
-    Red         int     `json:"Red" xml:"Red"`
-    Green       int     `json:"Green" xml:"Green"`
-    Blue        int     `json:"Blue" xml:"Blue"`
-}
-
-type BGLayer struct {
-    ID                  int         `json:"id" xml:"id,attr"`
-    Name                string      `xml:"name"` // XXX: useful?
-
-    LastBGSourceIndex   int         `"json:"LastBGSourceIndex" xml:"LastBGSourceIndex"`
-
-    ShowMatte           int         `json:"BGShowMatte" xml:"BGShowMatte"`
-    Color               BGColor     `json:"BGColor" xml:"BGColor"`
-}
-
-type Transition struct {
-    ID                  int         `xml:"id,attr"`
-
-    ArmMode             *int        `xml:"ArmMode"`
-    TransPos            *int        `xml:"TransPos"`
-    AutoTransInProg     *int        `xml:"AutoTransInProg"`
-    TransInProg         *int        `xml:"TransInProg"`
+    //DestOutMapCol
 }
 
 type ScreenDest struct {
     ID                  int             `xml:"id,attr"`
 
-    IsActive            *int            `xml:"IsActive"`
-    BGLayer             BGLayer         `xml:"BGLyr"`
+    IsActive            int
+    Name                string
+    HSize               int
+    VSize               int
+
+    BGLayer             []BGLayer       `xml:"BGLyr"`
     Transition          []Transition    `xml:"Transition"`
-    Layer               []Layer         `xml:"LayerCollection>Layer"`
+    LayerCollection     LayerCollection `xml:"LayerCollection>Layer"`
+}
+
+type ScreenDestCol struct {
+    ScreenDest      map[int]ScreenDest
+}
+
+func (col *ScreenDestCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
+    id, err := xmlID(e)
+    if err != nil {
+        return err
+    }
+
+    screenDest := col.ScreenDest[id]
+
+    if err := d.DecodeElement(&screenDest, &e); err != nil {
+        return err
+    }
+
+    if col.ScreenDest == nil {
+        col.ScreenDest = make(map[int]ScreenDest)
+    }
+
+    col.ScreenDest[id] = screenDest
+
+    return nil
+}
+
+func (col ScreenDestCol) List() (items []ScreenDest) {
+    var keys []int
+
+    for key, _ := range col.ScreenDest {
+        keys = append(keys, key)
+    }
+
+    sort.Ints(keys)
+
+    for _, key := range keys {
+        items = append(items, col.ScreenDest[key])
+    }
+
+    return items
 }

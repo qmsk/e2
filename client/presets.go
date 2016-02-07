@@ -2,14 +2,16 @@ package client
 
 import (
     "fmt"
+    "sort"
     "strings"
+    "encoding/xml"
 )
 
 type Preset struct {
-    ID          int     `json:"id"`
+    ID          int     `json:"id" xml:"id,attr"`
     Name        string  `json:"Name"`
     LockMode    int     `json:"LockMode"`
-    Sno         float64 `json:"presetSno"`
+    Sno         float64 `json:"presetSno" xml:"presetSno"`
 }
 
 func (preset Preset) ParseOrder() (group int, index int) {
@@ -102,8 +104,50 @@ func (client *Client) ListDestinationsForPreset(presetID int) (result PresetDest
 }
 
 // XML
+type PresetMap map[int]Preset
+
+func (m *PresetMap) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
+    if id, err := xmlID(e); err != nil {
+        return err
+    } else {
+        value := (*m)[id]
+
+        if err := d.DecodeElement(&value, &e); err != nil {
+            return err
+        }
+
+        if *m == nil {
+            *m = make(PresetMap)
+        }
+
+        (*m)[id] = value
+
+        return nil
+    }
+}
+
+func (m PresetMap) List() []Preset {
+    var keys []int
+    var items []Preset
+
+    for key, _ := range m {
+        keys = append(keys, key)
+    }
+
+    sort.Ints(keys)
+
+
+    for _, key := range keys {
+        items = append(items, m[key])
+    }
+
+    return items
+}
+
 type PresetMgr struct {
     ID          int             `xml:"id,attr"`
 
-    LastRecall  *int            `xml:"LastRecall"`
+    LastRecall  int             `xml:"LastRecall"`
+
+    Preset      PresetMap       `xml:"Preset"`
 }

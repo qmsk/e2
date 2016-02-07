@@ -9,7 +9,7 @@ const listDestinationsTypeScreen    = 1
 const listDestinationsTypeAux       = 2
 
 type ListDestinations struct {
-    AuxDestinations         []AuxDestination        `json:"AuxDestination"`
+    AuxDestinations         []AuxDest               `json:"AuxDestination"`
     ScreenDestinations      []ScreenDestination     `json:"ScreenDestination"`
 }
 
@@ -28,7 +28,7 @@ func (client *Client) ListDestinations() (result ListDestinations, err error) {
     }
 }
 
-func (client *Client) ListAuxDestinations() ([]AuxDestination, error) {
+func (client *Client) ListAuxDestinations() ([]AuxDest, error) {
     var result ListDestinations
 
     request := Request{
@@ -77,14 +77,6 @@ type ListContent struct {
     // Transition
 }
 
-func (self *ListContent) fixup() {
-    for _, layer := range self.Layers {
-        if layer.LastSrcIdx != nil && *layer.LastSrcIdx < 0 {
-            layer.LastSrcIdx = nil
-        }
-    }
-}
-
 func (client *Client) ListContent(screenID int) (result ListContent, err error) {
     request := Request{
         Method:     "listContent",
@@ -102,8 +94,8 @@ func (client *Client) ListContent(screenID int) (result ListContent, err error) 
 
 // XML
 type DestMgr struct {
-    ID          int             `xml:"id,attr"`
+    ID              int             `xml:"id,attr"`
 
-    AuxDest     []AuxDest       `xml:"AuxDestCol>AuxDest"`
-    ScreenDest  []ScreenDest    `xml:"ScreenDestCol>ScreenDest"`
+    AuxDestCol      AuxDestCol      `xml:"AuxDestCol>AuxDest"`
+    ScreenDestCol   ScreenDestCol   `xml:"ScreenDestCol>ScreenDest"`
 }

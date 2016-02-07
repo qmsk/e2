@@ -19,7 +19,7 @@ func (cmd *PresetShow) Execute(args []string) error {
         return err
     }
 
-    auxDestinations := make(map[int]client.AuxDestination)
+    auxDestinations := make(map[int]client.AuxDest)
     screenDestinations := make(map[int]client.ScreenDestination)
 
     if listDestinations, err := c.ListDestinations(); err != nil {
