@@ -130,9 +130,9 @@ Useful for testing the client library:
 
 ### Support
 
-The client library (`github.com/qmsk/e2/client`) supports:
-    * The streaming XML API (read-only)
-    * The JSON-RPC API
+The client library (`github.com/qmsk/e2/client`) provides partial support for the following E2 APIs:
+* TCP XML (read-only, streaming)
+* JSON-RPC (read-only for now, includes preset destinations)
 
 The discovery library (`github.com/qmsk/e2/discovery`) supports UDP broadcast discovery of connected E2 systems.
 
