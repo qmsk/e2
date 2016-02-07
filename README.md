@@ -30,6 +30,9 @@ Combines both sources and screens, including cross-correlated program/preview st
              "id" : 4,
              "name" : "PC 3",
              "status" : "ok"
+             "preview_screens" : [
+                "0"
+             ],
           },
           "5" : {
              "id" : 5,
@@ -40,6 +43,9 @@ Combines both sources and screens, including cross-correlated program/preview st
                 "height" : 1080,
                 "width" : 1920
              }
+             "program_screens" : [
+                "0"
+             ],
           },
         },
         "screens" : {
