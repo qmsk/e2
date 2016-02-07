@@ -56,13 +56,6 @@ func (options Options) Discovery() (*Discovery, error) {
     return discovery, nil
 }
 
-type Packet struct {
-    addr        *net.UDPAddr
-    data        []byte
-
-    IP          net.IP
-}
-
 type Discovery struct {
     options     Options
     udpConn     *net.UDPConn
@@ -85,23 +78,28 @@ func (discovery *Discovery) send() error {
     return nil
 }
 
+func (discovery *Discovery) recv(packet *Packet) error {
+    buf := make([]byte, 1500)
+
+    if n, recvAddr, err := discovery.udpConn.ReadFromUDP(buf); err != nil {
+        return err
+    } else if err := packet.unpack(recvAddr, buf[:n]); err != nil {
+        return err
+    } else {
+        return nil
+    }
+}
+
 func (discovery *Discovery) receiver() {
     defer close(discovery.recvChan)
 
     for {
         var packet Packet
 
-        buf := make([]byte, 1500)
-
-        if n, recvAddr, err := discovery.udpConn.ReadFromUDP(buf); err != nil {
-            log.Printf("Discovery.receiver: udpConn.ReadFromUDP: %v\n", err)
+        if err := discovery.recv(&packet); err != nil {
+            log.Printf("Discovery.receiver: %v\n", err)
             return
-        } else {
-            packet.addr = recvAddr
-            packet.data = buf[:n]
         }
-
-        packet.IP = packet.addr.IP
 
         discovery.recvChan <- packet
     }

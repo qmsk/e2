@@ -18,7 +18,7 @@ func (cmd *Discover) Execute(args []string) error {
         return err
     } else {
         for packet := range discovery.Run() {
-            fmt.Printf("%v\n", packet.IP)
+            fmt.Printf("%#v\n", packet)
         }
     }
 
