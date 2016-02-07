@@ -10,8 +10,8 @@ import (
 const EVENTS_BUFFER = 100
 
 type Event struct {
-    Data        interface{} `json:"data"`
-    Line        string      `json:"line"`
+    // System      client.System   `json:"system"`
+    Line        string          `json:"line"`
 }
 
 type clientSet map[chan Event]bool
@@ -49,7 +49,7 @@ func (clientSet clientSet) close() {
 }
 
 type Events struct {
-    eventChan   chan client.Event
+    listenChan   chan client.System
 
     registerChan    chan chan Event
     unregisterChan  chan chan Event
@@ -61,10 +61,12 @@ func (server *Server) Events() (*Events, error) {
         unregisterChan:     make(chan chan Event),
     }
 
-    if eventChan, err := server.client.ListenEvents(); err != nil {
+    if xmlClient, err := server.clientOptions.XMLClient(); err != nil {
+        return nil, err
+    } else if listenChan, err := xmlClient.Listen(); err != nil {
         return nil, err
     } else {
-        events.eventChan = eventChan
+        events.listenChan = listenChan
     }
 
     go events.run()
@@ -88,18 +90,18 @@ func (events *Events) run() {
         case clientChan := <-events.unregisterChan:
             clients.unregister(clientChan)
 
-        case clientEvent, ok := <-events.eventChan:
+        case system, ok := <-events.listenChan:
             if !ok {
                 // TODO: recover..
                 panic("Events died")
             }
 
             event := Event{
-                Data:   clientEvent,
-                Line:   clientEvent.String(),
+                // System: system, // XXX: not JSON-encodable
+                Line:   system.String(),
             }
 
-            log.Printf("Events: %v\n", event)
+            // log.Printf("Events: %v\n", event)
 
             clients.publish(event)
         }
@@ -125,6 +127,7 @@ func (events *Events) ServeWebsocket(websocketConn *websocket.Conn) {
 
     for event := range eventChan {
         if err := websocket.JSON.Send(websocketConn, event); err != nil {
+            log.Printf("webSocket.JSON.Send: %v\n", err)
             return
         }
     }

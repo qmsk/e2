@@ -2,22 +2,38 @@ package server
 
 import (
     "github.com/qmsk/e2/client"
+    "github.com/qmsk/e2/discovery"
+    "log"
 )
 
 type Options struct {
-
+    DiscoveryOptions    discovery.Options       `group:"E2 Discovery"`
+    ClientOptions       client.Options          `group:"E2 JSON-RPC"`
 }
 
-func (options Options) Server(clientClient *client.Client) (*Server, error) {
+func (options Options) Server() (*Server, error) {
     server := &Server{
-        client:     clientClient,
+        options:    options,
+    }
+
+    if clientOptions, err := options.ClientOptions.DiscoverClient(options.DiscoveryOptions); err != nil {
+        log.Fatalf("Client %#v: Discover %#v: %v\n", options.ClientOptions, options.DiscoveryOptions,err)
+    } else if client, err := clientOptions.Client(); err !=nil {
+        log.Fatalf("Client %#v: %v\n", clientOptions, err)
+    } else {
+        log.Printf("Client %#v: %v\n", clientOptions, client)
+
+        server.clientOptions = clientOptions
+        server.client = client
     }
 
     return server, nil
 }
 
 type Server struct {
-    client      *client.Client
+    options         Options
+    clientOptions   client.Options
+    client          *client.Client
 }
 
 func (server *Server) Index(name string) (apiResource, error) {

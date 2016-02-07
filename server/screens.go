@@ -83,16 +83,16 @@ func (screenState *ScreenState) load(client *client.Client) error {
     }
 
     for _, layer := range screenContent.Layers {
-        if layer.LastSrcIdx == nil || *layer.LastSrcIdx < 0 {
+        if layer.LastSrcIdx < 0 {
             continue
         }
 
-        sourceID := fmt.Sprintf("%d", *layer.LastSrcIdx)
+        sourceID := fmt.Sprintf("%d", layer.LastSrcIdx)
 
-        if layer.PgmMode != nil && *layer.PgmMode > 0 {
+        if layer.PgmMode > 0 {
             screenState.ProgramSources = append(screenState.ProgramSources, sourceID)
         }
-        if layer.PvwMode != nil && *layer.PvwMode > 0 {
+        if layer.PvwMode > 0 {
             screenState.PreviewSources = append(screenState.PreviewSources, sourceID)
         }
     }
