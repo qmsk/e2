@@ -1,5 +1,5 @@
 # qmsk-e2
-E2 Client + Web Manager + REST API
+E2 Client + REST + WebSocket Server + Web UI
 
 ## Server
 
@@ -14,13 +14,71 @@ Follow E2 status, providing a REST + WebSocket API, and a web UI:
 TODO: examples
 
 #### *GET* `/api/`
+
+Combines both sources and screens. This is O(N) RPCs on the number of screen destinations.
+
+      {
+        "sources": {
+          "4" : {
+             "dimensions" : {
+                "width" : 1920,
+                "height" : 1080
+             },
+             "type" : "input",
+             "id" : 4,
+             "name" : "PC 3",
+             "status" : "ok"
+          },
+          "5" : {
+             "id" : 5,
+             "name" : "PC 4",
+             "status" : "ok",
+             "type" : "input",
+             "dimensions" : {
+                "height" : 1080,
+                "width" : 1920
+             }
+          },
+        },
+        "screens" : {
+          "0" : {
+             "id" : 0,
+             "preview_sources" : [
+                "4"
+             ],
+             "name" : "Main",
+             "program_sources" : [
+                "5"
+             ],
+             "dimensions" : {
+                "width" : 1920,
+                "height" : 1080
+             }
+          },
+        }
+     }
+
 #### *GET* `/api/sources`
+
 #### *GET* `/api/sources/:id`
+
 #### *GET* `/api/screens`
+
 #### *GET* `/api/screens/`
+
+Includes the detailed information for each screen. This is O(N) RPCs on the number of screen destinations.
+
 #### *GET* `/api/screens/:id`
+
 #### *GET* `/api/auxes`
+
 #### *GET* `/api/auxes/:id`
+
+#### *GET* `/api/presets`
+
+#### *GET* `/api/presets/`
+
+#### *GET* `/api/presets/:id`
 
 ### Events
 
