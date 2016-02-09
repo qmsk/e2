@@ -41,22 +41,23 @@ func (vs InputVideoStatus) String() string {
 
 type Source struct {
     ID              int         `json:"id" xml:"id,attr"`
-    Name            string      `json:"Name" xml:"Name"`
+
+    Name            string
     HSize           int         `json:"HSize" xml:"AOIRect>HSize"`
     VSize           int         `json:"VSize" xml:"AOIRect>VSize"`
-    Type            SourceType  `json:"SrcType" xml:"SrcType"`
+    SrcType         SourceType
 
-    UserKeyIndex    int         `json:"UserKeyIndex", xml:"UserKeyIndex"`
+    UserKeyIndex    int
 
     // -1 unless Type == SourceTypeInput
-    InputCfgIndex       int                 `json:"InputCfgIndex", xml"InputCfgIndex"`
-    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus"` // XXX: xml
+    InputCfgIndex       int
+    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus" xml:"-"` // XXX: xml
 
     // -1 unless Type == SourceTypeStill
-    StillIndex      int         `json:"StillIndex" xml:"StillIndex"`
+    StillIndex      int
 
     // -1 unless Type == SourceTypeDest
-    DestIndex       int         `json:"DestIndex" xml:"DestIndex"`
+    DestIndex       int
 }
 
 type listSources struct {

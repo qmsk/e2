@@ -27,7 +27,7 @@ func (cmd *SourceList) Execute(args []string) error {
                 status = fmt.Sprintf("size=%4dx%-4d video=%-8v", source.HSize, source.VSize, source.InputVideoStatus)
             }
 
-            fmt.Printf("%8d %-8v %-20s %s\n", source.ID, source.Type, source.Name, status)
+            fmt.Printf("%8d %-8v %-20s %s\n", source.ID, source.SrcType, source.Name, status)
         }
     }
 

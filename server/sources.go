@@ -22,7 +22,7 @@ func (sources *Sources) load(client *client.Client) error {
         source := Source{
             ID:     apiSource.ID,
             Name:   apiSource.Name,
-            Type:   apiSource.Type.String(),
+            Type:   apiSource.SrcType.String(),
 
             Dimensions: Dimensions{
                 Width:      apiSource.HSize,
