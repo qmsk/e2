@@ -8,7 +8,7 @@ import (
 )
 
 type System struct {
-    //SrcMgr
+    SrcMgr      SrcMgr      `xml:"SrcMgr"`
     DestMgr     DestMgr     `xml:"DestMgr"`
     PresetMgr   PresetMgr   `xml:"PresetMgr"`
 }
@@ -20,6 +20,10 @@ func (system *System) Reset() {
 }
 
 func (system *System) Print(f io.Writer) {
+    for _, source := range system.SrcMgr.SourceCol.List() {
+        fmt.Fprintf(f, "Source %d: %v\n\tSrcType: %v\n\tInputCfgIndex=%d StillIndex=%d DestIndex=%d\n", source.ID, source.Name, source.SrcType, source.InputCfgIndex, source.StillIndex, source.DestIndex)
+    }
+
     for _, auxDest := range system.DestMgr.AuxDestCol.List() {
         fmt.Fprintf(f, "Aux %d: %v\n\tISActive: %v\n\tPvwLastSrcIndex=%d PgmLastSrcIndex=%d\n", auxDest.ID, auxDest.Name, auxDest.IsActive, auxDest.PvwLastSrcIndex, auxDest.PgmLastSrcIndex)
     }
