@@ -25,22 +25,6 @@ func (sourceType SourceType) String() string {
     }
 }
 
-type InputVideoStatus int
-
-const InputVideoStatusOK    = 1
-const InputVideoStatusBad   = 4
-
-func (vs InputVideoStatus) String() string {
-    switch vs {
-    case InputVideoStatusOK:
-        return "ok"
-    case InputVideoStatusBad:
-        return "bad"
-    default:
-        return fmt.Sprintf("%d", int(vs))
-    }
-}
-
 type Source struct {
     ID              int         `json:"id" xml:"id,attr"`
 
@@ -53,7 +37,7 @@ type Source struct {
 
     // -1 unless Type == SourceTypeInput
     InputCfgIndex       int
-    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus" xml:"-"` // XXX: xml
+    InputVideoStatus    InputVideoStatus    `json:"InputCfgVideoStatus" xml:"-"` // XXX: JSON isi different
 
     // -1 unless Type == SourceTypeStill
     StillIndex      int
@@ -130,6 +114,6 @@ type SrcMgr struct {
 
     SourceCol       SourceCol       `xml:"SourceCol>Source"`
     //BGSourceCol
-    //InputCfgCol
+    InputCfgCol     InputCfgCol     `xml:"InputCfgCol>InputCfg"`
     //SavedInputCfgCol
 }

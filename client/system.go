@@ -20,6 +20,10 @@ func (system *System) Reset() {
 }
 
 func (system *System) Print(f io.Writer) {
+    for _, inputCfg := range system.SrcMgr.InputCfgCol.List() {
+        fmt.Fprintf(f, "Input %d: %s\n\tInputCfgType=%d\n\tInputCfgVideoStatus=%v\n\tConfig: Owner=%#v Contact=%#v\n", inputCfg.ID, inputCfg.Name, inputCfg.InputCfgType, inputCfg.InputCfgVideoStatus, inputCfg.ConfigOwner, inputCfg.ConfigContact)
+    }
+
     for _, source := range system.SrcMgr.SourceCol.List() {
         fmt.Fprintf(f, "Source %d: %v\n\tSrcType: %v\n\tInputCfgIndex=%d StillIndex=%d DestIndex=%d\n", source.ID, source.Name, source.SrcType, source.InputCfgIndex, source.StillIndex, source.DestIndex)
     }
