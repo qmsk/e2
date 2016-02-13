@@ -186,3 +186,8 @@ table.table tbody tr {
   }
 }
 
+/* System view */
+#system {
+    padding: 1em;
+    background-color: #ddd;
+}

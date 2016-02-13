@@ -20,6 +20,9 @@
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/angular-websocket/angular-websocket.js"></script>
         <script src="bower_components/angular-scroll-glue/src/scrollglue.js"></script>
+        <script src="bower_components/json-formatter/dist/json-formatter.min.js"></script>
+
+        <link rel="stylesheet" href="bower_components/json-formatter/dist/json-formatter.min.css"></link>
         
         <!-- qmsk.e2 -->
         <link rel="stylesheet" href="qmsk.e2/app.css">
@@ -51,6 +54,9 @@
                     <li ng-class="{'active': isActive('/presets')}">
                         <a href="#/presets">Presets</a>
                     </li>
+                    <li ng-class="{'active': isActive('/system')}">
+                        <a href="#/system">System</a>
+                    </li>
                 </ul>
 
                 <p class="navbar-text navbar-right state-error" ng-show="state.error">
@@ -72,7 +78,7 @@
         <div id="view" ng-view></div>
             
         <div id="status" ng-controller="StatusCtrl" scroll-glue>
-            <pre class="event-state">{{events.state}}</pre>
+            <div ng-repeat="event in events.events">{{event.line}}</div>
             <div class="state" ng-class="{'open': events.open, 'error': events.error}">
                 WebSocket 
                 <span ng-if="!events.open">Closed</span>

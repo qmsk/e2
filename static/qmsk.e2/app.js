@@ -4,6 +4,7 @@ angular.module('qmsk.e2', [
         'ngRoute',
         'ngWebSocket',
         'luegg.directives',
+        'jsonFormatter',
 ])
 
 .config(function($routeProvider) {
@@ -28,6 +29,10 @@ angular.module('qmsk.e2', [
         .when('/presets', {
             templateUrl: 'qmsk.e2/presets.html',
             controller: 'PresetsCtrl',
+        })
+        .when('/system', {
+            templateUrl: 'qmsk.e2/system.html',
+            controller: 'SystemCtrl',
         })
         .otherwise({
             redirectTo: '/main',
@@ -145,7 +150,8 @@ angular.module('qmsk.e2', [
         open:   false,
         error:  null,
 
-        state:  null,
+        events: [],
+        system: null,
     }
 
     var ws = $websocket(Events.url);
@@ -175,7 +181,8 @@ angular.module('qmsk.e2', [
     ws.onMessage(function(message){
         var event = JSON.parse(message.data);
     
-        Events.state = event.line;
+        Events.events.push({line: "WebSocket update"})
+        Events.system = event.system;
 
         $rootScope.$broadcast('qmsk.e2.event', event);
     });
@@ -204,6 +211,10 @@ angular.module('qmsk.e2', [
 })
 
 .controller('StatusCtrl', function($scope, Events) {
+    $scope.events = Events;
+})
+
+.controller('SystemCtrl', function($scope, Events) {
     $scope.events = Events;
 })
 
