@@ -3,6 +3,7 @@ package client
 import (
     "bytes"
     "fmt"
+    "log"
     "reflect"
     "encoding/xml"
 )
@@ -34,13 +35,24 @@ const (
     xmlColRemove                        = "Remove"
 )
 
-// Support for 
+// Unmarshal XML messages of the form:
 //  <FooCol> 
 //      <Add>
 //          <Foo id="...">
 //      <Foo id="...">
+//      <Remove>
+//          <Foo id="...">
+//
+// The xmlCol should be created with a colMap pointing to a map. The existing map values will be copied, or a new map created if the map is still nil.
+// *colMap will then be updated with the resulting new map.
+// This copy-on-write mechanism ensures that the datastructure is safe for concurrent read access when a copy of it is sent via a chan.
 type xmlCol struct {
-    colMap  interface{} // *map[int]T
+    colMap      interface{} // *map[int]T
+
+    mapValue    reflect.Value   // existing map to read items for update
+    itemType    reflect.Type    // type of new items
+
+    newMap      reflect.Value   // new map to write items 
 
     // decoding scope
     scope    xmlColScope
@@ -70,12 +82,7 @@ func (xmlCol *xmlCol) setScope(scope string) error {
 }
 
 // unmarshal an <Foo> element
-func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
-    mapValue := reflect.ValueOf(xmlCol.colMap).Elem()
-    mapType := mapValue.Type()
-
-    itemType := mapType.Elem()
-
+func (xmlCol xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
     // index by id
     id, err := xmlID(e)
     if err != nil {
@@ -84,31 +91,28 @@ func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
 
     idValue := reflect.ValueOf(id)
 
-    // update into new map
-    newMap := reflect.MakeMap(mapType)
-
-    if !mapValue.IsNil() {
-        // copy
-        for _, keyValue := range mapValue.MapKeys() {
-            newMap.SetMapIndex(keyValue, mapValue.MapIndex(keyValue))
-        }
-    }
-
     if xmlCol.scope == xmlColRemove {
+        log.Printf("XML remove %s[%d]\n", xmlCol.itemType.Name(), idValue.Interface())
+
         if err := d.Skip(); err != nil {
             return err
         }
 
         // delete identified element fom map
-        newMap.SetMapIndex(idValue, reflect.Value{})
+        xmlCol.newMap.SetMapIndex(idValue, reflect.Value{})
     } else {
         // unmarshal into existing item from map, or zero value if item was not in map
-        itemValue := reflect.New(itemType)
+        itemValue := reflect.New(xmlCol.itemType)
 
         if xmlCol.scope == xmlColAdd {
+            log.Printf("XML add %s[%d]\n", xmlCol.itemType.Name(), idValue.Interface())
             // there should never be any existing item
-        } else if getValue := mapValue.MapIndex(idValue); getValue.IsValid() {
+        } else if getValue := xmlCol.newMap.MapIndex(idValue); getValue.IsValid() {
+            log.Printf("XML set %s[%d]\n", getValue.Type().Name(), idValue.Interface())
+
             itemValue.Elem().Set(getValue)
+        } else {
+            log.Printf("XML new %s[%d]\n", xmlCol.itemType.Name(), idValue.Interface())
         }
 
         if err := d.DecodeElement(itemValue.Interface(), &e); err != nil {
@@ -116,11 +120,8 @@ func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
         }
 
         // store into map
-        newMap.SetMapIndex(idValue, itemValue.Elem())
+        xmlCol.newMap.SetMapIndex(idValue, itemValue.Elem())
     }
-
-    // replace map
-    mapValue.Set(newMap)
 
     return nil
 }
@@ -129,15 +130,29 @@ func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
 func (xmlCol xmlCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
     ptrValue := reflect.ValueOf(xmlCol.colMap)
 
-    mapValue := ptrValue.Elem()
-    mapType := mapValue.Type()
-
-    if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
-        panic(fmt.Errorf("xmlMap should be map[int]..."))
+    if ptrValue.Kind() != reflect.Ptr {
+        panic(fmt.Errorf("xmlCol.colMap must be *map[int]..."))
     }
 
-    itemType := mapType.Elem()
-    itemName := itemType.Name() // matching element name
+    xmlCol.mapValue = ptrValue.Elem()
+    mapType := xmlCol.mapValue.Type()
+
+    if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
+        panic(fmt.Errorf("xmlCol.colMap must be *map[int]..."))
+    }
+
+    xmlCol.itemType = mapType.Elem()
+    itemName := xmlCol.itemType.Name() // matching element name
+
+    // prepare copy-on-write map for update
+    xmlCol.newMap = reflect.MakeMap(mapType)
+
+    if !xmlCol.mapValue.IsNil() {
+        // copy
+        for _, keyValue := range xmlCol.mapValue.MapKeys() {
+            xmlCol.newMap.SetMapIndex(keyValue, xmlCol.mapValue.MapIndex(keyValue))
+        }
+    }
 
     for {
         if xmlToken, err := d.Token(); err != nil {
@@ -175,6 +190,9 @@ func (xmlCol xmlCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
             return fmt.Errorf("Unexpected token: %#v\n", xmlToken)
         }
     }
+
+    // replace map
+    xmlCol.mapValue.Set(xmlCol.newMap)
 
     return nil
 }
