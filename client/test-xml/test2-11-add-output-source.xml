@@ -1,0 +1,223 @@
+<System id="0">
+  <GuiId>6196be40-eefe-4af2-ab5b-9b836b4c1b42</GuiId>
+  <SrcMgr id="0">
+    <SourceCol id="0">
+      <Add id="0">
+        <Source id="0">
+          <InputCfgIndex Min="-1" Max="127">-1</InputCfgIndex>
+          <StillIndex Min="-1" Max="99">-1</StillIndex>
+          <UserKeyIndex Min="-1" Max="299">-1</UserKeyIndex>
+          <Name>ScreenDest1_PGM-1</Name>
+          <SrcType Min="0" Max="3">2</SrcType>
+          <DestIndex Min="-1" Max="127">0</DestIndex>
+          <AR Min="0" Max="128">1.77778</AR>
+          <Error Min="-1000000" Max="1000000">-9397</Error>
+          <AOIRect id="0">
+            <HPos Min="0" Max="0">0</HPos>
+            <VPos Min="0" Max="0">0</VPos>
+            <HSize Min="0" Max="0">1920</HSize>
+            <VSize Min="0" Max="0">1080</VSize>
+            <AR Min="0" Max="99">1.77778</AR>
+          </AOIRect>
+          <VideoColor id="0">
+            <Hue Min="-90" Max="90">0</Hue>
+            <Sat Min="0" Max="150">100</Sat>
+            <Bright Min="50" Max="150">100</Bright>
+            <BrightR Min="25" Max="150">100</BrightR>
+            <BrightG Min="25" Max="150">100</BrightG>
+            <BrightB Min="25" Max="150">100</BrightB>
+            <Contr Min="50" Max="150">100</Contr>
+            <ContrR Min="25" Max="150">100</ContrR>
+            <ContrG Min="25" Max="150">100</ContrG>
+            <ContrB Min="25" Max="150">100</ContrB>
+            <Invert Min="0" Max="1">0</Invert>
+            <Gamma Min="0.3" Max="3.3">1</Gamma>
+            <ColorSpace LegalValues="0 1">1</ColorSpace>
+            <ColorRange LegalValues="0 1">0</ColorRange>
+            <Mono Min="0" Max="1">0</Mono>
+          </VideoColor>
+        </Source>
+      </Add>
+      <Source id="0">
+        <AR Min="0" Max="128">1.77778</AR>
+        <Error Min="-1000000" Max="1000000">-9397</Error>
+        <AOIRect id="0">
+          <HPos Min="0" Max="0">0</HPos>
+          <VPos Min="0" Max="0">0</VPos>
+          <HSize Min="0" Max="0">1920</HSize>
+          <VSize Min="0" Max="0">1080</VSize>
+          <AR Min="0" Max="99">1.77778</AR>
+        </AOIRect>
+        <VideoColor id="0">
+          <Hue Min="-90" Max="90">0</Hue>
+          <Sat Min="0" Max="150">100</Sat>
+          <Bright Min="50" Max="150">100</Bright>
+          <BrightR Min="25" Max="150">100</BrightR>
+          <BrightG Min="25" Max="150">100</BrightG>
+          <BrightB Min="25" Max="150">100</BrightB>
+          <Contr Min="50" Max="150">100</Contr>
+          <ContrR Min="25" Max="150">100</ContrR>
+          <ContrG Min="25" Max="150">100</ContrG>
+          <ContrB Min="25" Max="150">100</ContrB>
+        </VideoColor>
+      </Source>
+    </SourceCol>
+  </SrcMgr>
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <Add id="0">
+        <ScreenDest id="0">
+          <IsActive LegalValues="0 1">0</IsActive>
+          <CanvasOpMode Min="0" Max="1">0</CanvasOpMode>
+          <CurrBGLyr Min="0" Max="1">0</CurrBGLyr>
+          <Name>ScreenDest1</Name>
+          <ToggleMode Min="0" Max="1">0</ToggleMode>
+          <Live Min="0" Max="1">0</Live>
+          <HdcpMode Min="0" Max="1">0</HdcpMode>
+          <CanvasMode LegalValues="0 1">0</CanvasMode>
+          <CanvasInCfg Min="-1" Max="127">-1</CanvasInCfg>
+          <HSize Min="0" Max="32767">1920</HSize>
+          <VSize Min="0" Max="32767">1080</VSize>
+          <HDimension Min="0" Max="16">1</HDimension>
+          <VDimension Min="0" Max="16">1</VDimension>
+          <AvlSclr Min="0" Max="63">0</AvlSclr>
+          <BGLyr id="0">
+            <LastBGSourceIndex Min="-1" Max="255">-1</LastBGSourceIndex>
+            <BGShowMatte Min="0" Max="1">1</BGShowMatte>
+            <Name>Empty</Name>
+            <BGColor id="0">
+              <Red Min="0" Max="1023">0</Red>
+              <Green Min="0" Max="1023">0</Green>
+              <Blue Min="0" Max="1023">0</Blue>
+            </BGColor>
+          </BGLyr>
+          <BGLyr id="1">
+            <LastBGSourceIndex Min="-1" Max="255">-1</LastBGSourceIndex>
+            <BGShowMatte Min="0" Max="1">1</BGShowMatte>
+            <Name>Empty</Name>
+            <BGColor id="0">
+              <Red Min="0" Max="1023">0</Red>
+              <Green Min="0" Max="1023">0</Green>
+              <Blue Min="0" Max="1023">0</Blue>
+            </BGColor>
+          </BGLyr>
+          <Transition id="0">
+            <TransTime Min="0" Max="1999">30</TransTime>
+            <TransPos Min="0" Max="4096">0</TransPos>
+            <TransCurve LegalValues="0 1 2 3">1</TransCurve>
+            <TransDelay Min="0" Max="1999">0</TransDelay>
+            <ArmMode Min="0" Max="1">0</ArmMode>
+            <KfPlay Min="0" Max="1">0</KfPlay>
+            <TBarDead Min="0" Max="1">0</TBarDead>
+            <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+            <TransInProg Min="0" Max="1">0</TransInProg>
+          </Transition>
+          <Transition id="1">
+            <TransTime Min="0" Max="1999">30</TransTime>
+            <TransPos Min="0" Max="4096">0</TransPos>
+            <TransCurve LegalValues="0 1 2 3">1</TransCurve>
+            <TransDelay Min="0" Max="1999">0</TransDelay>
+            <ArmMode Min="0" Max="1">0</ArmMode>
+            <KfPlay Min="0" Max="1">0</KfPlay>
+            <TBarDead Min="0" Max="1">0</TBarDead>
+            <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+            <TransInProg Min="0" Max="1">0</TransInProg>
+          </Transition>
+          <VideoFormat id="0">
+            <Name>1920x1080p @59.94</Name>
+            <HFreq>67433</HFreq>
+            <HSync Min="1" Max="192">88</HSync>
+            <HActive Min="0" Max="2024">1920</HActive>
+            <HFP Min="0" Max="192">88</HFP>
+            <HTotal Min="2096" Max="8191">2200</HTotal>
+            <VFreq Min="20" Max="75">59.9401</VFreq>
+            <VSync Min="1" Max="41">5</VSync>
+            <VActive Min="0" Max="1116">1080</VActive>
+            <VFP Min="0" Max="40">4</VFP>
+            <VTotal Min="1089" Max="8191">1125</VTotal>
+            <PixelClk>148.352</PixelClk>
+            <HSP Min="78" Max="80">80</HSP>
+            <VSP Min="78" Max="80">80</VSP>
+            <AR Min="0" Max="1000">1.77778</AR>
+            <Interlaced>80</Interlaced>
+            <VFType Min="0" Max="0">8</VFType>
+            <VFEnum Min="0" Max="4700">2708</VFEnum>
+            <VFStdFrom Min="0" Max="4">4</VFStdFrom>
+            <VFStdNum>16</VFStdNum>
+          </VideoFormat>
+          <DestOutMapCol id="0">
+            <DestOutMap id="0">
+              <OutCfgIndex Min="-1" Max="127">0</OutCfgIndex>
+              <CanvasIndex Min="0" Max="1">0</CanvasIndex>
+              <HPos Min="-100000" Max="100000">0</HPos>
+              <VPos Min="-100000" Max="100000">0</VPos>
+              <Group Min="0" Max="1">0</Group>
+              <FrzMode Min="0" Max="1">0</FrzMode>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </DestOutMap>
+          </DestOutMapCol>
+        </ScreenDest>
+      </Add>
+      <ScreenDest id="0">
+        <VideoFormat id="0">
+          <HActive Min="0" Max="2024">1920</HActive>
+          <HTotal Min="2096" Max="8191">2200</HTotal>
+          <VActive Min="0" Max="1116">1080</VActive>
+          <VTotal Min="1089" Max="8191">1125</VTotal>
+        </VideoFormat>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+  <FrameCollection id="0">
+    <Frame id="08::00::27::43::ba::54">
+      <Slot id="14">
+        <Card id="0">
+          <CardLayer id="0">
+            <LinkAssign id="0">
+              <XPos Min="0" Max="1000000">0</XPos>
+              <YPos Min="0" Max="1000000">0</YPos>
+              <ZPos Min="0" Max="1000000">0</ZPos>
+              <DestIndex Min="-1" Max="127">0</DestIndex>
+            </LinkAssign>
+          </CardLayer>
+        </Card>
+      </Slot>
+      <Slot id="15">
+        <Card id="0">
+          <CardLayer id="0">
+            <LinkAssign id="0">
+              <XPos Min="0" Max="1000000">0</XPos>
+              <YPos Min="0" Max="1000000">0</YPos>
+              <ZPos Min="0" Max="1000000">0</ZPos>
+              <DestIndex Min="-1" Max="127">0</DestIndex>
+            </LinkAssign>
+          </CardLayer>
+        </Card>
+      </Slot>
+      <Slot id="16">
+        <Card id="0">
+          <CardLayer id="0">
+            <LinkAssign id="0">
+              <XPos Min="0" Max="1000000">0</XPos>
+              <YPos Min="0" Max="1000000">0</YPos>
+              <ZPos Min="0" Max="1000000">0</ZPos>
+              <DestIndex Min="-1" Max="127">0</DestIndex>
+            </LinkAssign>
+          </CardLayer>
+        </Card>
+      </Slot>
+      <Slot id="17">
+        <Card id="0">
+          <CardLayer id="0">
+            <LinkAssign id="0">
+              <XPos Min="0" Max="1000000">0</XPos>
+              <YPos Min="0" Max="1000000">0</YPos>
+              <ZPos Min="0" Max="1000000">0</ZPos>
+              <DestIndex Min="-1" Max="127">0</DestIndex>
+            </LinkAssign>
+          </CardLayer>
+        </Card>
+      </Slot>
+    </Frame>
+  </FrameCollection>
+</System>

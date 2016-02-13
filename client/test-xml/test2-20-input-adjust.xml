@@ -1,0 +1,38 @@
+<System id="0">
+  <GuiId>cd10a91d-e7c3-4ede-a21f-ed3e60e9890a</GuiId>
+  <SrcMgr id="0">
+    <SourceCol id="0">
+      <Source id="1">
+        <AR Min="0" Max="128">1.77778</AR>
+        <AOIRect id="0">
+          <HPos Min="0" Max="0">0</HPos>
+          <VPos Min="0" Max="0">0</VPos>
+          <HSize Min="0" Max="1920">1920</HSize>
+          <VSize Min="0" Max="1080">1080</VSize>
+          <AR Min="0" Max="99">1.77778</AR>
+        </AOIRect>
+      </Source>
+    </SourceCol>
+    <InputCfgCol id="0">
+      <InputCfg id="0">
+        <VideoColor id="0">
+          <Hue Min="-90" Max="90">0</Hue>
+          <Sat Min="0" Max="150">100</Sat>
+          <Bright Min="50" Max="150">100</Bright>
+          <BrightR Min="25" Max="150">100</BrightR>
+          <BrightG Min="25" Max="150">100</BrightG>
+          <BrightB Min="25" Max="150">100</BrightB>
+          <Contr Min="50" Max="150">100</Contr>
+          <ContrR Min="25" Max="150">100</ContrR>
+          <ContrG Min="25" Max="150">100</ContrG>
+          <ContrB Min="25" Max="150">100</ContrB>
+          <Invert Min="0" Max="1">0</Invert>
+          <Gamma Min="0.3" Max="3.3">1</Gamma>
+          <ColorSpace LegalValues="0 1">0</ColorSpace>
+          <ColorRange LegalValues="0 1">0</ColorRange>
+          <Mono Min="0" Max="1">0</Mono>
+        </VideoColor>
+      </InputCfg>
+    </InputCfgCol>
+  </SrcMgr>
+</System>

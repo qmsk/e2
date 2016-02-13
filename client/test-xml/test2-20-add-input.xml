@@ -1,0 +1,308 @@
+<System id="0">
+  <GuiId>727c23df-f645-46fb-9bce-1b84dc79e529</GuiId>
+  <SrcMgr id="0">
+    <SourceCol id="0">
+      <Add id="0">
+        <Source id="1">
+          <InputCfgIndex Min="-1" Max="127">0</InputCfgIndex>
+          <StillIndex Min="-1" Max="99">-1</StillIndex>
+          <UserKeyIndex Min="-1" Max="299">-1</UserKeyIndex>
+          <Name>Input1-2</Name>
+          <SrcType Min="0" Max="3">0</SrcType>
+          <DestIndex Min="-1" Max="127">-1</DestIndex>
+          <AR Min="0" Max="128">1.77777</AR>
+          <Error Min="-1000000" Max="1000000">-9399</Error>
+          <AOIRect id="0">
+            <HPos Min="0" Max="1920">0</HPos>
+            <VPos Min="0" Max="1080">0</VPos>
+            <HSize Min="0" Max="1920">0</HSize>
+            <VSize Min="0" Max="1080">0</VSize>
+            <AR Min="0" Max="99">0</AR>
+          </AOIRect>
+          <VideoColor id="0">
+            <Hue Min="-90" Max="90">0</Hue>
+            <Sat Min="0" Max="150">100</Sat>
+            <Bright Min="50" Max="150">100</Bright>
+            <BrightR Min="25" Max="150">100</BrightR>
+            <BrightG Min="25" Max="150">100</BrightG>
+            <BrightB Min="25" Max="150">100</BrightB>
+            <Contr Min="50" Max="150">100</Contr>
+            <ContrR Min="25" Max="150">100</ContrR>
+            <ContrG Min="25" Max="150">100</ContrG>
+            <ContrB Min="25" Max="150">100</ContrB>
+            <Invert Min="0" Max="1">0</Invert>
+            <Gamma Min="0.3" Max="3.3">1</Gamma>
+            <ColorSpace LegalValues="0 1">1</ColorSpace>
+            <ColorRange LegalValues="0 1">0</ColorRange>
+            <Mono Min="0" Max="1">0</Mono>
+          </VideoColor>
+        </Source>
+      </Add>
+      <Source id="1">
+        <Error Min="-1000000" Max="1000000">-9399</Error>
+        <AOIRect id="0">
+          <HPos Min="0" Max="1920">0</HPos>
+          <VPos Min="0" Max="1080">0</VPos>
+          <HSize Min="0" Max="1920">0</HSize>
+          <VSize Min="0" Max="1080">0</VSize>
+        </AOIRect>
+        <VideoColor id="0">
+          <Hue Min="-90" Max="90">0</Hue>
+          <Sat Min="0" Max="150">100</Sat>
+          <Bright Min="50" Max="150">100</Bright>
+          <BrightR Min="25" Max="150">100</BrightR>
+          <BrightG Min="25" Max="150">100</BrightG>
+          <BrightB Min="25" Max="150">100</BrightB>
+          <Contr Min="50" Max="150">100</Contr>
+          <ContrR Min="25" Max="150">100</ContrR>
+          <ContrG Min="25" Max="150">100</ContrG>
+          <ContrB Min="25" Max="150">100</ContrB>
+        </VideoColor>
+      </Source>
+    </SourceCol>
+    <InputCfgCol id="0">
+      <Add id="0">
+        <InputCfg id="0">
+          <InputCfgType Min="0" Max="1">0</InputCfgType>
+          <SyncInvertS3D LegalValues="0 1">0</SyncInvertS3D>
+          <Mode3D LegalValues="0 1">0</Mode3D>
+          <In3DSync LegalValues="0 1 2 3 4">0</In3DSync>
+          <Eye3D LegalValues="0 1">0</Eye3D>
+          <InputCfgInputNameId Min="0" Max="128">0</InputCfgInputNameId>
+          <Name>Input1</Name>
+          <AutoAcqMode Min="0" Max="1">1</AutoAcqMode>
+          <Motion Min="0" Max="15">15</Motion>
+          <Type3G LegalValues="0 1 2 3">2</Type3G>
+          <InputCfgVideoStatus Min="0" Max="4">4</InputCfgVideoStatus>
+          <FrzMode Min="0" Max="1">0</FrzMode>
+          <Config id="0">
+            <Name>Config0</Name>
+            <Owner></Owner>
+            <Contact></Contact>
+            <HDimension Min="0" Max="16">1</HDimension>
+            <VDimension Min="0" Max="16">1</VDimension>
+            <ConnMapOrient LegalValues="0 1 2">0</ConnMapOrient>
+            <ConfigStatus Min="0" Max="5">1</ConfigStatus>
+            <ConnMap id="0">
+              <InUse Min="0" Max="1">1</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">1</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">2</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="1">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="2">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="3">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="4">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="5">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="6">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="7">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="8">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="9">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="10">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="11">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="12">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="13">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="14">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <ConnMap id="15">
+              <InUse Min="0" Max="1">0</InUse>
+              <VPID Min="0" Max="1">0</VPID>
+              <CardType Min="0" Max="255">255</CardType>
+              <ColumnIndex Min="0" Max="15">0</ColumnIndex>
+              <RowIndex Min="0" Max="15">0</RowIndex>
+              <ConnectorIndex Min="0" Max="3">0</ConnectorIndex>
+              <SlotIndex Min="0" Max="22">-1</SlotIndex>
+              <Error Min="-1000000" Max="1000000">0</Error>
+            </ConnMap>
+            <VideoFormat id="0">
+              <Name>1920x1080p @59.94</Name>
+              <HFreq>67433</HFreq>
+              <HSync Min="1" Max="192">88</HSync>
+              <HActive Min="0" Max="2008">1920</HActive>
+              <HFP Min="0" Max="192">88</HFP>
+              <HTotal Min="2112" Max="8191">2200</HTotal>
+              <VFreq Min="20" Max="75">59.9401</VFreq>
+              <VSync Min="1" Max="41">5</VSync>
+              <VActive Min="0" Max="1084">1080</VActive>
+              <VFP Min="0" Max="40">4</VFP>
+              <VTotal Min="1121" Max="8191">1125</VTotal>
+              <PixelClk>148.352</PixelClk>
+              <HSP Min="78" Max="80">80</HSP>
+              <VSP Min="78" Max="80">80</VSP>
+              <AR Min="0" Max="1000">1.77778</AR>
+              <Interlaced>80</Interlaced>
+              <VFType Min="0" Max="0">8</VFType>
+              <VFEnum Min="0" Max="4700">2708</VFEnum>
+              <VFStdFrom Min="0" Max="4">4</VFStdFrom>
+              <VFStdNum>16</VFStdNum>
+            </VideoFormat>
+          </Config>
+          <VideoColor id="0">
+            <Hue Min="-90" Max="90">0</Hue>
+            <Sat Min="0" Max="150">100</Sat>
+            <Bright Min="50" Max="150">100</Bright>
+            <BrightR Min="25" Max="150">100</BrightR>
+            <BrightG Min="25" Max="150">100</BrightG>
+            <BrightB Min="25" Max="150">100</BrightB>
+            <Contr Min="50" Max="150">100</Contr>
+            <ContrR Min="25" Max="150">100</ContrR>
+            <ContrG Min="25" Max="150">100</ContrG>
+            <ContrB Min="25" Max="150">100</ContrB>
+            <Invert Min="0" Max="1">0</Invert>
+            <Gamma Min="0.3" Max="3.3">1</Gamma>
+            <ColorSpace LegalValues="0 1">0</ColorSpace>
+            <ColorRange LegalValues="0 1">0</ColorRange>
+            <Mono Min="0" Max="1">0</Mono>
+          </VideoColor>
+        </InputCfg>
+      </Add>
+      <InputCfg id="0">
+        <InputCfgVideoStatus Min="0" Max="4">4</InputCfgVideoStatus>
+        <Config id="0">
+          <ConfigStatus Min="0" Max="5">1</ConfigStatus>
+        </Config>
+        <VideoColor id="0">
+          <Hue Min="-90" Max="90">0</Hue>
+          <Sat Min="0" Max="150">100</Sat>
+          <Bright Min="50" Max="150">100</Bright>
+          <BrightR Min="25" Max="150">100</BrightR>
+          <BrightG Min="25" Max="150">100</BrightG>
+          <BrightB Min="25" Max="150">100</BrightB>
+          <Contr Min="50" Max="150">100</Contr>
+          <ContrR Min="25" Max="150">100</ContrR>
+          <ContrG Min="25" Max="150">100</ContrG>
+          <ContrB Min="25" Max="150">100</ContrB>
+        </VideoColor>
+      </InputCfg>
+    </InputCfgCol>
+  </SrcMgr>
+</System>

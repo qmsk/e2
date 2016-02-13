@@ -159,3 +159,63 @@ func TestXmlRead(t *testing.T) {
         }
     }
 }
+
+// Adding new outputs/inputs from initial empty state
+func TestXmlAdd(t *testing.T) {
+    xmlClient := testXMLClient("./test-xml/test2-*.xml")
+
+    listenChan, err := xmlClient.Listen()
+    if err != nil {
+        t.Fatalf("xmlClient.Listen: %v", err)
+    }
+
+    // read System state updates, and updates this to be the final System state after all cumulative updates
+    var listenSystem System
+
+    for listenSystem = range listenChan {
+        // read it
+        _ = listenSystem.String()
+    }
+
+    log.Printf("End of Listen\n")
+
+    // check resulting system state
+    if source0, exists := listenSystem.SrcMgr.SourceCol[0]; !exists {
+        t.Errorf("Source #0 does not exist")
+    } else {
+        t.Logf("Source #0: %#v\n", source0)
+
+        if source0.Name != "ScreenDest1_PGM-1" {
+            t.Errorf("Source #0 Name: %v", source0.Name)
+        }
+        if !(source0.InputCfgIndex == -1 && source0.StillIndex == -1 && source0.DestIndex == 0) {
+            t.Errorf("Source 0: InputCfgIndex=%v StillIndex=%v DestIndex=%v", source0.InputCfgIndex, source0.StillIndex, source0.DestIndex)
+        }
+    }
+    if source1, exists := listenSystem.SrcMgr.SourceCol[1]; !exists {
+        t.Errorf("Source #1 does not exist")
+    } else {
+        t.Logf("Source #1: %#v\n", source1)
+
+        if source1.Name != "Input1-2" {
+            t.Errorf("Source #1 Name: %v", source1.Name)
+        }
+        if !(source1.InputCfgIndex == 0 && source1.StillIndex == -1 && source1.DestIndex == -1) {
+            t.Errorf("Source 1: InputCfgIndex=%v StillIndex=%v DestIndex=%v", source1.InputCfgIndex, source1.StillIndex, source1.DestIndex)
+        }
+    }
+
+    if screen0, exists := listenSystem.DestMgr.ScreenDestCol[0]; !exists {
+        t.Errorf("Screen #0 does not exist")
+    } else {
+        t.Logf("Screen #0: %#v\n", screen0)
+
+        if screen0.Name != "ScreenDest1" {
+            t.Errorf("Screen #0 Name: %v", screen0.Name)
+        }
+
+        if screen0.IsActive != 0 {
+            t.Errorf("Screen #0: IsActive=%v", screen0.IsActive)
+        }
+    }
+}

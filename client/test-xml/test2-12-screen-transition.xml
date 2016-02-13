@@ -1,0 +1,17 @@
+<System id="0">
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <ScreenDest id="0">
+        <Transition id="0">
+          <TBarDead Min="0" Max="1">0</TBarDead>
+          <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+        </Transition>
+        <Transition id="1">
+          <TBarDead Min="0" Max="1">0</TBarDead>
+          <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+        </Transition>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+</System>
+
