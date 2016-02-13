@@ -1,0 +1,34 @@
+<System id="0">
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <ScreenDest id="0">
+        <BGLyr id="0">
+          <LastBGSourceIndex Min="-1" Max="255">-1</LastBGSourceIndex>
+          <BGShowMatte Min="0" Max="1">1</BGShowMatte>
+          <Name>Empty</Name>
+          <BGColor id="0">
+            <Red Min="0" Max="1023">0</Red>
+            <Green Min="0" Max="1023">0</Green>
+            <Blue Min="0" Max="1023">0</Blue>
+          </BGColor>
+        </BGLyr>
+        <Transition id="0">
+          <TransPos Min="0" Max="4096">0</TransPos>
+          <KfPlay Min="0" Max="1">0</KfPlay>
+          <TBarDead Min="0" Max="1">0</TBarDead>
+          <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+          <TransInProg Min="0" Max="1">0</TransInProg>
+        </Transition>
+        <LayerCollection id="0">
+          <Layer id="0">
+            <PgmMode Min="0" Max="1">1</PgmMode>
+            <PvwMode Min="0" Max="1">0</PvwMode>
+          </Layer>
+          <Layer id="1">
+            <PvwMode Min="0" Max="1">1</PvwMode>
+          </Layer>
+        </LayerCollection>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+</System>

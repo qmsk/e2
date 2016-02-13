@@ -1,0 +1,13 @@
+<System id="0">
+  <GuiId>45c77865-97b1-49c5-88bd-63c8531888f8</GuiId>
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <ScreenDest id="0">
+        <IsActive LegalValues="0 1">1</IsActive>
+        <Transition id="0">
+          <ArmMode Min="0" Max="1">1</ArmMode>
+        </Transition>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+</System>
