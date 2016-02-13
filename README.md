@@ -26,52 +26,54 @@ TODO: examples
 
 Combines both sources and screens, including cross-correlated program/preview state for both. This is `O(N)` RPCs on the number of screen destinations.
 
-      {
-        "sources": {
-          "4" : {
-             "dimensions" : {
-                "width" : 1920,
-                "height" : 1080
-             },
-             "type" : "input",
-             "id" : 4,
-             "name" : "PC 3",
-             "status" : "ok"
-             "preview_screens" : [
-                "0"
-             ],
-          },
-          "5" : {
-             "id" : 5,
-             "name" : "PC 4",
-             "status" : "ok",
-             "type" : "input",
-             "dimensions" : {
-                "height" : 1080,
-                "width" : 1920
-             }
-             "program_screens" : [
-                "0"
-             ],
-          },
-        },
-        "screens" : {
-          "0" : {
-             "id" : 0,
-             "preview_sources" : [
-                "4"
-             ],
-             "name" : "Main",
-             "program_sources" : [
-                "5"
-             ],
-             "dimensions" : {
-                "width" : 1920,
-                "height" : 1080
-             }
-          },
-        }
-     }
+```JSON
+  {
+    "sources": {
+      "4" : {
+         "dimensions" : {
+            "width" : 1920,
+            "height" : 1080
+         },
+         "type" : "input",
+         "id" : 4,
+         "name" : "PC 3",
+         "status" : "ok"
+         "preview_screens" : [
+            "0"
+         ],
+      },
+      "5" : {
+         "id" : 5,
+         "name" : "PC 4",
+         "status" : "ok",
+         "type" : "input",
+         "dimensions" : {
+            "height" : 1080,
+            "width" : 1920
+         }
+         "program_screens" : [
+            "0"
+         ],
+      },
+    },
+    "screens" : {
+      "0" : {
+         "id" : 0,
+         "preview_sources" : [
+            "4"
+         ],
+         "name" : "Main",
+         "program_sources" : [
+            "5"
+         ],
+         "dimensions" : {
+            "width" : 1920,
+            "height" : 1080
+         }
+      },
+    }
+ }
+```
 
 #### *GET* `/api/sources`
 
@@ -99,15 +101,166 @@ Includes the detailed information for each preset. This is `O(N)` RPCs on the nu
 
 ### Events
 
-TODO: examples
+Supports live streaming of updated E2 system state on events.
+
+The same output can be followed using `client listen` and `client listen --json`.
 
 #### `ws://.../events`
 
-TODO: support JSON encoding `Client.System`
-
-    {
-        "line": "...",
+```JSON
+{
+    "system": {
+       "OSVersion" : "0.0.0",
+       "PresetMgr" : {
+          "LastRecall" : -1,
+          "ID" : 0,
+          "Preset" : {}
+       },
+       "DestMgr" : {
+          "AuxDestCol" : {},
+          "ID" : 0,
+          "ScreenDestCol" : {
+             "0" : {
+                "Transition" : [
+                   {
+                      "AutoTransInProg" : 0,
+                      "ArmMode" : 0,
+                      "ID" : 0,
+                      "TransInProg" : 0,
+                      "TransPos" : 0
+                   },
+                   {
+                      "AutoTransInProg" : 0,
+                      "ID" : 1,
+                      "ArmMode" : 0,
+                      "TransInProg" : 0,
+                      "TransPos" : 0
+                   }
+                ],
+                "VSize" : 1080,
+                "HSize" : 1920,
+                "Name" : "ScreenDest1",
+                "IsActive" : 0,
+                "LayerCollection" : {
+                   "0" : {
+                      "LastSrcIdx" : 1,
+                      "PgmMode" : 1,
+                      "PgmZOrder" : 0,
+                      "IsActive" : 0,
+                      "PvwMode" : 0,
+                      "Name" : "Layer1-A",
+                      "id" : 0,
+                      "LastUserKeyIdx" : -1,
+                      "PvwZOrder" : 0
+                   },
+                   "3" : {
+                      "PvwZOrder" : 2,
+                      "LastUserKeyIdx" : -1,
+                      "PvwMode" : 0,
+                      "Name" : "Layer2-B",
+                      "IsActive" : 0,
+                      "id" : 3,
+                      "PgmMode" : 0,
+                      "PgmZOrder" : 2,
+                      "LastSrcIdx" : -1
+                   },
+                   "1" : {
+                      "PgmZOrder" : 0,
+                      "PgmMode" : 0,
+                      "LastSrcIdx" : 1,
+                      "LastUserKeyIdx" : -1,
+                      "PvwZOrder" : 0,
+                      "id" : 1,
+                      "PvwMode" : 1,
+                      "Name" : "Layer1-B",
+                      "IsActive" : 0
+                   },
+                   "2" : {
+                      "PvwZOrder" : 2,
+                      "LastUserKeyIdx" : -1,
+                      "IsActive" : 0,
+                      "Name" : "Layer2-A",
+                      "PvwMode" : 0,
+                      "id" : 2,
+                      "PgmMode" : 0,
+                      "PgmZOrder" : 2,
+                      "LastSrcIdx" : -1
+                   }
+                },
+                "BGLayer" : [
+                   {
+                      "Name" : "",
+                      "BGShowMatte" : 1,
+                      "BGColor" : {
+                         "Red" : 0,
+                         "Blue" : 0,
+                         "Green" : 0,
+                         "id" : 0
+                      },
+                      "id" : 0,
+                      "LastBGSourceIndex" : -1
+                   },
+                   {
+                      "LastBGSourceIndex" : -1,
+                      "Name" : "",
+                      "BGShowMatte" : 1,
+                      "BGColor" : {
+                         "id" : 0,
+                         "Blue" : 0,
+                         "Green" : 0,
+                         "Red" : 0
+                      },
+                      "id" : 1
+                   }
+                ],
+                "ID" : 0
+             }
+          }
+       },
+       "SrcMgr" : {
+          "ID" : 0,
+          "SourceCol" : {
+             "0" : {
+                "HSize" : 1920,
+                "StillIndex" : -1,
+                "id" : 0,
+                "SrcType" : 2,
+                "Name" : "ScreenDest1_PGM-1",
+                "DestIndex" : 0,
+                "UserKeyIndex" : -1,
+                "VSize" : 1080,
+                "InputCfgVideoStatus" : 0,
+                "InputCfgIndex" : -1
+             },
+             "1" : {
+                "DestIndex" : -1,
+                "VSize" : 1080,
+                "UserKeyIndex" : -1,
+                "InputCfgVideoStatus" : 0,
+                "InputCfgIndex" : 0,
+                "HSize" : 1920,
+                "id" : 1,
+                "StillIndex" : -1,
+                "SrcType" : 0,
+                "Name" : "Input1-2"
+             }
+          },
+          "InputCfgCol" : {
+             "0" : {
+                "id" : 0,
+                "InputCfgType" : 0,
+                "Name" : "Input1",
+                "ConfigOwner" : "",
+                "ConfigContact" : "",
+                "InputCfgVideoStatus" : 4
+             }
+          }
+       },
+       "Version" : "0.0.0",
+       "Name" : "System1"
     }
+}
+```
 
 ### Usage
     server [OPTIONS]
