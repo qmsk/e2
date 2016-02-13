@@ -52,6 +52,17 @@ func unmarshalXMLMap(x xmlMap, d *xml.Decoder, e xml.StartElement) error {
 
     idValue := reflect.ValueOf(id)
 
+    // update into new map
+    newMap := reflect.MakeMap(mapType)
+
+    if !mapValue.IsNil() {
+        // copy
+        for _, keyValue := range mapValue.MapKeys() {
+            newMap.SetMapIndex(keyValue, mapValue.MapIndex(keyValue))
+        }
+    }
+    mapValue.Set(newMap)
+
     // unmarshal into existing item from map, or zero value if item was not in map
     itemValue := reflect.New(itemType)
 
@@ -64,10 +75,6 @@ func unmarshalXMLMap(x xmlMap, d *xml.Decoder, e xml.StartElement) error {
     }
 
     // store into map
-    if mapValue.IsNil() {
-        mapValue.Set(reflect.MakeMap(mapType))
-    }
-
     mapValue.SetMapIndex(idValue, itemValue.Elem())
 
     return nil

@@ -207,9 +207,10 @@ func (xmlClient *XMLClient) run() {
 
 // Listen for system updates.
 //
-// Starts the XML stream and sends each updated System state on the given chan, starting from the initial reset state
+// Starts the XML stream and sends each updated System state on the given chan, starting from the initial reset state.
 //
-// XXX: the System is not safe (modified in-place...)
+// The received System is safe for concurrent reads, but do *not* write to it! Use the public methods if possible.
+//
 // XXX: only one shared chan for all callers
 func (xmlClient *XMLClient) Listen() (chan System, error) {
     if xmlClient.listenChan != nil {
