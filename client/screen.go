@@ -28,42 +28,23 @@ type ScreenDest struct {
     LayerCollection     LayerCollection `xml:"LayerCollection>Layer"`
 }
 
-type ScreenDestCol struct {
-    ScreenDest      map[int]ScreenDest
-}
+type ScreenDestCol map[int]ScreenDest
 
 func (col *ScreenDestCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    id, err := xmlID(e)
-    if err != nil {
-        return err
-    }
-
-    screenDest := col.ScreenDest[id]
-
-    if err := d.DecodeElement(&screenDest, &e); err != nil {
-        return err
-    }
-
-    if col.ScreenDest == nil {
-        col.ScreenDest = make(map[int]ScreenDest)
-    }
-
-    col.ScreenDest[id] = screenDest
-
-    return nil
+    return unmarshalXMLMap(col, d, e)
 }
 
 func (col ScreenDestCol) List() (items []ScreenDest) {
     var keys []int
 
-    for key, _ := range col.ScreenDest {
+    for key, _ := range col {
         keys = append(keys, key)
     }
 
     sort.Ints(keys)
 
     for _, key := range keys {
-        items = append(items, col.ScreenDest[key])
+        items = append(items, col[key])
     }
 
     return items

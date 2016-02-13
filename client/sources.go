@@ -68,42 +68,23 @@ func (client *Client) ListSources() (sourceList []Source, err error) {
 }
 
 // XML
-type SourceCol struct {
-    Source          map[int]Source
-}
+type SourceCol map[int]Source
 
 func (col *SourceCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    id, err := xmlID(e)
-    if err != nil {
-        return err
-    }
-
-    source := col.Source[id]
-
-    if err := d.DecodeElement(&source, &e); err != nil {
-        return err
-    }
-
-    if col.Source == nil {
-        col.Source = make(map[int]Source)
-    }
-
-    col.Source[id] = source
-
-    return nil
+    return unmarshalXMLMap(col, d, e)
 }
 
 func (col SourceCol) List() (items []Source) {
     var keys []int
 
-    for key, _ := range col.Source {
+    for key, _ := range col {
         keys = append(keys, key)
     }
 
     sort.Ints(keys)
 
     for _, key := range keys {
-        items = append(items, col.Source[key])
+        items = append(items, col[key])
     }
 
     return items

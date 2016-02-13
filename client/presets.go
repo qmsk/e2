@@ -104,41 +104,23 @@ func (client *Client) ListDestinationsForPreset(presetID int) (result PresetDest
 }
 
 // XML
-type PresetMap map[int]Preset
+type PresetCol map[int]Preset
 
-func (m *PresetMap) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    if id, err := xmlID(e); err != nil {
-        return err
-    } else {
-        value := (*m)[id]
-
-        if err := d.DecodeElement(&value, &e); err != nil {
-            return err
-        }
-
-        if *m == nil {
-            *m = make(PresetMap)
-        }
-
-        (*m)[id] = value
-
-        return nil
-    }
+func (col *PresetCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
+    return unmarshalXMLMap(col, d, e)
 }
 
-func (m PresetMap) List() []Preset {
+func (col PresetCol) List() (items []Preset) {
     var keys []int
-    var items []Preset
 
-    for key, _ := range m {
+    for key, _ := range col {
         keys = append(keys, key)
     }
 
     sort.Ints(keys)
 
-
     for _, key := range keys {
-        items = append(items, m[key])
+        items = append(items, col[key])
     }
 
     return items
@@ -149,5 +131,5 @@ type PresetMgr struct {
 
     LastRecall  int             `xml:"LastRecall"`
 
-    Preset      PresetMap       `xml:"Preset"`
+    Preset      PresetCol       `xml:"Preset"`
 }

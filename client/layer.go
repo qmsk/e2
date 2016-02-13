@@ -50,42 +50,23 @@ type Layer struct {
     //Mask
 }
 
-type LayerCollection struct {
-    Layer       map[int]Layer   `xml:"Layer"`
-}
+type LayerCollection map[int]Layer
 
 func (col *LayerCollection) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    id, err := xmlID(e)
-    if err != nil {
-        return err
-    }
-
-    layer := col.Layer[id]
-
-    if err := d.DecodeElement(&layer, &e); err != nil {
-        return err
-    }
-
-    if col.Layer == nil {
-        col.Layer = make(map[int]Layer)
-    }
-
-    col.Layer[id] = layer
-
-    return nil
+    return unmarshalXMLMap(col, d, e)
 }
 
 func (col LayerCollection) List() (items []Layer) {
     var keys []int
 
-    for key, _ := range col.Layer {
+    for key, _ := range col {
         keys = append(keys, key)
     }
 
     sort.Ints(keys)
 
     for _, key := range keys {
-        items = append(items, col.Layer[key])
+        items = append(items, col[key])
     }
 
     return items

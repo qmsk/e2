@@ -8,6 +8,10 @@ import (
 )
 
 type System struct {
+    OSVersion   string
+    Version     string
+    Name        string
+
     SrcMgr      SrcMgr      `xml:"SrcMgr"`
     DestMgr     DestMgr     `xml:"DestMgr"`
     PresetMgr   PresetMgr   `xml:"PresetMgr"`

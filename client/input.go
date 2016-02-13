@@ -34,42 +34,23 @@ type InputCfg struct {
 }
 
 // XML
-type InputCfgCol struct {
-    InputCfg    map[int]InputCfg
-}
+type InputCfgCol map[int]InputCfg
 
 func (col *InputCfgCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    id, err := xmlID(e)
-    if err != nil {
-        return err
-    }
-
-    source := col.InputCfg[id]
-
-    if err := d.DecodeElement(&source, &e); err != nil {
-        return err
-    }
-
-    if col.InputCfg == nil {
-        col.InputCfg = make(map[int]InputCfg)
-    }
-
-    col.InputCfg[id] = source
-
-    return nil
+    return unmarshalXMLMap(col, d, e)
 }
 
 func (col InputCfgCol) List() (items []InputCfg) {
     var keys []int
 
-    for key, _ := range col.InputCfg {
+    for key, _ := range col {
         keys = append(keys, key)
     }
 
     sort.Ints(keys)
 
     for _, key := range keys {
-        items = append(items, col.InputCfg[key])
+        items = append(items, col[key])
     }
 
     return items

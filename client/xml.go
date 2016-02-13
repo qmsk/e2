@@ -8,26 +8,6 @@ import (
     "encoding/xml"
 )
 
-func xmlAttr(e xml.StartElement, name string) (value string) {
-    for _, attr := range e.Attr {
-        if attr.Name.Local == name {
-            return attr.Value
-        }
-    }
-
-    return ""
-}
-
-func xmlID(e xml.StartElement) (id int, err error) {
-    value := xmlAttr(e, "id")
-
-    if _, err := fmt.Sscanf(value, "%d", &id); err != nil {
-        return id, err
-    } else {
-        return id, nil
-    }
-}
-
 type xmlResponse struct {
     ID          int         `xml:"id,attr"`
     Reset       string      `xml:"reset,attr"`
@@ -44,11 +24,10 @@ type xmlResponse struct {
 type xmlPacket struct {
     XMLName     xml.Name    `xml:"System"`
 
-    reset       bool
-
     xmlResponse
 
-    system      *System
+    // decoding state
+    reset       bool
 }
 
 func (r *xmlPacket) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
@@ -58,11 +37,8 @@ func (r *xmlPacket) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
         r.reset = true
 
         // reset
-        r.system.Reset()
+        r.System.Reset()
     }
-
-    // decode into selected *System
-    r.xmlResponse.System = r.system
 
     return d.DecodeElement(&r.xmlResponse, &e)
 }
@@ -162,7 +138,7 @@ func (xmlClient *XMLClient) reader() {
     var wantReset = true
 
     for {
-        packet := xmlPacket{system: &xmlClient.system}
+        packet := xmlPacket{xmlResponse: xmlResponse{System: &xmlClient.system}}
 
         if err := xmlClient.read(&packet); err != nil {
             log.Printf("xmlClient.read: %v\n", err)
