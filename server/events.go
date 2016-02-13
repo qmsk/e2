@@ -10,8 +10,8 @@ import (
 const EVENTS_BUFFER = 100
 
 type Event struct {
-    // System      client.System   `json:"system"`
-    Line        string          `json:"line"`
+    System      client.System   `json:"system"`
+    String      string          `json:"string"`
 }
 
 type clientSet map[chan Event]bool
@@ -29,16 +29,19 @@ func (clientSet clientSet) drop(clientChan chan Event) {
     close(clientChan)
     delete(clientSet, clientChan)
 }
+func (clientSet clientSet) send(clientChan chan Event, event Event) {
+    select {
+    case clientChan <- event:
+
+    default:
+        // client dropped behind
+        clientSet.drop(clientChan)
+    }
+}
 
 func (clientSet clientSet) publish(event Event) {
     for clientChan, _ := range clientSet {
-        select {
-        case clientChan <- event:
-
-        default:
-            // client dropped behind
-            clientSet.drop(clientChan)
-        }
+        clientSet.send(clientChan, event)
     }
 }
 
@@ -75,6 +78,8 @@ func (server *Server) Events() (*Events, error) {
 }
 
 func (events *Events) run() {
+    var event Event
+
     clients := make(clientSet)
     defer clients.close()
 
@@ -87,6 +92,9 @@ func (events *Events) run() {
         case clientChan := <-events.registerChan:
             clients.register(clientChan)
 
+            // initial state
+            clients.send(clientChan, event)
+
         case clientChan := <-events.unregisterChan:
             clients.unregister(clientChan)
 
@@ -96,9 +104,10 @@ func (events *Events) run() {
                 panic("Events died")
             }
 
-            event := Event{
-                // System: system, // XXX: not JSON-encodable
-                Line:   system.String(),
+            // update state
+            event = Event{
+                System:     system,
+                String:     system.String(),
             }
 
             // log.Printf("Events: %v\n", event)
