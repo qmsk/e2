@@ -2,59 +2,109 @@ package client
 
 import (
     "path/filepath"
+    "fmt"
+    "io"
+    "log"
+    "net"
     "os"
-    "sync"
     "testing"
-    "encoding/xml"
+    "time"
 )
 
-const testXmlFiles = "./test-xml/test1-*.xml"
+func testXMLClient(xmlGlob string) *XMLClient {
+    streamFiles, err := filepath.Glob(xmlGlob)
+    if err != nil {
+        panic(fmt.Errorf("filepath.Glob: %v\n", err))
+    }
+
+    // setup mock server
+    tcpListener, err := net.ListenTCP("tcp", nil)
+    if err != nil {
+        panic(err)
+    }
+
+    go func(tcpListener *net.TCPListener) {
+        for {
+            tcpConn, err := tcpListener.AcceptTCP()
+            if err != nil {
+                panic(err)
+            }
+
+            // write each .xml file into the testConn end of the pipe, for XMLClient to read
+            go func(tcpConn *net.TCPConn) {
+                defer tcpConn.CloseWrite()
+
+                for _, xmlPath := range streamFiles {
+                    xmlFile, err := os.Open(xmlPath)
+                    if err != nil {
+                        panic(fmt.Errorf("os.Open: %v\n", err))
+                    }
+                    defer xmlFile.Close()
+
+                    if write, err := io.Copy(tcpConn, xmlFile); err != nil {
+                        panic(fmt.Errorf("io.Copy: %v\n", err))
+                    } else {
+                        log.Printf("Send %v: %d bytes\n", xmlPath, write)
+                    }
+
+                    time.Sleep(1 * time.Second)
+                }
+
+                log.Printf("Send: done\n")
+            }(tcpConn)
+
+            go func(tcpConn *net.TCPConn) {
+                defer tcpConn.Close()
+
+                for {
+                    buf := make([]byte, 1500)
+
+                    if read, err := tcpConn.Read(buf); err != nil {
+                        log.Printf("Recv error: %v\n", err)
+                        break
+                    } else {
+                        log.Printf("Recv %d bytes: %#v\n", read, string(buf[:read]))
+                    }
+                }
+
+                log.Printf("Recv: done\n")
+            }(tcpConn)
+        }
+    }(tcpListener)
+
+    // connect client to test server
+    listenAddr := tcpListener.Addr().(*net.TCPAddr)
+
+    tcpConn, err := net.DialTCP("tcp", nil, listenAddr)
+    if err != nil {
+        panic(err)
+    }
+
+    xmlClient := XMLClient{
+        timeout:    10 * time.Second,
+        conn:       tcpConn,
+    }
+
+    return &xmlClient
+}
 
 func TestXmlRead(t *testing.T) {
-    var wg sync.WaitGroup
+    xmlClient := testXMLClient("./test-xml/test1-*.xml")
 
-    listenChan := make(chan System)
+    listenChan, err := xmlClient.Listen()
+    if err != nil {
+        t.Fatalf("xmlClient.Listen: %v", err)
+    }
+
+    // read System state updates, and updates this to be the final System state after all cumulative updates
     var listenSystem System
 
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
+    for listenSystem = range listenChan {
+        // read it
+        _ = listenSystem.String()
+    }
 
-        for listenSystem = range listenChan {
-            // read it
-            _ = listenSystem.String()
-        }
-    }()
-
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        defer close(listenChan)
-
-        var system System
-
-        streamFiles, err := filepath.Glob(testXmlFiles)
-        if err != nil {
-            t.Fatalf("filepath.Glob: %v\n", err)
-        }
-
-        for _, xmlPath := range streamFiles {
-            xmlFile, err := os.Open(xmlPath)
-            if err != nil {
-                t.Fatalf("os.Open: %v\n", err)
-            }
-
-            packet := xmlPacket{xmlResponse: xmlResponse{System: &system}}
-
-            if err := xml.NewDecoder(xmlFile).Decode(&packet); err != nil {
-                t.Fatalf("XML Decode: %v\n", err)
-            }
-
-            listenChan <- system
-        }
-    }()
-
-    wg.Wait()
+    log.Printf("End of Listen\n")
 
     // check resulting system state
     if source0, exists := listenSystem.SrcMgr.SourceCol[0]; !exists {
