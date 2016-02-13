@@ -1,6 +1,13 @@
 # qmsk-e2
 E2 Client + REST + WebSocket Server + Web UI
 
+## Web UI
+
+### System
+Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
+
+![#/system](/docs/web-system.png?raw=true)
+
 ## Server
 
     go get ./cmd/server
