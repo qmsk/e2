@@ -59,8 +59,7 @@ type xmlQuery struct {
 }
 
 type XMLClient struct {
-    addr            *net.TCPAddr
-    conn            *net.TCPConn
+    conn            net.Conn
     timeout         time.Duration
 
     readChan        chan xmlPacket
@@ -77,12 +76,8 @@ func (options Options) XMLClient() (*XMLClient, error) {
 
     if tcpAddr, err := net.ResolveTCPAddr("tcp4", net.JoinHostPort(options.Address, options.XMLPort)); err != nil {
         return nil, fmt.Errorf("Client.initXML: ResolveTCPAddr: %v", err)
-    } else {
-        xmlClient.addr = tcpAddr
-    }
-
-    if tcpConn, err := net.DialTCP("tcp4", nil, xmlClient.addr); err != nil {
-        return nil, fmt.Errorf("Client.initXML: DialTCP %v: %v", xmlClient.addr,err)
+    } else if tcpConn, err := net.DialTCP("tcp4", nil, tcpAddr); err != nil {
+        return nil, fmt.Errorf("Client.initXML: DialTCP %v: %v", tcpAddr, err)
     } else {
         xmlClient.conn = tcpConn
     }
@@ -173,9 +168,12 @@ func (xmlClient *XMLClient) reader() {
 }
 
 func (xmlClient *XMLClient) run() {
+    defer xmlClient.conn.Close()
+
     if xmlClient.listenChan != nil {
         defer close(xmlClient.listenChan)
     }
+
     timer := time.NewTimer(xmlClient.timeout / 2)
 
     // initialize
