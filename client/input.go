@@ -40,6 +40,10 @@ func (col *InputCfgCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
     return unmarshalXMLMap(col, d, e)
 }
 
+func (col InputCfgCol) MarshalJSON() ([]byte, error) {
+    return marshalJSONMap(col)
+}
+
 func (col InputCfgCol) List() (items []InputCfg) {
     var keys []int
 

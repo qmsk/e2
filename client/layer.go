@@ -56,6 +56,10 @@ func (col *LayerCollection) UnmarshalXML(d *xml.Decoder, e xml.StartElement) err
     return unmarshalXMLMap(col, d, e)
 }
 
+func (col LayerCollection) MarshalJSON() ([]byte, error) {
+    return marshalJSONMap(col)
+}
+
 func (col LayerCollection) List() (items []Layer) {
     var keys []int
 

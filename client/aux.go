@@ -24,6 +24,10 @@ func (col *AuxDestCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
     return unmarshalXMLMap(col, d, e)
 }
 
+func (col AuxDestCol) MarshalJSON() ([]byte, error) {
+    return marshalJSONMap(col)
+}
+
 func (col AuxDestCol) List() (items []AuxDest) {
     var keys []int
 

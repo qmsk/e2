@@ -110,6 +110,10 @@ func (col *PresetCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
     return unmarshalXMLMap(col, d, e)
 }
 
+func (col PresetCol) MarshalJSON() ([]byte, error) {
+    return marshalJSONMap(col)
+}
+
 func (col PresetCol) List() (items []Preset) {
     var keys []int
 

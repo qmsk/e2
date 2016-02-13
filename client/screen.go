@@ -34,6 +34,10 @@ func (col *ScreenDestCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error
     return unmarshalXMLMap(col, d, e)
 }
 
+func (col ScreenDestCol) MarshalJSON() ([]byte, error) {
+    return marshalJSONMap(col)
+}
+
 func (col ScreenDestCol) List() (items []ScreenDest) {
     var keys []int
 
