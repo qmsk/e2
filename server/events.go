@@ -11,7 +11,6 @@ const EVENTS_BUFFER = 100
 
 type Event struct {
     System      client.System   `json:"system"`
-    String      string          `json:"string"`
 }
 
 type clientSet map[chan Event]bool
@@ -107,7 +106,6 @@ func (events *Events) run() {
             // update state
             event = Event{
                 System:     system,
-                String:     system.String(),
             }
 
             // log.Printf("Events: %v\n", event)
