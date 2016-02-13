@@ -96,6 +96,6 @@ func (client *Client) ListContent(screenID int) (result ListContent, err error) 
 type DestMgr struct {
     ID              int             `xml:"id,attr"`
 
-    AuxDestCol      AuxDestCol      `xml:"AuxDestCol>AuxDest"`
-    ScreenDestCol   ScreenDestCol   `xml:"ScreenDestCol>ScreenDest"`
+    AuxDestCol      AuxDestCol      `xml:"AuxDestCol"`
+    ScreenDestCol   ScreenDestCol   `xml:"ScreenDestCol"`
 }

@@ -1,6 +1,7 @@
 package client
 
 import (
+    "bytes"
     "fmt"
     "reflect"
     "encoding/xml"
@@ -26,23 +27,25 @@ func xmlID(e xml.StartElement) (id int, err error) {
     }
 }
 
-type xmlMap interface{} // *map[int]T
+// Support for 
+//  <FooCol> 
+//      <Add>
+//          <Foo id="...">
+//      <Foo id="...">
+type xmlCol struct {
+    colMap  interface{} // *map[int]T
+}
 
-func unmarshalXMLMap(x xmlMap, d *xml.Decoder, e xml.StartElement) error {
-    ptrValue := reflect.ValueOf(x)
+func unmarshalXMLMap(colMap interface{}, d *xml.Decoder, e xml.StartElement) error {
+    return xmlCol{colMap: colMap}.UnmarshalXML(d, e)
+}
 
-    mapValue := ptrValue.Elem()
+// unmarshal an <Foo> element
+func (xmlCol xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
+    mapValue := reflect.ValueOf(xmlCol.colMap).Elem()
     mapType := mapValue.Type()
 
-    if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
-        panic(fmt.Errorf("xmlMap should be map[int]..."))
-    }
-
     itemType := mapType.Elem()
-
-    if e.Name.Local != itemType.Name() {
-        return fmt.Errorf("xmpMap Element <%s> mismatch; should be type %s", e.Name.Local, itemType.Name())
-    }
 
     // index by id
     id, err := xmlID(e)
@@ -76,6 +79,53 @@ func unmarshalXMLMap(x xmlMap, d *xml.Decoder, e xml.StartElement) error {
 
     // store into map
     mapValue.SetMapIndex(idValue, itemValue.Elem())
+
+    return nil
+}
+
+// Unmarshal the top-level <FooCol> element
+func (xmlCol xmlCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
+    ptrValue := reflect.ValueOf(xmlCol.colMap)
+
+    mapValue := ptrValue.Elem()
+    mapType := mapValue.Type()
+
+    if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
+        panic(fmt.Errorf("xmlMap should be map[int]..."))
+    }
+
+    itemType := mapType.Elem()
+    itemName := itemType.Name() // matching element name
+
+    for {
+        if xmlToken, err := d.Token(); err != nil {
+            return err
+        } else if charData, valid := xmlToken.(xml.CharData); valid {
+            if len(bytes.TrimSpace(charData)) > 0 {
+                return fmt.Errorf("Unexpected <%s> CharData: %v", e.Name.Local, charData)
+            }
+        } else if startElement, valid := xmlToken.(xml.StartElement); valid {
+            switch startElement.Name.Local {
+                case "Add":
+                    return fmt.Errorf("TODO <Add>")
+
+                case "Remove":
+                    return fmt.Errorf("TODO <Remove>")
+
+                case itemName:
+                    if err := xmlCol.unmarshalItem(d, startElement); err != nil {
+                        return err
+                    }
+
+                default:
+                    return fmt.Errorf("Unexpected <%s> StartElement <%s>", e.Name.Local, startElement.Name.Local)
+            }
+        } else if _, valid := xmlToken.(xml.EndElement); valid {
+            break
+        } else {
+            return fmt.Errorf("Unexpected token: %#v\n", xmlToken)
+        }
+    }
 
     return nil
 }

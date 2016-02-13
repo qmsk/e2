@@ -93,8 +93,8 @@ func (col SourceCol) List() (items []Source) {
 type SrcMgr struct {
     ID              int             `xml:"id,attr"`
 
-    SourceCol       SourceCol       `xml:"SourceCol>Source"`
+    SourceCol       SourceCol       `xml:"SourceCol"`
     //BGSourceCol
-    InputCfgCol     InputCfgCol     `xml:"InputCfgCol>InputCfg"`
+    InputCfgCol     InputCfgCol     `xml:"InputCfgCol"`
     //SavedInputCfgCol
 }

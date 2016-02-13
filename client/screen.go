@@ -25,7 +25,7 @@ type ScreenDest struct {
 
     BGLayer             []BGLayer       `xml:"BGLyr"`
     Transition          []Transition    `xml:"Transition"`
-    LayerCollection     LayerCollection `xml:"LayerCollection>Layer"`
+    LayerCollection     LayerCollection `xml:"LayerCollection"`
 }
 
 type ScreenDestCol map[int]ScreenDest
