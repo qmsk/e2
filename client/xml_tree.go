@@ -53,10 +53,10 @@ func unmarshalXMLMap(x xmlMap, d *xml.Decoder, e xml.StartElement) error {
     idValue := reflect.ValueOf(id)
 
     // unmarshal into existing item from map, or zero value if item was not in map
-    itemValue := mapValue.MapIndex(idValue)
+    itemValue := reflect.New(itemType)
 
-    if !itemValue.IsValid() {
-        itemValue = reflect.New(itemType)
+    if getValue := mapValue.MapIndex(idValue); getValue.IsValid() {
+        itemValue.Elem().Set(getValue)
     }
 
     if err := d.DecodeElement(itemValue.Interface(), &e); err != nil {
