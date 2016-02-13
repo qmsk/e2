@@ -204,6 +204,11 @@ func TestXmlAdd(t *testing.T) {
             t.Errorf("Source 1: InputCfgIndex=%v StillIndex=%v DestIndex=%v", source1.InputCfgIndex, source1.StillIndex, source1.DestIndex)
         }
     }
+    if source2, exists := listenSystem.SrcMgr.SourceCol[2]; !exists {
+        t.Logf("Source #2: removed\n")
+    } else {
+        t.Logf("Source #2: still exists: %#v\n", source2)
+    }
 
     if screen0, exists := listenSystem.DestMgr.ScreenDestCol[0]; !exists {
         t.Errorf("Screen #0 does not exist")

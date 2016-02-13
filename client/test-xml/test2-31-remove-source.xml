@@ -1,0 +1,43 @@
+<System id="0">
+  <GuiId>9f0dd10d-f83c-4fbf-a184-661395f952c8</GuiId>
+  <SrcMgr id="0">
+    <SourceCol id="0">
+      <Remove id="0">
+        <Source id="2">
+          <InputCfgIndex Min="-1" Max="127">1</InputCfgIndex>
+          <StillIndex Min="-1" Max="99">-1</StillIndex>
+          <UserKeyIndex Min="-1" Max="299">-1</UserKeyIndex>
+          <Name>Input2-3</Name>
+          <SrcType Min="0" Max="3">0</SrcType>
+          <DestIndex Min="-1" Max="127">-1</DestIndex>
+          <AR Min="0" Max="128">1.77778</AR>
+          <Error Min="-1000000" Max="1000000">-9399</Error>
+          <AOIRect id="0">
+            <HPos Min="0" Max="0">0</HPos>
+            <VPos Min="0" Max="0">0</VPos>
+            <HSize Min="0" Max="1920">1920</HSize>
+            <VSize Min="0" Max="1080">1080</VSize>
+            <AR Min="0" Max="99">1.77778</AR>
+          </AOIRect>
+          <VideoColor id="0">
+            <Hue Min="-90" Max="90">0</Hue>
+            <Sat Min="0" Max="150">100</Sat>
+            <Bright Min="50" Max="150">100</Bright>
+            <BrightR Min="25" Max="150">100</BrightR>
+            <BrightG Min="25" Max="150">100</BrightG>
+            <BrightB Min="25" Max="150">100</BrightB>
+            <Contr Min="50" Max="150">100</Contr>
+            <ContrR Min="25" Max="150">100</ContrR>
+            <ContrG Min="25" Max="150">100</ContrG>
+            <ContrB Min="25" Max="150">100</ContrB>
+            <Invert Min="0" Max="1">0</Invert>
+            <Gamma Min="0.3" Max="3.3">1</Gamma>
+            <ColorSpace LegalValues="0 1">1</ColorSpace>
+            <ColorRange LegalValues="0 1">0</ColorRange>
+            <Mono Min="0" Max="1">0</Mono>
+          </VideoColor>
+        </Source>
+      </Remove>
+    </SourceCol>
+  </SrcMgr>
+</System>

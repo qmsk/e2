@@ -27,6 +27,13 @@ func xmlID(e xml.StartElement) (id int, err error) {
     }
 }
 
+type xmlColScope string
+
+const (
+    xmlColAdd       xmlColScope          = "Add"
+    xmlColRemove                        = "Remove"
+)
+
 // Support for 
 //  <FooCol> 
 //      <Add>
@@ -34,14 +41,36 @@ func xmlID(e xml.StartElement) (id int, err error) {
 //      <Foo id="...">
 type xmlCol struct {
     colMap  interface{} // *map[int]T
+
+    // decoding scope
+    scope    xmlColScope
 }
 
 func unmarshalXMLMap(colMap interface{}, d *xml.Decoder, e xml.StartElement) error {
     return xmlCol{colMap: colMap}.UnmarshalXML(d, e)
 }
 
+func (xmlCol *xmlCol) setScope(scope string) error {
+    if xmlCol.scope != "" {
+        return fmt.Errorf("Unexpected nested <%s>", scope)
+    }
+
+    switch xmlColScope(scope) {
+    case xmlColAdd:
+        xmlCol.scope = xmlColAdd
+
+    case xmlColRemove:
+        xmlCol.scope = xmlColRemove
+
+    default:
+        return fmt.Errorf("Invalid scope <%s>", scope)
+    }
+
+    return nil
+}
+
 // unmarshal an <Foo> element
-func (xmlCol xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
+func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
     mapValue := reflect.ValueOf(xmlCol.colMap).Elem()
     mapType := mapValue.Type()
 
@@ -64,21 +93,34 @@ func (xmlCol xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
             newMap.SetMapIndex(keyValue, mapValue.MapIndex(keyValue))
         }
     }
+
+    if xmlCol.scope == xmlColRemove {
+        if err := d.Skip(); err != nil {
+            return err
+        }
+
+        // delete identified element fom map
+        newMap.SetMapIndex(idValue, reflect.Value{})
+    } else {
+        // unmarshal into existing item from map, or zero value if item was not in map
+        itemValue := reflect.New(itemType)
+
+        if xmlCol.scope == xmlColAdd {
+            // there should never be any existing item
+        } else if getValue := mapValue.MapIndex(idValue); getValue.IsValid() {
+            itemValue.Elem().Set(getValue)
+        }
+
+        if err := d.DecodeElement(itemValue.Interface(), &e); err != nil {
+            return err
+        }
+
+        // store into map
+        newMap.SetMapIndex(idValue, itemValue.Elem())
+    }
+
+    // replace map
     mapValue.Set(newMap)
-
-    // unmarshal into existing item from map, or zero value if item was not in map
-    itemValue := reflect.New(itemType)
-
-    if getValue := mapValue.MapIndex(idValue); getValue.IsValid() {
-        itemValue.Elem().Set(getValue)
-    }
-
-    if err := d.DecodeElement(itemValue.Interface(), &e); err != nil {
-        return err
-    }
-
-    // store into map
-    mapValue.SetMapIndex(idValue, itemValue.Elem())
 
     return nil
 }
@@ -106,13 +148,13 @@ func (xmlCol xmlCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
             }
         } else if startElement, valid := xmlToken.(xml.StartElement); valid {
             switch startElement.Name.Local {
-                case "Add":
-                    return fmt.Errorf("TODO <Add>")
-
-                case "Remove":
-                    return fmt.Errorf("TODO <Remove>")
+                case "Add", "Remove":
+                    if err := xmlCol.setScope(startElement.Name.Local); err != nil {
+                        return err
+                    }
 
                 case itemName:
+                    // within scope
                     if err := xmlCol.unmarshalItem(d, startElement); err != nil {
                         return err
                     }
@@ -120,8 +162,15 @@ func (xmlCol xmlCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
                 default:
                     return fmt.Errorf("Unexpected <%s> StartElement <%s>", e.Name.Local, startElement.Name.Local)
             }
-        } else if _, valid := xmlToken.(xml.EndElement); valid {
-            break
+        } else if endElement, valid := xmlToken.(xml.EndElement); valid {
+            if xmlCol.scope == "" {
+                break
+            } else if string(xmlCol.scope) == endElement.Name.Local {
+                // exit out of <Add/Remove> scope
+                xmlCol.scope = ""
+            } else {
+                return fmt.Errorf("Unexpected <%s> EndElement </%s>", e.Name.Local, endElement.Name.Local)
+            }
         } else {
             return fmt.Errorf("Unexpected token: %#v\n", xmlToken)
         }
