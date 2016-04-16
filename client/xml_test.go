@@ -11,8 +11,14 @@ import (
     "time"
 )
 
-func testXMLClient(xmlGlob string) *XMLClient {
-    streamFiles, err := filepath.Glob(xmlGlob)
+type testXML struct {
+    fileGlob    string
+    fileDelay   time.Duration
+}
+
+// Create a new XMLClient, connected to a local TCP server that serves up the globbed .xml files in order, using a 1
+func testXMLClient(test testXML) *XMLClient {
+    streamFiles, err := filepath.Glob(test.fileGlob)
     if err != nil {
         panic(fmt.Errorf("filepath.Glob: %v\n", err))
     }
@@ -47,7 +53,9 @@ func testXMLClient(xmlGlob string) *XMLClient {
                         log.Printf("Send %v: %d bytes\n", xmlPath, write)
                     }
 
-                    time.Sleep(1 * time.Second)
+                    if test.fileDelay > 0 {
+                        time.Sleep(test.fileDelay)
+                    }
                 }
 
                 log.Printf("Send: done\n")
@@ -92,8 +100,29 @@ func testXMLClient(xmlGlob string) *XMLClient {
     return &xmlClient
 }
 
+// Create an XMLClient, and return the final System state after reading all the .xml files
+func testXMLClientRead(test testXML) System {
+    xmlClient := testXMLClient(test)
+
+    var system System
+
+    for {
+        if readSystem, err := xmlClient.Read(); err == io.EOF {
+            return system
+        } else if err != nil {
+            panic(err)
+        } else {
+            system = readSystem
+        }
+    }
+}
+
 func TestXmlRead(t *testing.T) {
-    xmlClient := testXMLClient("./test-xml/test1-*.xml")
+    // test with some minor concurrency
+    xmlClient := testXMLClient(testXML{
+        fileGlob:   "./test-xml/test1-*.xml",
+        fileDelay:  10 * time.Millisecond,
+    })
 
     listenChan, err := xmlClient.Listen()
     if err != nil {
@@ -175,34 +204,19 @@ func TestXmlRead(t *testing.T) {
         if preset0.Name != "Test 1" {
             t.Errorf("Preset #0 Name: %v", preset0.Name)
         }
-    } 
+    }
 }
 
 // Adding new outputs/inputs from initial empty state
 func TestXmlAdd(t *testing.T) {
-    xmlClient := testXMLClient("./test-xml/test2-*.xml")
-
-    listenChan, err := xmlClient.Listen()
-    if err != nil {
-        t.Fatalf("xmlClient.Listen: %v", err)
-    }
-
-    // read System state updates, and updates this to be the final System state after all cumulative updates
-    var listenSystem System
-
-    for listenSystem = range listenChan {
-        // read it
-        _ = listenSystem.String()
-    }
-
-    log.Printf("End of Listen\n")
+    system := testXMLClientRead(testXML{
+        fileGlob:   "./test-xml/test2-*.xml",
+    })
 
     // check resulting system state
-    if source0, exists := listenSystem.SrcMgr.SourceCol[0]; !exists {
+    if source0, exists := system.SrcMgr.SourceCol[0]; !exists {
         t.Errorf("Source #0 does not exist")
     } else {
-        t.Logf("Source #0: %#v\n", source0)
-
         if source0.Name != "ScreenDest1_PGM-1" {
             t.Errorf("Source #0 Name: %v", source0.Name)
         }
@@ -210,11 +224,9 @@ func TestXmlAdd(t *testing.T) {
             t.Errorf("Source 0: InputCfgIndex=%v StillIndex=%v DestIndex=%v", source0.InputCfgIndex, source0.StillIndex, source0.DestIndex)
         }
     }
-    if source1, exists := listenSystem.SrcMgr.SourceCol[1]; !exists {
+    if source1, exists := system.SrcMgr.SourceCol[1]; !exists {
         t.Errorf("Source #1 does not exist")
     } else {
-        t.Logf("Source #1: %#v\n", source1)
-
         if source1.Name != "Input1-2" {
             t.Errorf("Source #1 Name: %v", source1.Name)
         }
@@ -222,17 +234,15 @@ func TestXmlAdd(t *testing.T) {
             t.Errorf("Source 1: InputCfgIndex=%v StillIndex=%v DestIndex=%v", source1.InputCfgIndex, source1.StillIndex, source1.DestIndex)
         }
     }
-    if source2, exists := listenSystem.SrcMgr.SourceCol[2]; !exists {
-        t.Logf("Source #2: removed\n")
+    if source2, exists := system.SrcMgr.SourceCol[2]; !exists {
+
     } else {
-        t.Logf("Source #2: still exists: %#v\n", source2)
+        t.Errorf("Source #2: still exists: %#v\n", source2)
     }
 
-    if screen0, exists := listenSystem.DestMgr.ScreenDestCol[0]; !exists {
+    if screen0, exists := system.DestMgr.ScreenDestCol[0]; !exists {
         t.Errorf("Screen #0 does not exist")
     } else {
-        t.Logf("Screen #0: %#v\n", screen0)
-
         if screen0.Name != "ScreenDest1" {
             t.Errorf("Screen #0 Name: %v", screen0.Name)
         }
