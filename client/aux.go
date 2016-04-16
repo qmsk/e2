@@ -21,7 +21,7 @@ type AuxDest struct {
 type AuxDestCol map[int]AuxDest
 
 func (col *AuxDestCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    return unmarshalXMLMap(col, d, e)
+    return unmarshalXMLCol(col, d, e)
 }
 
 func (col AuxDestCol) MarshalJSON() ([]byte, error) {

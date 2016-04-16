@@ -71,7 +71,7 @@ func (client *Client) ListSources() (sourceList []Source, err error) {
 type SourceCol map[int]Source
 
 func (col *SourceCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    return unmarshalXMLMap(col, d, e)
+    return unmarshalXMLCol(col, d, e)
 }
 
 func (col SourceCol) MarshalJSON() ([]byte, error) {

@@ -106,8 +106,10 @@ func (client *Client) ListDestinationsForPreset(presetID int) (result PresetDest
 // XML
 type PresetCol map[int]Preset
 
+// unmarshal each <Preset> separately
+// TODO: this is not as efficient, since we COW the PresetCol map on every Preset...
 func (col *PresetCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    return unmarshalXMLMap(col, d, e)
+    return unmarshalXMLItem(col, d, e)
 }
 
 func (col PresetCol) MarshalJSON() ([]byte, error) {

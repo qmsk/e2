@@ -35,21 +35,12 @@ const (
     xmlColRemove                        = "Remove"
 )
 
-// Unmarshal XML messages of the form:
-//  <FooCol> 
-//      <Add>
-//          <Foo id="...">
-//      <Foo id="...">
-//      <Remove>
-//          <Foo id="...">
-//
-// The xmlCol should be created with a colMap pointing to a map. The existing map values will be copied, or a new map created if the map is still nil.
-// *colMap will then be updated with the resulting new map.
-// This copy-on-write mechanism ensures that the datastructure is safe for concurrent read access when a copy of it is sent via a chan.
+// XML-based collection tree unmarshalling state
 type xmlCol struct {
-    colMap      interface{} // *map[int]T
+    colMap      interface{}     // *map[int]T
 
     mapValue    reflect.Value   // existing map to read items for update
+    itemName    string          // XML element name for type
     itemType    reflect.Type    // type of new items
 
     newMap      reflect.Value   // new map to write items 
@@ -58,8 +49,37 @@ type xmlCol struct {
     scope    xmlColScope
 }
 
-func unmarshalXMLMap(colMap interface{}, d *xml.Decoder, e xml.StartElement) error {
-    return xmlCol{colMap: colMap}.UnmarshalXML(d, e)
+// setup xmlCol from reflect on the given colMap
+func makeXmlCol(colMap interface{}) (xmlCol xmlCol, err error) {
+    xmlCol.colMap = colMap
+
+    ptrValue := reflect.ValueOf(xmlCol.colMap)
+
+    if ptrValue.Kind() != reflect.Ptr {
+        return xmlCol, fmt.Errorf("xmlCol.colMap must be *map[int]...")
+    }
+
+    xmlCol.mapValue = ptrValue.Elem()
+    mapType := xmlCol.mapValue.Type()
+
+    if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
+        return xmlCol, fmt.Errorf("xmlCol.colMap must be *map[int]...")
+    }
+
+    xmlCol.itemType = mapType.Elem()
+    xmlCol.itemName = xmlCol.itemType.Name() // matching element name
+
+    // prepare copy-on-write map for update
+    xmlCol.newMap = reflect.MakeMap(mapType)
+
+    if !xmlCol.mapValue.IsNil() {
+        // copy
+        for _, keyValue := range xmlCol.mapValue.MapKeys() {
+            xmlCol.newMap.SetMapIndex(keyValue, xmlCol.mapValue.MapIndex(keyValue))
+        }
+    }
+
+    return
 }
 
 func (xmlCol *xmlCol) setScope(scope string) error {
@@ -81,8 +101,8 @@ func (xmlCol *xmlCol) setScope(scope string) error {
     return nil
 }
 
-// unmarshal an <Foo> element
-func (xmlCol xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
+// unmarshal a <Foo> element
+func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
     // index by id
     id, err := xmlID(e)
     if err != nil {
@@ -126,73 +146,112 @@ func (xmlCol xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
     return nil
 }
 
-// Unmarshal the top-level <FooCol> element
-func (xmlCol xmlCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    ptrValue := reflect.ValueOf(xmlCol.colMap)
+// Unmarshal a single <Foo> or an <Add>/n<Remove> collection of elements
+func (xmlCol *xmlCol) unmarshalElement(d *xml.Decoder, e xml.StartElement) error {
+    switch e.Name.Local {
+        case "Add", "Remove":
+            if err := xmlCol.setScope(e.Name.Local); err != nil {
+                return err
+            }
 
-    if ptrValue.Kind() != reflect.Ptr {
-        panic(fmt.Errorf("xmlCol.colMap must be *map[int]..."))
+            // recurse
+            return xmlCol.unmarshalElements(d, e)
+
+        case xmlCol.itemName:
+            // single item within scope
+            return xmlCol.unmarshalItem(d, e)
+
+        default:
+            return fmt.Errorf("Unexpected StartElement <%s>", e.Name.Local)
     }
+}
 
-    xmlCol.mapValue = ptrValue.Elem()
-    mapType := xmlCol.mapValue.Type()
-
-    if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
-        panic(fmt.Errorf("xmlCol.colMap must be *map[int]..."))
-    }
-
-    xmlCol.itemType = mapType.Elem()
-    itemName := xmlCol.itemType.Name() // matching element name
-
-    // prepare copy-on-write map for update
-    xmlCol.newMap = reflect.MakeMap(mapType)
-
-    if !xmlCol.mapValue.IsNil() {
-        // copy
-        for _, keyValue := range xmlCol.mapValue.MapKeys() {
-            xmlCol.newMap.SetMapIndex(keyValue, xmlCol.mapValue.MapIndex(keyValue))
-        }
-    }
-
+// Unmarshal current StartElement containing sub-elements up to matching EndElement
+func (xmlCol *xmlCol) unmarshalElements(d *xml.Decoder, e xml.StartElement) error {
     for {
-        if xmlToken, err := d.Token(); err != nil {
+        xmlToken, err := d.Token()
+        if err != nil {
             return err
-        } else if charData, valid := xmlToken.(xml.CharData); valid {
-            if len(bytes.TrimSpace(charData)) > 0 {
-                return fmt.Errorf("Unexpected <%s> CharData: %v", e.Name.Local, charData)
-            }
-        } else if startElement, valid := xmlToken.(xml.StartElement); valid {
-            switch startElement.Name.Local {
-                case "Add", "Remove":
-                    if err := xmlCol.setScope(startElement.Name.Local); err != nil {
-                        return err
-                    }
+        }
 
-                case itemName:
-                    // within scope
-                    if err := xmlCol.unmarshalItem(d, startElement); err != nil {
-                        return err
-                    }
+        // log.Printf("unmarshalElements %v: %#v", e.Name, xmlToken)
 
-                default:
-                    return fmt.Errorf("Unexpected <%s> StartElement <%s>", e.Name.Local, startElement.Name.Local)
+        switch t := xmlToken.(type) {
+        case xml.CharData:
+            if len(bytes.TrimSpace(t)) > 0 {
+                return fmt.Errorf("Unexpected <%s> CharData: %v", e.Name.Local, t)
             }
-        } else if endElement, valid := xmlToken.(xml.EndElement); valid {
-            if xmlCol.scope == "" {
-                break
-            } else if string(xmlCol.scope) == endElement.Name.Local {
-                // exit out of <Add/Remove> scope
-                xmlCol.scope = ""
-            } else {
-                return fmt.Errorf("Unexpected <%s> EndElement </%s>", e.Name.Local, endElement.Name.Local)
+
+        case xml.StartElement:
+            // recurse into element
+            if err := xmlCol.unmarshalElement(d, t); err != nil {
+                return err
             }
-        } else {
+
+        case xml.EndElement:
+            if xmlCol.scope != "" {
+                // internal <Add/Remove> scoping state
+                if string(xmlCol.scope) == t.Name.Local {
+                    // exit out of scope
+                    xmlCol.scope = ""
+                } else {
+                    return fmt.Errorf("Unexpected <%s> scope EndElement </%s>", e.Name.Local, t.Name.Local)
+                }
+            }
+
+            // done
+            return nil
+
+        default:
             return fmt.Errorf("Unexpected token: %#v\n", xmlToken)
         }
     }
+}
 
+// commit changes to col
+func (xmlCol *xmlCol) commit() error {
     // replace map
     xmlCol.mapValue.Set(xmlCol.newMap)
 
     return nil
 }
+
+// Unmarshal complete XML collection elements of the form:
+//  <FooCol> 
+//      <Add>
+//          <Foo id="...">
+//      <Foo id="...">
+//      <Remove>
+//          <Foo id="...">
+//
+// The xmlCol should be created with a colMap pointing to a map. The existing map values will be copied, or a new map created if the map is still nil.
+// *colMap will then be updated with the resulting new map.
+// This copy-on-write mechanism ensures that the datastructure is safe for concurrent read access when a copy of it is sent via a chan.
+func unmarshalXMLCol(colMap interface{}, d *xml.Decoder, e xml.StartElement) error {
+    // e is the <FooCol>, which we ignore except for error messages
+    if xmlCol, err := makeXmlCol(colMap); err != nil {
+        return err
+    } else if err := xmlCol.unmarshalElements(d, e); err != nil {
+        return err
+    } else {
+        return xmlCol.commit()
+    }
+}
+
+// Unmarshal a single XML collection element of one of the forms:
+//      <Add>
+//          <Foo id="...">
+//      <Foo id="...">
+//      <Remove>
+//          <Foo id="...">
+func unmarshalXMLItem(colMap interface{}, d *xml.Decoder, e xml.StartElement) error {
+    if xmlCol, err := makeXmlCol(colMap); err != nil {
+        return err
+    } else if err := xmlCol.unmarshalElement(d, e); err != nil {
+        return err
+    } else {
+        return xmlCol.commit()
+    }
+}
+
+

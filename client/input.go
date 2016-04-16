@@ -37,7 +37,7 @@ type InputCfg struct {
 type InputCfgCol map[int]InputCfg
 
 func (col *InputCfgCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    return unmarshalXMLMap(col, d, e)
+    return unmarshalXMLCol(col, d, e)
 }
 
 func (col InputCfgCol) MarshalJSON() ([]byte, error) {

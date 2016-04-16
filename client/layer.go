@@ -53,7 +53,7 @@ type Layer struct {
 type LayerCollection map[int]Layer
 
 func (col *LayerCollection) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    return unmarshalXMLMap(col, d, e)
+    return unmarshalXMLCol(col, d, e)
 }
 
 func (col LayerCollection) MarshalJSON() ([]byte, error) {

@@ -31,7 +31,7 @@ type ScreenDest struct {
 type ScreenDestCol map[int]ScreenDest
 
 func (col *ScreenDestCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-    return unmarshalXMLMap(col, d, e)
+    return unmarshalXMLCol(col, d, e)
 }
 
 func (col ScreenDestCol) MarshalJSON() ([]byte, error) {
