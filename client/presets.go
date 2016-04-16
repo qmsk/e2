@@ -137,5 +137,5 @@ type PresetMgr struct {
 
     LastRecall  int             `xml:"LastRecall"`
 
-    Preset      PresetCol       `xml:"Preset"`
+    Preset      PresetCol       `xml:",any"`    // <Preset> or <Add><Preset> or <Remove><Preset>
 }
