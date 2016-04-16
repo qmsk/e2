@@ -1,6 +1,7 @@
 package client
 
 import (
+    "runtime/debug"
     "fmt"
     "io"
     "log"
@@ -145,6 +146,8 @@ func (xmlClient *XMLClient) start() error {
 func (xmlClient *XMLClient) reader() {
     defer close(xmlClient.listenChan)
     defer close(xmlClient.readChan)
+
+    // wrap to return panics via .readError
     defer func(){
         panicValue := recover()
 
@@ -153,7 +156,7 @@ func (xmlClient *XMLClient) reader() {
         } else if panicError, ok := panicValue.(Error); ok {
             xmlClient.readError = panicError
         } else {
-            xmlClient.readError = fmt.Errorf("%v", panicValue)
+            xmlClient.readError = fmt.Errorf("%v\n%v", panicValue, string(debug.Stack()))
         }
     }()
 
