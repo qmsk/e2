@@ -85,6 +85,10 @@ func testXMLClient(xmlGlob string) *XMLClient {
         conn:       tcpConn,
     }
 
+    if err := xmlClient.start(); err != nil {
+        panic(err)
+    }
+
     return &xmlClient
 }
 
@@ -104,7 +108,11 @@ func TestXmlRead(t *testing.T) {
         _ = listenSystem.String()
     }
 
-    log.Printf("End of Listen\n")
+    if err := xmlClient.ListenError(); err != nil {
+        t.Fatalf("xmlClient.ListenError: %v\n", err)
+    } else {
+        t.Logf("End of Listen\n")
+    }
 
     // check resulting system state
     if source0, exists := listenSystem.SrcMgr.SourceCol[0]; !exists {

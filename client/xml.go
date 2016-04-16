@@ -63,10 +63,8 @@ type XMLClient struct {
     timeout         time.Duration
 
     readChan        chan xmlPacket
+    readError       error           // set once readChan is closed
     listenChan      chan System
-
-    // state
-    system          System
 }
 
 func (options Options) XMLClient() (*XMLClient, error) {
@@ -82,9 +80,17 @@ func (options Options) XMLClient() (*XMLClient, error) {
         xmlClient.conn = tcpConn
     }
 
+    if err := xmlClient.start(); err != nil {
+        return nil, err
+    }
+
     return &xmlClient, nil
 }
 
+// Blocking read and decode of a complete <System> state into the given xmlPacket.
+// Any existing xmlPacket.System state is updated, or reset if the server returns a <System reset="yes">
+//
+// The read is performed using a timeout deadline for the entire <System> state
 func (xmlClient *XMLClient) read(packet *xmlPacket) error {
     // applies to the complete XML packet read by the decoder..?
     if err := xmlClient.conn.SetReadDeadline(time.Now().Add(xmlClient.timeout)); err != nil {
@@ -98,6 +104,7 @@ func (xmlClient *XMLClient) read(packet *xmlPacket) error {
     }
 }
 
+// Blocking encode and write of an arbitrary XML packet to the server.
 func (xmlClient *XMLClient) write(packet interface{}) error {
     if err := xmlClient.conn.SetWriteDeadline(time.Now().Add(xmlClient.timeout)); err != nil {
         return err
@@ -106,6 +113,7 @@ func (xmlClient *XMLClient) write(packet interface{}) error {
     return xml.NewEncoder(xmlClient.conn).Encode(packet)
 }
 
+// Send a <System> reset query
 func (xmlClient *XMLClient) writeReset() error {
     return xmlClient.write(xmlQuery{Reset: "yes",
         Type:       3,
@@ -114,51 +122,69 @@ func (xmlClient *XMLClient) writeReset() error {
     })
 }
 
+// Send a <System> ping
 func (xmlClient *XMLClient) writePing() error {
     return xmlClient.write(xmlPing{})
 }
 
-func (xmlClient *XMLClient) start() {
-    if xmlClient.readChan == nil {
-        xmlClient.readChan = make(chan xmlPacket)
+// Launch background goroutines
+func (xmlClient *XMLClient) start() error {
+    xmlClient.listenChan = make(chan System)
+    xmlClient.readChan = make(chan xmlPacket)
 
-        go xmlClient.reader()
-        go xmlClient.run()
-    }
+    go xmlClient.reader()
+    go xmlClient.writer()
+
+    return nil
 }
 
+// Read and handle messages from the server, dispatching readChan for timing and listenChan for readers
+//
+// Guarantees completion by closing the readChan and setting readError
 func (xmlClient *XMLClient) reader() {
+    defer close(xmlClient.listenChan)
     defer close(xmlClient.readChan)
+    defer func(){
+        panicValue := recover()
 
+        if panicError, ok := panicValue.(Error); ok {
+            xmlClient.readError = panicError
+        } else {
+            xmlClient.readError = fmt.Errorf("%v", panicValue)
+        }
+    }()
+
+    var system System
     var wantReset = true
 
     for {
-        packet := xmlPacket{xmlResponse: xmlResponse{System: &xmlClient.system}}
+        packet := xmlPacket{xmlResponse: xmlResponse{System: &system}}
 
         if err := xmlClient.read(&packet); err != nil {
             log.Printf("xmlClient.read: %v\n", err)
-            return
+
+            // quit with error
+            panic(err)
+
         } else if wantReset && !packet.reset {
             // skip packets before initial reset-sync
             log.Printf("xmlClient.read: skip")
+
         } else {
             wantReset = false
 
+            // timeout handling
             xmlClient.readChan <- packet
 
             if packet.reset {
                 log.Printf("xmlClient.read: reset")
 
-                if xmlClient.listenChan != nil {
-                    xmlClient.listenChan <- xmlClient.system
-                }
+                xmlClient.listenChan <- system
 
             } else if packet.Type == 0 {
                 log.Printf("xmlClient.read: update")
 
-                if xmlClient.listenChan != nil {
-                    xmlClient.listenChan <- xmlClient.system
-                }
+                xmlClient.listenChan <- system
 
             } else {
                 // log.Printf("xmlClient.read: pong")
@@ -167,12 +193,9 @@ func (xmlClient *XMLClient) reader() {
     }
 }
 
-func (xmlClient *XMLClient) run() {
+// Write requests, including the initial reset to sync state, and periodic pings on idle timeout
+func (xmlClient *XMLClient) writer() {
     defer xmlClient.conn.Close()
-
-    if xmlClient.listenChan != nil {
-        defer close(xmlClient.listenChan)
-    }
 
     timer := time.NewTimer(xmlClient.timeout / 2)
 
@@ -190,7 +213,7 @@ func (xmlClient *XMLClient) run() {
                 return
             }
 
-            // fast-ping
+            // fast-retry ping on timeout
             timer.Reset(xmlClient.timeout / 8)
 
         case _, ok := <-xmlClient.readChan:
@@ -198,6 +221,7 @@ func (xmlClient *XMLClient) run() {
                 return
             }
 
+            // got update, reschedule idle ping
             timer.Reset(xmlClient.timeout / 2)
         }
     }
@@ -205,18 +229,36 @@ func (xmlClient *XMLClient) run() {
 
 // Listen for system updates.
 //
-// Starts the XML stream and sends each updated System state on the given chan, starting from the initial reset state.
+// Read updated System states from the given chan, starting from the initial reset state.
 //
 // The received System is safe for concurrent reads, but do *not* write to it! Use the public methods if possible.
 //
 // XXX: only one shared chan for all callers
 func (xmlClient *XMLClient) Listen() (chan System, error) {
-    if xmlClient.listenChan != nil {
-        return nil, fmt.Errorf("Already listening..")
+    if xmlClient.readError != nil {
+        return nil, xmlClient.readError
+    } else {
+        return xmlClient.listenChan, nil
     }
+}
 
-    xmlClient.listenChan = make(chan System)
-    xmlClient.start()
+// Return any Error after Listen() returns
+//
+// XXX: nil on EOF?
+func (xmlClient *XMLClient) ListenError() error {
+    return xmlClient.readError
+}
 
-    return xmlClient.listenChan, nil
+// Read system updates.
+//
+// Blocking read of updated System state, or error
+//
+// The received System is safe for concurrent reads, but do *not* write to it! Use the public methods if possible.
+func (xmlClient *XMLClient) Read() (System, error) {
+    if system, ok := <-xmlClient.listenChan; ok {
+        return system, nil
+    } else {
+        // chan as closed
+        return system, xmlClient.readError
+    }
 }
