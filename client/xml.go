@@ -2,6 +2,7 @@ package client
 
 import (
     "fmt"
+    "io"
     "log"
     "net"
     "time"
@@ -63,7 +64,7 @@ type XMLClient struct {
     timeout         time.Duration
 
     readChan        chan xmlPacket
-    readError       error           // set once readChan is closed
+    readError       error           // set once readChan is closed, nil on clean EOF
     listenChan      chan System
 }
 
@@ -147,7 +148,9 @@ func (xmlClient *XMLClient) reader() {
     defer func(){
         panicValue := recover()
 
-        if panicError, ok := panicValue.(Error); ok {
+        if panicValue == nil {
+            xmlClient.readError = nil
+        } else if panicError, ok := panicValue.(Error); ok {
             xmlClient.readError = panicError
         } else {
             xmlClient.readError = fmt.Errorf("%v", panicValue)
@@ -163,8 +166,14 @@ func (xmlClient *XMLClient) reader() {
         if err := xmlClient.read(&packet); err != nil {
             log.Printf("xmlClient.read: %v\n", err)
 
-            // quit with error
-            panic(err)
+            if err == io.EOF {
+                // done
+                return
+
+            } else {
+                // quit with error
+                panic(err)
+            }
 
         } else if wantReset && !packet.reset {
             // skip packets before initial reset-sync
@@ -242,23 +251,24 @@ func (xmlClient *XMLClient) Listen() (chan System, error) {
     }
 }
 
-// Return any Error after Listen() returns
-//
-// XXX: nil on EOF?
+// Return any Error after Listen() returns, or nil if the connection was closed cleanly by the other end (EOF)
 func (xmlClient *XMLClient) ListenError() error {
     return xmlClient.readError
 }
 
 // Read system updates.
 //
-// Blocking read of updated System state, or error
+// Blocking read of updated System state, or error (including io.EOF on clean shutdown).
 //
 // The received System is safe for concurrent reads, but do *not* write to it! Use the public methods if possible.
 func (xmlClient *XMLClient) Read() (System, error) {
     if system, ok := <-xmlClient.listenChan; ok {
         return system, nil
-    } else {
-        // chan as closed
+    } else if xmlClient.readError != nil {
+        // chan was closed with an error
         return system, xmlClient.readError
+    } else {
+        // chan was closed after EOF
+        return system, io.EOF
     }
 }
