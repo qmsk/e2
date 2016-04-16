@@ -1,0 +1,349 @@
+<System id="0">
+  <GuiId>88f73bcc-1707-42c4-93f0-ff468f99be38</GuiId>
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <ScreenDest id="0">
+        <IsActive LegalValues="0 1">1</IsActive>
+        <BGLyr id="1">
+          <LastBGSourceIndex Min="-1" Max="255">-1</LastBGSourceIndex>
+          <BGShowMatte Min="0" Max="1">1</BGShowMatte>
+          <Name>Empty</Name>
+          <BGColor id="0">
+            <Red Min="0" Max="1023">0</Red>
+            <Green Min="0" Max="1023">0</Green>
+            <Blue Min="0" Max="1023">0</Blue>
+          </BGColor>
+        </BGLyr>
+        <Transition id="0">
+          <TransTime Min="0" Max="1999">30</TransTime>
+          <TransPos Min="0" Max="4096">0</TransPos>
+          <TransCurve LegalValues="0 1 2 3">1</TransCurve>
+          <TransDelay Min="0" Max="1999">0</TransDelay>
+          <ArmMode Min="0" Max="1">1</ArmMode>
+          <KfPlay Min="0" Max="1">0</KfPlay>
+        </Transition>
+        <Transition id="1">
+          <TransTime Min="0" Max="1999">30</TransTime>
+          <TransPos Min="0" Max="4096">0</TransPos>
+          <TransCurve LegalValues="0 1 2 3">1</TransCurve>
+          <TransDelay Min="0" Max="1999">0</TransDelay>
+          <ArmMode Min="0" Max="1">0</ArmMode>
+          <KfPlay Min="0" Max="1">0</KfPlay>
+        </Transition>
+        <LayerCollection id="0">
+          <Layer id="0">
+            <PvwMode Min="0" Max="1">0</PvwMode>
+            <LayerCfg id="0">
+              <Transition id="1">
+                <ArmMode Min="0" Max="1">0</ArmMode>
+              </Transition>
+            </LayerCfg>
+          </Layer>
+          <Layer id="1">
+            <PgmMode Min="0" Max="1">0</PgmMode>
+            <PvwMode Min="0" Max="1">1</PvwMode>
+            <SrcSwitch Min="0" Max="1">1</SrcSwitch>
+            <IsActive LegalValues="0 1">0</IsActive>
+            <PgmZOrder Min="0" Max="63">0</PgmZOrder>
+            <PvwZOrder Min="0" Max="63">0</PvwZOrder>
+            <Eye3D LegalValues="0 1">0</Eye3D>
+            <LastSrcIdx Min="-1" Max="255">1</LastSrcIdx>
+            <LastUserKeyIdx Min="-1" Max="299">-1</LastUserKeyIdx>
+            <Name>Layer1-B</Name>
+            <Capacity LegalValues="1 2 4">1</Capacity>
+            <LayerCfg id="0">
+              <LayerMode LegalValues="0 1">1</LayerMode>
+              <NumOfStates Min="0" Max="2">1</NumOfStates>
+              <ActiveState Min="0" Max="1">0</ActiveState>
+              <UseEfxColor Min="0" Max="1">0</UseEfxColor>
+              <Source id="0">
+                <InputCfgIndex Min="-1" Max="127">0</InputCfgIndex>
+                <StillIndex Min="-1" Max="99">-1</StillIndex>
+                <UserKeyIndex Min="-1" Max="299">-1</UserKeyIndex>
+                <Name>Input1-2</Name>
+                <SrcType Min="0" Max="3">0</SrcType>
+                <DestIndex Min="-1" Max="127">-1</DestIndex>
+                <AR Min="0" Max="128">1.77778</AR>
+                <Error Min="-1000000" Max="1000000">-9399</Error>
+                <AOIRect id="0">
+                  <HPos Min="0" Max="0">0</HPos>
+                  <VPos Min="0" Max="0">0</VPos>
+                  <HSize Min="0" Max="1920">1920</HSize>
+                  <VSize Min="0" Max="1080">1080</VSize>
+                  <AR Min="0" Max="99">1.77778</AR>
+                </AOIRect>
+                <VideoColor id="0">
+                  <Hue Min="-90" Max="90">0</Hue>
+                  <Sat Min="0" Max="150">100</Sat>
+                  <Bright Min="50" Max="150">100</Bright>
+                  <BrightR Min="25" Max="150">100</BrightR>
+                  <BrightG Min="25" Max="150">100</BrightG>
+                  <BrightB Min="25" Max="150">100</BrightB>
+                  <Contr Min="50" Max="150">100</Contr>
+                  <ContrR Min="25" Max="150">100</ContrR>
+                  <ContrG Min="25" Max="150">100</ContrG>
+                  <ContrB Min="25" Max="150">100</ContrB>
+                  <Invert Min="0" Max="1">0</Invert>
+                  <Gamma Min="0.3" Max="3.3">1</Gamma>
+                  <ColorSpace LegalValues="0 1">1</ColorSpace>
+                  <ColorRange LegalValues="0 1">0</ColorRange>
+                  <Mono Min="0" Max="1">0</Mono>
+                </VideoColor>
+              </Source>
+              <LayerState id="0">
+                <Flip LegalValues="0 1 2 3">0</Flip>
+                <StrobeMode Min="0" Max="1">0</StrobeMode>
+                <StrobeInt Min="2" Max="100">2</StrobeInt>
+                <Key id="0">
+                  <KeyType LegalValues="0">0</KeyType>
+                  <Clip Min="0" Max="100">50</Clip>
+                  <Gain Min="0" Max="100">1</Gain>
+                  <Opacity Min="0" Max="100">100</Opacity>
+                  <FillType LegalValues="0 1 2">0</FillType>
+                  <Color id="0">
+                    <Red Min="0" Max="1023">0</Red>
+                    <Green Min="0" Max="1023">0</Green>
+                    <Blue Min="0" Max="1023">0</Blue>
+                  </Color>
+                </Key>
+                <PIP id="0">
+                  <Border id="0">
+                    <UnitType Min="0" Max="1">0</UnitType>
+                    <BrdrPixel Min="0" Max="512">50</BrdrPixel>
+                    <BrdrPercent Min="0" Max="50">4.62963</BrdrPercent>
+                    <BrdrTyp LegalValues="0 1 2 3 4 5">0</BrdrTyp>
+                    <Color id="0">
+                      <Red Min="0" Max="1023">800</Red>
+                      <Green Min="0" Max="1023">800</Green>
+                      <Blue Min="0" Max="1023">800</Blue>
+                    </Color>
+                  </Border>
+                  <Shadow id="0">
+                    <Mode Min="0" Max="1">0</Mode>
+                    <Opacity Min="0" Max="1">0.5</Opacity>
+                    <EdgeWidth Min="0" Max="512">30</EdgeWidth>
+                    <Rect id="0">
+                      <HPos Min="-32767" Max="32767">5</HPos>
+                      <VPos Min="-32767" Max="32767">5</VPos>
+                      <HSize Min="0" Max="32767">100</HSize>
+                      <VSize Min="0" Max="32767">100</VSize>
+                    </Rect>
+                    <Color id="0">
+                      <Red Min="0" Max="1023">0</Red>
+                      <Green Min="0" Max="1023">0</Green>
+                      <Blue Min="0" Max="1023">0</Blue>
+                    </Color>
+                  </Shadow>
+                </PIP>
+                <WinAdjust id="0">
+                  <IWIN id="0">
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </IWIN>
+                  <Mask id="0">
+                    <Left Min="0" Max="100">0</Left>
+                    <Right Min="0" Max="100">0</Right>
+                    <Top Min="0" Max="100">0</Top>
+                    <Bottom Min="0" Max="100">0</Bottom>
+                  </Mask>
+                  <OWIN id="0">
+                    <HPos Min="-32767" Max="32767">0</HPos>
+                    <VPos Min="-32767" Max="32767">0</VPos>
+                    <HSize Min="0" Max="32767">1920</HSize>
+                    <VSize Min="0" Max="32767">1080</VSize>
+                  </OWIN>
+                  <PostMaskIWIN id="0">
+                    <AR Min="0" Max="99">1.77778</AR>
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </PostMaskIWIN>
+                  <PostMaskOWIN id="0">
+                    <AR Min="0" Max="99">1.77778</AR>
+                    <HPos Min="-32767" Max="32767">0</HPos>
+                    <VPos Min="-32767" Max="32767">0</VPos>
+                    <HSize Min="0" Max="32767">1920</HSize>
+                    <VSize Min="0" Max="32767">1080</VSize>
+                  </PostMaskOWIN>
+                </WinAdjust>
+                <VideoColor id="0">
+                  <Hue Min="-180" Max="180">0</Hue>
+                  <Sat Min="0" Max="200">100</Sat>
+                  <Bright Min="0" Max="200">100</Bright>
+                  <BrightR Min="0" Max="200">100</BrightR>
+                  <BrightG Min="0" Max="200">100</BrightG>
+                  <BrightB Min="0" Max="200">100</BrightB>
+                  <Contr Min="0" Max="200">100</Contr>
+                  <ContrR Min="0" Max="200">100</ContrR>
+                  <ContrG Min="0" Max="200">100</ContrG>
+                  <ContrB Min="0" Max="200">100</ContrB>
+                  <Invert Min="0" Max="1">0</Invert>
+                  <Gamma Min="0.3" Max="3.3">1</Gamma>
+                  <ColorSpace LegalValues="0 1">1</ColorSpace>
+                  <ColorRange LegalValues="0 1">0</ColorRange>
+                  <Mono Min="0" Max="1">0</Mono>
+                </VideoColor>
+              </LayerState>
+              <LayerState id="1">
+                <Flip LegalValues="0 1 2 3">0</Flip>
+                <StrobeMode Min="0" Max="1">0</StrobeMode>
+                <StrobeInt Min="2" Max="100">2</StrobeInt>
+                <Key id="0">
+                  <KeyType LegalValues="0">0</KeyType>
+                  <Clip Min="0" Max="100">50</Clip>
+                  <Gain Min="0" Max="100">1</Gain>
+                  <Opacity Min="0" Max="100">100</Opacity>
+                  <FillType LegalValues="0 1 2">0</FillType>
+                  <Color id="0">
+                    <Red Min="0" Max="1023">0</Red>
+                    <Green Min="0" Max="1023">0</Green>
+                    <Blue Min="0" Max="1023">0</Blue>
+                  </Color>
+                </Key>
+                <PIP id="0">
+                  <Border id="0">
+                    <UnitType Min="0" Max="1">0</UnitType>
+                    <BrdrPixel Min="0" Max="512">50</BrdrPixel>
+                    <BrdrPercent Min="0" Max="50">10</BrdrPercent>
+                    <BrdrTyp LegalValues="0 1 2 3 4 5">0</BrdrTyp>
+                    <Color id="0">
+                      <Red Min="0" Max="1023">800</Red>
+                      <Green Min="0" Max="1023">800</Green>
+                      <Blue Min="0" Max="1023">800</Blue>
+                    </Color>
+                  </Border>
+                  <Shadow id="0">
+                    <Mode Min="0" Max="1">0</Mode>
+                    <Opacity Min="0" Max="1">0.5</Opacity>
+                    <EdgeWidth Min="0" Max="512">30</EdgeWidth>
+                    <Rect id="0">
+                      <HPos Min="-32767" Max="32767">5</HPos>
+                      <VPos Min="-32767" Max="32767">5</VPos>
+                      <HSize Min="0" Max="32767">100</HSize>
+                      <VSize Min="0" Max="32767">100</VSize>
+                    </Rect>
+                    <Color id="0">
+                      <Red Min="0" Max="1023">0</Red>
+                      <Green Min="0" Max="1023">0</Green>
+                      <Blue Min="0" Max="1023">0</Blue>
+                    </Color>
+                  </Shadow>
+                </PIP>
+                <WinAdjust id="0">
+                  <IWIN id="0">
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </IWIN>
+                  <Mask id="0">
+                    <Left Min="0" Max="100">0</Left>
+                    <Right Min="0" Max="100">0</Right>
+                    <Top Min="0" Max="100">0</Top>
+                    <Bottom Min="0" Max="100">0</Bottom>
+                  </Mask>
+                  <OWIN id="0">
+                    <HPos Min="-32767" Max="32767">-194</HPos>
+                    <VPos Min="-32767" Max="32767">0</VPos>
+                    <HSize Min="0" Max="32767">889</HSize>
+                    <VSize Min="0" Max="32767">500</VSize>
+                  </OWIN>
+                  <PostMaskIWIN id="0">
+                    <AR Min="0" Max="99">1.77778</AR>
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </PostMaskIWIN>
+                  <PostMaskOWIN id="0">
+                    <AR Min="0" Max="99">1.778</AR>
+                    <HPos Min="-32767" Max="32767">-194</HPos>
+                    <VPos Min="-32767" Max="32767">0</VPos>
+                    <HSize Min="0" Max="32767">889</HSize>
+                    <VSize Min="0" Max="32767">500</VSize>
+                  </PostMaskOWIN>
+                </WinAdjust>
+                <VideoColor id="0">
+                  <Hue Min="-180" Max="180">0</Hue>
+                  <Sat Min="0" Max="200">100</Sat>
+                  <Bright Min="0" Max="200">100</Bright>
+                  <BrightR Min="0" Max="200">100</BrightR>
+                  <BrightG Min="0" Max="200">100</BrightG>
+                  <BrightB Min="0" Max="200">100</BrightB>
+                  <Contr Min="0" Max="200">100</Contr>
+                  <ContrR Min="0" Max="200">100</ContrR>
+                  <ContrG Min="0" Max="200">100</ContrG>
+                  <ContrB Min="0" Max="200">100</ContrB>
+                  <Invert Min="0" Max="1">0</Invert>
+                  <Gamma Min="0.3" Max="3.3">1</Gamma>
+                  <ColorSpace LegalValues="0 1">1</ColorSpace>
+                  <ColorRange LegalValues="0 1">0</ColorRange>
+                  <Mono Min="0" Max="1">0</Mono>
+                </VideoColor>
+              </LayerState>
+              <Transition id="0">
+                <TransTime Min="0" Max="1999">30</TransTime>
+                <TransPos Min="0" Max="4096">0</TransPos>
+                <TransCurve LegalValues="0 1 2 3">1</TransCurve>
+                <TransDelay Min="0" Max="1999">0</TransDelay>
+                <ArmMode Min="0" Max="1">0</ArmMode>
+                <KfPlay Min="0" Max="1">0</KfPlay>
+              </Transition>
+              <Transition id="1">
+                <TransTime Min="0" Max="1999">30</TransTime>
+                <TransPos Min="0" Max="4096">0</TransPos>
+                <TransCurve LegalValues="0 1 2 3">1</TransCurve>
+                <TransDelay Min="0" Max="1999">0</TransDelay>
+                <ArmMode Min="0" Max="1">0</ArmMode>
+                <KfPlay Min="0" Max="1">0</KfPlay>
+              </Transition>
+            </LayerCfg>
+          </Layer>
+          <Layer id="2">
+            <PvwMode Min="0" Max="1">0</PvwMode>
+          </Layer>
+          <Layer id="3">
+            <PvwMode Min="0" Max="1">0</PvwMode>
+          </Layer>
+        </LayerCollection>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+  <PresetMgr id="0">
+    <LastRecall>0</LastRecall>
+  </PresetMgr>
+</System>
+<System id="0">
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <ScreenDest id="0">
+        <Transition id="0">
+          <TBarDead Min="0" Max="1">0</TBarDead>
+          <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+        </Transition>
+        <Transition id="1">
+          <TBarDead Min="0" Max="1">0</TBarDead>
+          <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+        </Transition>
+        <LayerCollection id="0">
+          <Layer id="1">
+            <LayerCfg id="0">
+              <Transition id="0">
+                <TBarDead Min="0" Max="1">0</TBarDead>
+                <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+              </Transition>
+              <Transition id="1">
+                <TBarDead Min="0" Max="1">0</TBarDead>
+                <AutoTransInProg Min="0" Max="1">0</AutoTransInProg>
+              </Transition>
+            </LayerCfg>
+          </Layer>
+        </LayerCollection>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+</System>
+

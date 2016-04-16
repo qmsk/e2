@@ -1,0 +1,141 @@
+<System id="0">
+  <GuiId>cc58ee12-0964-4d43-b3e2-cc21add74450</GuiId>
+  <DestMgr id="0">
+    <ScreenDestCol id="0">
+      <ScreenDest id="0">
+        <LayerCollection id="0">
+          <Layer id="1">
+            <LastSrcIdx Min="-1" Max="255">2</LastSrcIdx>
+            <LayerCfg id="0">
+              <Source id="0">
+                <InputCfgIndex Min="-1" Max="127">1</InputCfgIndex>
+                <StillIndex Min="-1" Max="99">-1</StillIndex>
+                <UserKeyIndex Min="-1" Max="299">-1</UserKeyIndex>
+                <Name>Input2-3</Name>
+                <SrcType Min="0" Max="3">0</SrcType>
+                <DestIndex Min="-1" Max="127">-1</DestIndex>
+                <AR Min="0" Max="128">1.77778</AR>
+                <Error Min="-1000000" Max="1000000">-9399</Error>
+                <AOIRect id="0">
+                  <HPos Min="0" Max="0">0</HPos>
+                  <VPos Min="0" Max="0">0</VPos>
+                  <HSize Min="0" Max="1920">1920</HSize>
+                  <VSize Min="0" Max="1080">1080</VSize>
+                  <AR Min="0" Max="99">1.77778</AR>
+                </AOIRect>
+                <VideoColor id="0">
+                  <Hue Min="-90" Max="90">0</Hue>
+                  <Sat Min="0" Max="150">100</Sat>
+                  <Bright Min="50" Max="150">100</Bright>
+                  <BrightR Min="25" Max="150">100</BrightR>
+                  <BrightG Min="25" Max="150">100</BrightG>
+                  <BrightB Min="25" Max="150">100</BrightB>
+                  <Contr Min="50" Max="150">100</Contr>
+                  <ContrR Min="25" Max="150">100</ContrR>
+                  <ContrG Min="25" Max="150">100</ContrG>
+                  <ContrB Min="25" Max="150">100</ContrB>
+                  <Invert Min="0" Max="1">0</Invert>
+                  <Gamma Min="0.3" Max="3.3">1</Gamma>
+                  <ColorSpace LegalValues="0 1">1</ColorSpace>
+                  <ColorRange LegalValues="0 1">0</ColorRange>
+                  <Mono Min="0" Max="1">0</Mono>
+                </VideoColor>
+              </Source>
+              <LayerState id="0">
+                <WinAdjust id="0">
+                  <IWIN id="0">
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </IWIN>
+                  <Mask id="0">
+                    <Left Min="0" Max="100">0</Left>
+                    <Right Min="0" Max="100">0</Right>
+                    <Top Min="0" Max="100">0</Top>
+                    <Bottom Min="0" Max="100">0</Bottom>
+                  </Mask>
+                  <OWIN id="0">
+                    <HPos Min="-32767" Max="32767">0</HPos>
+                    <HSize Min="0" Max="32767">1920</HSize>
+                  </OWIN>
+                  <PostMaskIWIN id="0">
+                    <AR Min="0" Max="99">1.77778</AR>
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </PostMaskIWIN>
+                  <PostMaskOWIN id="0">
+                    <AR Min="0" Max="99">1.77778</AR>
+                    <HPos Min="-32767" Max="32767">0</HPos>
+                    <VPos Min="-32767" Max="32767">0</VPos>
+                    <HSize Min="0" Max="32767">1920</HSize>
+                    <VSize Min="0" Max="32767">1080</VSize>
+                  </PostMaskOWIN>
+                </WinAdjust>
+              </LayerState>
+              <LayerState id="1">
+                <WinAdjust id="0">
+                  <IWIN id="0">
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </IWIN>
+                  <Mask id="0">
+                    <Left Min="0" Max="100">0</Left>
+                    <Right Min="0" Max="100">0</Right>
+                    <Top Min="0" Max="100">0</Top>
+                    <Bottom Min="0" Max="100">0</Bottom>
+                  </Mask>
+                  <OWIN id="0">
+                    <HPos Min="-32767" Max="32767">-194</HPos>
+                    <HSize Min="0" Max="32767">889</HSize>
+                  </OWIN>
+                  <PostMaskIWIN id="0">
+                    <AR Min="0" Max="99">1.77778</AR>
+                    <HPos Min="0" Max="0">0</HPos>
+                    <VPos Min="0" Max="0">0</VPos>
+                    <HSize Min="0" Max="1920">1920</HSize>
+                    <VSize Min="0" Max="1080">1080</VSize>
+                  </PostMaskIWIN>
+                  <PostMaskOWIN id="0">
+                    <AR Min="0" Max="99">1.778</AR>
+                    <HPos Min="-32767" Max="32767">-194</HPos>
+                    <VPos Min="-32767" Max="32767">0</VPos>
+                    <HSize Min="0" Max="32767">889</HSize>
+                    <VSize Min="0" Max="32767">500</VSize>
+                  </PostMaskOWIN>
+                </WinAdjust>
+              </LayerState>
+            </LayerCfg>
+          </Layer>
+        </LayerCollection>
+      </ScreenDest>
+    </ScreenDestCol>
+  </DestMgr>
+</System>
+<System id="0">
+  <GuiId>37264fc4-4d94-439d-aa3d-9d843634f1a5</GuiId>
+  <PresetMgr id="0">
+    <Add id="0">
+      <Preset id="1">
+        <Name>Preset2.00</Name>
+        <LockMode>0</LockMode>
+        <presetSno>2.00</presetSno>
+      </Preset>
+    </Add>
+    <Preset id="1">
+      <presetSno>2.00</presetSno>
+    </Preset>
+  </PresetMgr>
+</System>
+<System id="0">
+  <GuiId>96db4e53-b203-46b1-a876-985f67bb8c31</GuiId>
+  <PresetMgr id="0">
+    <Preset id="1">
+      <Name>Test 2</Name>
+    </Preset>
+  </PresetMgr>
+</System>

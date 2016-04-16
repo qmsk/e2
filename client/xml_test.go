@@ -252,3 +252,30 @@ func TestXmlAdd(t *testing.T) {
         }
     }
 }
+
+// Test initial system state with UserKeys and Presets, and then build + save a new Preset
+func TestXmlPresets(t *testing.T) {
+    system := testXMLClientRead(testXML{
+        fileGlob:   "./test-xml/test3-*.xml",
+    })
+
+    if system.PresetMgr.LastRecall != 0 {
+        t.Errorf("Preset LastRecall=%d", system.PresetMgr.LastRecall)
+    }
+
+    if preset0, exists := system.PresetMgr.Preset[0]; !exists {
+
+    } else {
+        t.Errorf("Preset #0 should not exist: %#v", preset0)
+    }
+
+    if preset1, exists := system.PresetMgr.Preset[1]; !exists {
+        t.Errorf("Preset #1 does not exist")
+    } else {
+        t.Logf("Preset #1: %#v\n", preset1)
+
+        if preset1.Name != "Test 2" {
+            t.Errorf("Preset #0 Name: %v", preset1.Name)
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<System id="0">
+  <GuiId>bcb0a6e4-e220-49c9-86c9-a017b6629c6c</GuiId>
+  <PresetMgr id="0">
+    <Remove id="0">
+      <Preset id="0">
+        <Name>Test 1</Name>
+        <LockMode>0</LockMode>
+        <presetSno>1.00</presetSno>
+      </Preset>
+    </Remove>
+  </PresetMgr>
+</System>
