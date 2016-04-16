@@ -1,6 +1,7 @@
 package client
 
 import (
+    "bufio"
     "runtime/debug"
     "fmt"
     "io"
@@ -61,8 +62,10 @@ type xmlQuery struct {
 }
 
 type XMLClient struct {
-    conn            net.Conn
     timeout         time.Duration
+
+    conn            net.Conn
+    connReader      *bufio.Reader
 
     readChan        chan xmlPacket
     readError       error           // set once readChan is closed, nil on clean EOF
@@ -70,7 +73,7 @@ type XMLClient struct {
 }
 
 func (options Options) XMLClient() (*XMLClient, error) {
-    xmlClient := XMLClient{
+    xmlClient := &XMLClient{
         timeout:        options.Timeout,
     }
 
@@ -86,20 +89,23 @@ func (options Options) XMLClient() (*XMLClient, error) {
         return nil, err
     }
 
-    return &xmlClient, nil
+    return xmlClient, nil
 }
 
 // Blocking read and decode of a complete <System> state into the given xmlPacket.
 // Any existing xmlPacket.System state is updated, or reset if the server returns a <System reset="yes">
 //
 // The read is performed using a timeout deadline for the entire <System> state
+//
+// Reading uses a bufio.Reader shared across all read() calls on the TCPConn, and this is thus NOT goroutine-safe
 func (xmlClient *XMLClient) read(packet *xmlPacket) error {
     // applies to the complete XML packet read by the decoder..?
     if err := xmlClient.conn.SetReadDeadline(time.Now().Add(xmlClient.timeout)); err != nil {
         return err
     }
 
-    if err := xml.NewDecoder(xmlClient.conn).Decode(packet); err != nil {
+    // xml.Decoder needs an io.ByteReader, or it will use its own implicit buffering which breaks consecutive messages
+    if err := xml.NewDecoder(xmlClient.connReader).Decode(packet); err != nil {
         return err
     } else {
         return nil
@@ -131,6 +137,11 @@ func (xmlClient *XMLClient) writePing() error {
 
 // Launch background goroutines
 func (xmlClient *XMLClient) start() error {
+    // xml.Decoder needs an io.ByteReader to read consecutive messages
+    // we must use the same read buffer for all xml.Decoders
+    xmlClient.connReader = bufio.NewReader(xmlClient.conn)
+
+
     xmlClient.listenChan = make(chan System)
     xmlClient.readChan = make(chan xmlPacket)
 
