@@ -158,6 +158,16 @@ func TestXmlRead(t *testing.T) {
             }
         }
     }
+
+    if preset0, exists := listenSystem.PresetMgr.Preset[0]; !exists {
+        t.Errorf("Preset #0 does not exist")
+    } else {
+        t.Logf("Preset #0: %#v\n", preset0)
+
+        if preset0.Name != "Test 1" {
+            t.Errorf("Preset #0 Name: %v", preset0.Name)
+        }
+    } 
 }
 
 // Adding new outputs/inputs from initial empty state
