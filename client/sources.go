@@ -78,6 +78,14 @@ func (col SourceCol) MarshalJSON() ([]byte, error) {
     return marshalJSONMap(col)
 }
 
+func (col SourceCol) Get(id int) *Source {
+    if item, exists := col[id]; exists {
+        return &item
+    } else {
+        return nil
+    }
+}
+
 func (col SourceCol) List() (items []Source) {
     var keys []int
 
