@@ -88,5 +88,23 @@ func (tally *Tally) Run() error {
 
 // Compute new output state from sources
 func (tally *Tally) update() error {
+    var state = State{
+        Inputs: make(map[Input]ID),
+        Tally:  make(map[ID]Status),
+    }
+
+    for _, source := range tally.sources {
+        if err := state.updateSystem(source.system, source.String()); err != nil {
+            return err
+        }
+    }
+
+    if err := state.update(); err != nil {
+        return err
+    }
+
+    log.Printf("Tally.update: state:\n")
+    state.Print()
+
     return nil
 }
