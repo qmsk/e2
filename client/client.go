@@ -23,6 +23,11 @@ type Options struct {
     Timeout     time.Duration   `long:"e2-timeout" default:"10s"`
 }
 
+// Returns something sufficient to identify matching Options for the same System
+func (options Options) String() string {
+    return options.Address
+}
+
 func (options Options) Client() (*Client, error) {
     if options.Address == "" {
         return nil, fmt.Errorf("No Address given")
