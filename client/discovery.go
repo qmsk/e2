@@ -9,6 +9,7 @@ import (
 // Returns client Options for the given discovery packet
 func (options Options) DiscoverOptions(discoveryPacket discovery.Packet) (Options, error) {
     options.Address = discoveryPacket.IP.String()
+    options.XMLPort = fmt.Sprintf("%d", discoveryPacket.XMLPort)
 
     return options, nil
 }

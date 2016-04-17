@@ -15,6 +15,8 @@ type AuxDest struct {
     PgmLastSrcIndex int             `xml:"PgmLastSrcIndex"`
 
     Transition      *Transition     `xml:"Transition"`
+
+    // XXX: there are two different sources, id=0 and id=1
     Source          *Source         `xml:"Source"`
 }
 
