@@ -30,18 +30,25 @@ func (state *State) updateSystem(system client.System, tallySource string) error
 
         // lookup active Links
         for _, screen := range system.DestMgr.ScreenDestCol {
+            var status Status
+
             for _, layer := range screen.LayerCollection {
                 if layer.LastSrcIdx == sourceID {
-                    state.addLink(Link{
-                        Input:          input,
-                        Output:         Output{tallySource, screen.Name},
-                        ID:             tallyID,
-                        Status: Status{
-                            Preview:    (layer.PvwMode > 0),
-                            Program:    (layer.PgmMode > 0),
-                        },
-                    })
+                    if layer.PvwMode > 0 {
+                        status.Preview = true
+                    }
+                    if layer.PgmMode > 0 {
+                        status.Program = true
+                    }
                 }
+            }
+            if status.Preview || status.Program {
+                state.addLink(Link{
+                    Input:          input,
+                    Output:         Output{tallySource, screen.Name},
+                    ID:             tallyID,
+                    Status:         status,
+                })
             }
         }
 
