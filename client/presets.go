@@ -137,5 +137,13 @@ type PresetMgr struct {
 
     LastRecall  int             `xml:"LastRecall"`
 
+    // E2 3.1
+    ConflictMode int
+    ConflictPref int
+    TransTime    int
+    GuiId        string
+    Conflict     int
+
+    // TODO: ignore extra fields
     Preset      PresetCol       `xml:",any"`    // <Preset> or <Add><Preset> or <Remove><Preset>
 }

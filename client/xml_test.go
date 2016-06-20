@@ -279,3 +279,14 @@ func TestXmlPresets(t *testing.T) {
         }
     }
 }
+
+// Test initial system state with version 3.1
+func TestXmlVersion31(t *testing.T) {
+    system := testXMLClientRead(testXML{
+        fileGlob:   "./test-xml/test4-*.xml",
+    })
+
+    if system.PresetMgr.LastRecall != -1 {
+        t.Errorf("Preset LastRecall=%d", system.PresetMgr.LastRecall)
+    }
+}
