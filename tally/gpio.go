@@ -1,21 +1,21 @@
 package tally
 
 import (
-    "github.com/kidoman/embd"
 	"fmt"
-    _ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
+	"github.com/kidoman/embd"
+	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
 	"log"
 	"sync"
 )
 
 type GPIOOptions struct {
-	TallyPins	[]string	`long:"gpio-tally-pin"`
+	TallyPins []string `long:"gpio-tally-pin"`
 }
 
 func (options GPIOOptions) Make(tally *Tally) (*GPIO, error) {
 	var gpio = GPIO{
-		options:    options,
-		TallyPins:	make(map[ID]embd.DigitalPin),
+		options:   options,
+		TallyPins: make(map[ID]embd.DigitalPin),
 	}
 
 	if err := gpio.init(options); err != nil {
@@ -28,12 +28,12 @@ func (options GPIOOptions) Make(tally *Tally) (*GPIO, error) {
 }
 
 type GPIO struct {
-	options		GPIOOptions
+	options GPIOOptions
 
-    TallyPins   map[ID]embd.DigitalPin
+	TallyPins map[ID]embd.DigitalPin
 
-	stateChan	chan State
-	waitGroup	sync.WaitGroup
+	stateChan chan State
+	waitGroup sync.WaitGroup
 }
 
 func (gpio *GPIO) init(options GPIOOptions) error {
@@ -45,11 +45,11 @@ func (gpio *GPIO) init(options GPIOOptions) error {
 		if pin, err := embd.NewDigitalPin(pinName); err != nil {
 			return fmt.Errorf("embd.NewDigitalPin %v: %v", pinName, err)
 
-		// Writing as "out" defaults to initializing the value as low.
+			// Writing as "out" defaults to initializing the value as low.
 		} else if err := pin.SetDirection(embd.Out); err != nil {
 			return fmt.Errorf("pin.SetDirection %v: %v", pinName, err)
 		} else {
-			gpio.TallyPins[ID(i + 1)] = pin
+			gpio.TallyPins[ID(i+1)] = pin
 		}
 	}
 

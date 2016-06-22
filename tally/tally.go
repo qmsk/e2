@@ -1,57 +1,57 @@
 package tally
 
 import (
-    "github.com/qmsk/e2/client"
-    "github.com/qmsk/e2/discovery"
-    "fmt"
-    "log"
+	"fmt"
+	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/discovery"
+	"log"
 )
 
 type Options struct {
-    clientOptions       client.Options
-    discoveryOptions    discovery.Options
+	clientOptions    client.Options
+	discoveryOptions discovery.Options
 }
 
 func (options Options) Tally(clientOptions client.Options, discoveryOptions discovery.Options) (*Tally, error) {
-    options.clientOptions = clientOptions
-    options.discoveryOptions = discoveryOptions
+	options.clientOptions = clientOptions
+	options.discoveryOptions = discoveryOptions
 
-    var tally = Tally{
-		options: options,
-		closeChan: make(chan struct{}),
-		sources: make(map[string]Source),
+	var tally = Tally{
+		options:    options,
+		closeChan:  make(chan struct{}),
+		sources:    make(map[string]Source),
 		sourceChan: make(chan Source),
-		dests: make(map[chan State]bool),
+		dests:      make(map[chan State]bool),
 	}
 
-    return &tally, tally.init(options)
+	return &tally, tally.init(options)
 }
 
 // Concurrent tally support for multiple sources and destinations
 type Tally struct {
-    options         Options
+	options Options
 
-	closeChan		chan struct{}
+	closeChan chan struct{}
 
-    discovery       *discovery.Discovery
-    discoveryChan   chan discovery.Packet
+	discovery     *discovery.Discovery
+	discoveryChan chan discovery.Packet
 
-    sources         map[string]Source
-    sourceChan      chan Source
+	sources    map[string]Source
+	sourceChan chan Source
 
-	dests			map[chan State]bool
+	dests map[chan State]bool
 }
 
 func (tally *Tally) init(options Options) error {
 
-    if discovery, err := options.discoveryOptions.Discovery(); err != nil {
-        return fmt.Errorf("discovery:DiscoveryOptions.Discovery: %v", err)
-    } else {
-        tally.discovery = discovery
-        tally.discoveryChan = discovery.Run()
-    }
+	if discovery, err := options.discoveryOptions.Discovery(); err != nil {
+		return fmt.Errorf("discovery:DiscoveryOptions.Discovery: %v", err)
+	} else {
+		tally.discovery = discovery
+		tally.discoveryChan = discovery.Run()
+	}
 
-    return nil
+	return nil
 }
 
 // Register watcher for state
@@ -61,8 +61,8 @@ func (tally *Tally) register(stateChan chan State) {
 
 // mainloop, owns Tally state
 func (tally *Tally) Run() error {
-    for {
-        select {
+	for {
+		select {
 		case <-tally.closeChan:
 			log.Printf("Tally: stopping...")
 
@@ -73,56 +73,56 @@ func (tally *Tally) Run() error {
 			// mark as closed, wait for Sources to finish
 			tally.closeChan = nil
 
-        case discoveryPacket := <-tally.discoveryChan:
-            if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
-                log.Printf("Tally: invalid discovery client options: %v\n", err)
-            } else if _, exists := tally.sources[clientOptions.String()]; exists {
-                // already known
-            } else if source, err := newSource(tally, clientOptions); err != nil {
-                log.Printf("Tally: unable to connect to discovered system: %v\n", err)
-            } else {
-                log.Printf("Tally: connected to new source: %v\n", source)
+		case discoveryPacket := <-tally.discoveryChan:
+			if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
+				log.Printf("Tally: invalid discovery client options: %v\n", err)
+			} else if _, exists := tally.sources[clientOptions.String()]; exists {
+				// already known
+			} else if source, err := newSource(tally, clientOptions); err != nil {
+				log.Printf("Tally: unable to connect to discovered system: %v\n", err)
+			} else {
+				log.Printf("Tally: connected to new source: %v\n", source)
 
-                tally.sources[clientOptions.String()] = source
-            }
+				tally.sources[clientOptions.String()] = source
+			}
 
-        case source := <-tally.sourceChan:
-            if err := source.err; err != nil {
-                log.Printf("Tally: Source %v Error: %v\n", source, err)
+		case source := <-tally.sourceChan:
+			if err := source.err; err != nil {
+				log.Printf("Tally: Source %v Error: %v\n", source, err)
 
-                delete(tally.sources, source.String())
-            } else {
-                log.Printf("Tally: Source %v: Update\n", source)
+				delete(tally.sources, source.String())
+			} else {
+				log.Printf("Tally: Source %v: Update\n", source)
 
-                tally.sources[source.String()] = source
-            }
+				tally.sources[source.String()] = source
+			}
 
-            if err := tally.update(); err != nil {
-                return fmt.Errorf("Tally.update: %v\n", err)
-            }
-        }
+			if err := tally.update(); err != nil {
+				return fmt.Errorf("Tally.update: %v\n", err)
+			}
+		}
 
 		// stopping?
 		if tally.closeChan == nil && len(tally.sources) == 0 {
 			log.Printf("Tally: stopped")
 			return nil
 		}
-    }
+	}
 }
 
 // Compute new output state from sources
 func (tally *Tally) update() error {
-    var state = makeState()
+	var state = makeState()
 
-    for _, source := range tally.sources {
-        if err := source.updateState(&state); err != nil {
-            return err
-        }
-    }
+	for _, source := range tally.sources {
+		if err := source.updateState(&state); err != nil {
+			return err
+		}
+	}
 
-    if err := state.update(); err != nil {
-        return err
-    }
+	if err := state.update(); err != nil {
+		return err
+	}
 
 	// proagate
 	log.Printf("tally: Update: sources=%d inputs=%d outputs=%d tallys=%d",
@@ -133,7 +133,7 @@ func (tally *Tally) update() error {
 		stateChan <- state
 	}
 
-    return nil
+	return nil
 }
 
 // Termiante any Run()

@@ -1,29 +1,28 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
 )
 
 type ScreenList struct {
-
 }
 
 func init() {
-    parser.AddCommand("screen-list", "List Screen destinations", "", &ScreenList{})
+	parser.AddCommand("screen-list", "List Screen destinations", "", &ScreenList{})
 }
 
 func (cmd *ScreenList) Execute(args []string) error {
-    if client, err := options.ClientOptions.Client(); err != nil {
-        return err
-    } else if screenDestinations, err := client.ListScreenDestinations(); err != nil {
-        return err
-    } else {
-        fmt.Printf("%-8s %s\n", "Screen", "Name")
+	if client, err := options.ClientOptions.Client(); err != nil {
+		return err
+	} else if screenDestinations, err := client.ListScreenDestinations(); err != nil {
+		return err
+	} else {
+		fmt.Printf("%-8s %s\n", "Screen", "Name")
 
-        for _, screenDestination := range screenDestinations {
-            fmt.Printf("%-8d %s\n", screenDestination.ID, screenDestination.Name)
-        }
-    }
+		for _, screenDestination := range screenDestinations {
+			fmt.Printf("%-8d %s\n", screenDestination.ID, screenDestination.Name)
+		}
+	}
 
-    return nil
+	return nil
 }
