@@ -16,9 +16,13 @@ func (options Options) Tally(clientOptions client.Options, discoveryOptions disc
     options.clientOptions = clientOptions
     options.discoveryOptions = discoveryOptions
 
-    var tally Tally
+    var tally = Tally{
+		options: options,
+		sources: make(map[string]Source),
+		sourceChan: make(chan Source),
+	}
 
-    return &tally, tally.start(options)
+    return &tally, tally.init(options)
 }
 
 // Concurrent tally support for multiple sources and destinations
@@ -28,18 +32,11 @@ type Tally struct {
     discovery       *discovery.Discovery
     discoveryChan   chan discovery.Packet
 
-    /* run() state */
-    // active systems
     sources         map[string]Source
-
-    // updates to sources
     sourceChan      chan Source
 }
 
-func (tally *Tally) start(options Options) error {
-    tally.options = options
-    tally.sources = make(map[string]Source)
-    tally.sourceChan = make(chan Source)
+func (tally *Tally) init(options Options) error {
 
     if discovery, err := options.discoveryOptions.Discovery(); err != nil {
         return fmt.Errorf("discovery:DiscoveryOptions.Discovery: %v", err)
@@ -88,13 +85,10 @@ func (tally *Tally) Run() error {
 
 // Compute new output state from sources
 func (tally *Tally) update() error {
-    var state = State{
-        Inputs: make(map[Input]ID),
-        Tally:  make(map[ID]Status),
-    }
+    var state = makeState()
 
     for _, source := range tally.sources {
-        if err := state.updateSystem(source.system, source.String()); err != nil {
+        if err := source.updateState(&state); err != nil {
             return err
         }
     }
@@ -103,8 +97,9 @@ func (tally *Tally) update() error {
         return err
     }
 
-    log.Printf("Tally.update: state:\n")
-    state.Print()
+	log.Printf("tally: Update: sources=%d inputs=%d outputs=%d tallys=%d",
+		len(tally.sources), len(state.Inputs), len(state.Outputs), len(state.Tally),
+	)
 
     return nil
 }
