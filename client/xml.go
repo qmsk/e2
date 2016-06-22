@@ -70,6 +70,7 @@ type XMLClient struct {
     readChan        chan xmlPacket
     readError       error           // set once readChan is closed, nil on clean EOF
     listenChan      chan System
+	closeChan		chan struct{}
 }
 
 func (options Options) XMLClient() (*XMLClient, error) {
@@ -144,6 +145,7 @@ func (xmlClient *XMLClient) start() error {
 
     xmlClient.listenChan = make(chan System)
     xmlClient.readChan = make(chan xmlPacket)
+	xmlClient.closeChan = make(chan struct{})
 
     go xmlClient.reader()
     go xmlClient.writer()
@@ -246,6 +248,11 @@ func (xmlClient *XMLClient) writer() {
 
             // got update, reschedule idle ping
             timer.Reset(xmlClient.timeout / 2)
+
+		case <-xmlClient.closeChan:
+			log.Printf("xmlClient.writer: close")
+
+			return
         }
     }
 }
@@ -285,4 +292,9 @@ func (xmlClient *XMLClient) Read() (System, error) {
         // chan was closed after EOF
         return system, io.EOF
     }
+}
+
+// Close connection, erroring any concurrent or future Read() with io.EOF
+func (xmlClient *XMLClient) Close() {
+	close(xmlClient.closeChan)
 }
