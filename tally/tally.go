@@ -18,6 +18,7 @@ func (options Options) Tally(clientOptions client.Options, discoveryOptions disc
 
     var tally = Tally{
 		options: options,
+		closeChan: make(chan struct{}),
 		sources: make(map[string]Source),
 		sourceChan: make(chan Source),
 		dests: make(map[chan State]bool),
@@ -29,6 +30,8 @@ func (options Options) Tally(clientOptions client.Options, discoveryOptions disc
 // Concurrent tally support for multiple sources and destinations
 type Tally struct {
     options         Options
+
+	closeChan		chan struct{}
 
     discovery       *discovery.Discovery
     discoveryChan   chan discovery.Packet
@@ -60,6 +63,16 @@ func (tally *Tally) register(stateChan chan State) {
 func (tally *Tally) Run() error {
     for {
         select {
+		case <-tally.closeChan:
+			log.Printf("Tally: stopping...")
+
+			for _, source := range tally.sources {
+				source.close()
+			}
+
+			// mark as closed, wait for Sources to finish
+			tally.closeChan = nil
+
         case discoveryPacket := <-tally.discoveryChan:
             if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
                 log.Printf("Tally: invalid discovery client options: %v\n", err)
@@ -88,6 +101,12 @@ func (tally *Tally) Run() error {
                 return fmt.Errorf("Tally.update: %v\n", err)
             }
         }
+
+		// stopping?
+		if tally.closeChan == nil && len(tally.sources) == 0 {
+			log.Printf("Tally: stopped")
+			return nil
+		}
     }
 }
 
@@ -115,4 +134,9 @@ func (tally *Tally) update() error {
 	}
 
     return nil
+}
+
+// Termiante any Run()
+func (tally *Tally) Stop() {
+	close(tally.closeChan)
 }

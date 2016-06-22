@@ -5,7 +5,9 @@ import (
     "github.com/qmsk/e2/discovery"
     "github.com/jessevdk/go-flags"
     "log"
+	"os"
     "github.com/qmsk/e2/tally"
+	"os/signal"
 )
 
 var options = struct{
@@ -37,6 +39,14 @@ func main() {
 		}
 	}
 
+	// stopping
+	stopChan := make(chan os.Signal)
+
+	signal.Notify(stopChan, os.Interrupt)
+
+	go func(){ <-stopChan; tally.Stop() }()
+
+	// run
     if err := tally.Run(); err != nil {
         log.Fatalf("Tally.Run: %v\n", err)
     } else {

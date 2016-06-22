@@ -5,6 +5,7 @@ import (
 	"fmt"
     _ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
 	"log"
+	"sync"
 )
 
 type GPIOOptions struct {
@@ -32,6 +33,7 @@ type GPIO struct {
     TallyPins   map[ID]embd.DigitalPin
 
 	stateChan	chan State
+	waitGroup	sync.WaitGroup
 }
 
 func (gpio *GPIO) init(options GPIOOptions) error {
@@ -56,6 +58,7 @@ func (gpio *GPIO) init(options GPIOOptions) error {
 
 func (gpio *GPIO) register(tally *Tally) {
 	gpio.stateChan = make(chan State)
+	gpio.waitGroup.Add(1)
 
 	go gpio.run()
 
@@ -63,11 +66,19 @@ func (gpio *GPIO) register(tally *Tally) {
 }
 
 func (gpio *GPIO) close() {
+	defer gpio.waitGroup.Done()
+
+	var closed = 0
+
 	for id, pin := range gpio.TallyPins {
 		if err := pin.Close(); err != nil {
 			log.Printf("tally:GPIO: close pin %v:%v: %v", id, pin, err)
+		} else {
+			closed++
 		}
 	}
+
+	log.Printf("tally:GPIO: Closed %d pins", closed)
 }
 
 func (gpio *GPIO) run() {
@@ -92,9 +103,15 @@ func (gpio *GPIO) run() {
 			}
 		}
 	}
+
+	log.Printf("tally:GPIO: End")
 }
 
-// After Tally has stopped, close all GPIOs
+// Close and Wait
 func (gpio *GPIO) Close() {
+	log.Printf("tally:GPIO: Closing..")
+
 	close(gpio.stateChan)
+
+	gpio.waitGroup.Wait()
 }

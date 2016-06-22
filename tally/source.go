@@ -120,3 +120,8 @@ func (source Source) updateState(state *State) error {
 
     return nil
 }
+
+// close, causing run() to exit
+func (source Source) close() {
+	source.xmlClient.Close()
+}
