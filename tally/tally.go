@@ -20,6 +20,7 @@ func (options Options) Tally(clientOptions client.Options, discoveryOptions disc
 		options: options,
 		sources: make(map[string]Source),
 		sourceChan: make(chan Source),
+		dests: make(map[chan State]bool),
 	}
 
     return &tally, tally.init(options)
@@ -34,6 +35,8 @@ type Tally struct {
 
     sources         map[string]Source
     sourceChan      chan Source
+
+	dests			map[chan State]bool
 }
 
 func (tally *Tally) init(options Options) error {
@@ -46,6 +49,11 @@ func (tally *Tally) init(options Options) error {
     }
 
     return nil
+}
+
+// Register watcher for state
+func (tally *Tally) register(stateChan chan State) {
+	tally.dests[stateChan] = true
 }
 
 // mainloop, owns Tally state
@@ -97,9 +105,14 @@ func (tally *Tally) update() error {
         return err
     }
 
+	// proagate
 	log.Printf("tally: Update: sources=%d inputs=%d outputs=%d tallys=%d",
 		len(tally.sources), len(state.Inputs), len(state.Outputs), len(state.Tally),
 	)
+
+	for stateChan, _ := range tally.dests {
+		stateChan <- state
+	}
 
     return nil
 }
