@@ -11,7 +11,7 @@ func broadcastIP(addr *net.IPNet) (net.IP, error) {
     ip4 := addr.IP.To4()
     bits, size := addr.Mask.Size()
 
-    if size != 32 && ip4 != nil {
+    if size != 32 || ip4 == nil {
         return nil, fmt.Errorf("Invalid IPv4 address: %v", addr)
     }
 
