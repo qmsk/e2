@@ -44,7 +44,15 @@ func main() {
 
 	signal.Notify(stopChan, os.Interrupt)
 
-	go func() { <-stopChan; tally.Stop() }()
+	go func() {
+		<-stopChan
+
+		// second SIGINT kills
+		signal.Stop(stopChan)
+
+		tally.Stop()
+
+	}()
 
 	// run
 	if err := tally.Run(); err != nil {
