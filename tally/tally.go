@@ -73,8 +73,10 @@ func (tally *Tally) Run() error {
 			// mark as closed, wait for Sources to finish
 			tally.closeChan = nil
 
-		case discoveryPacket := <-tally.discoveryChan:
-			if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
+		case discoveryPacket, valid := <-tally.discoveryChan:
+			if !valid {
+				return fmt.Errorf("discovery: %v", tally.discovery.Error())
+			} else if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
 				log.Printf("Tally: invalid discovery client options: %v\n", err)
 			} else if _, exists := tally.sources[clientOptions.String()]; exists {
 				// already known
