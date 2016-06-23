@@ -1,0 +1,59 @@
+<html lang="en" ng-app="qmsk.e2.tally">
+    <head>
+        <title>github.com/qmsk/e2/tally</title>
+
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        
+        <!-- jQuery -->
+        <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+        <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        
+        <!-- Angular -->
+        <script src="/static/bower_components/angular/angular.js"></script>
+        <script src="/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script src="/static/bower_components/angular-resource/angular-resource.js"></script>
+        <script src="/static/bower_components/angular-route/angular-route.js"></script>
+        <script src="/static/bower_components/angular-websocket/angular-websocket.js"></script>
+        <script src="/static/bower_components/angular-scroll-glue/src/scrollglue.js"></script>
+        <script src="/static/bower_components/json-formatter/dist/json-formatter.min.js"></script>
+
+        <link rel="stylesheet" href="/static/bower_components/json-formatter/dist/json-formatter.min.css"></link>
+        
+        <!-- qmsk.e2 -->
+        <script src="/static/qmsk.e2/tally.js"></script>
+        <script src="/static/qmsk.e2/web.js"></script>
+    </head>
+
+    <body>
+        <div id="header" class="navbar navbar-inverse" ng-controller="HeaderCtrl">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">
+                        Encore2 Control
+                    </a>
+                </div>
+
+                <ul class="nav navbar-nav">
+                    <li ng-class="{'active': isActive('/tally')}">
+                        <a href="#/tally">Tally</a>
+                    </li>
+                </ul>
+
+                <p class="navbar-text navbar-right state-error" ng-show="state.error">
+                    <span class="glyphicon glyphicon-alert"></span>
+                </p>
+
+                <p class="navbar-text navbar-right" ng-show="state.busy">
+                    <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+                </p>
+            </div>
+        </div>
+
+        <div id="view" ng-view></div>
+    </body>
+</html>

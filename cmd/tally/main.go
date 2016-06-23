@@ -59,8 +59,10 @@ func main() {
 
 	// Web
 	go options.WebOptions.Server(
-		web.RoutePrefix("/api/", tally.WebAPI()),
+		web.RoutePrefix("/api/tally/", tally.WebAPI()),
 		web.RoutePrefix("/events/", tally.WebEvents()),
+		options.WebOptions.RouteStatic("/static/"),
+		options.WebOptions.RouteFile("/", "tally.html"),
 	)
 
 	// run
