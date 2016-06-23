@@ -95,7 +95,11 @@ func (tally *Tally) Run() error {
 				log.Printf("Tally: Source %v: Update\n", source)
 			}
 
-			tally.sources[source.String()] = source
+			if source.closed {
+				delete(tally.sources, source.String())
+			} else {
+				tally.sources[source.String()] = source
+			}
 
 			if err := tally.update(); err != nil {
 				return fmt.Errorf("Tally.update: %v\n", err)

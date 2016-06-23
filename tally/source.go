@@ -3,6 +3,7 @@ package tally
 import (
 	"fmt"
 	"github.com/qmsk/e2/client"
+	"io"
 	"regexp"
 )
 
@@ -32,6 +33,7 @@ type Source struct {
 	xmlClient     *client.XMLClient
 
 	system client.System
+	closed bool
 	err    error
 }
 
@@ -41,10 +43,12 @@ func (source Source) String() string {
 
 func (source Source) run(updateChan chan Source) {
 	for {
-		if system, err := source.xmlClient.Read(); err != nil {
-			source.err = err
-		} else {
+		if system, err := source.xmlClient.Read(); err == nil {
 			source.system = system
+		} else if err == io.EOF {
+			source.closed = true
+		} else {
+			source.err = err
 		}
 
 		updateChan <- source
