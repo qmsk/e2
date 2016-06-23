@@ -61,7 +61,8 @@ type Discovery struct {
 	udpConn *net.UDPConn
 	udpAddr *net.UDPAddr
 
-	recvChan chan Packet
+	recvChan  chan Packet
+	recvError error
 }
 
 func (discovery *Discovery) String() string {
@@ -98,6 +99,9 @@ func (discovery *Discovery) receiver() {
 
 		if err := discovery.recv(&packet); err != nil {
 			log.Printf("Discovery.receiver: %v\n", err)
+
+			discovery.recvError = err
+
 			return
 		}
 
@@ -119,7 +123,11 @@ func (discovery *Discovery) run(outChan chan Packet) {
 		case <-intervalChan:
 			if err := discovery.send(); err != nil {
 				log.Printf("Discovery.Send: %v\n", err)
+
+				discovery.recvError = err
+
 				return
+
 			} else {
 				//log.Printf("Discovery.Send...\n")
 			}
@@ -141,6 +149,11 @@ func (discovery *Discovery) Run() chan Packet {
 	go discovery.run(outChan)
 
 	return outChan
+}
+
+// Get error set after the Run() chan is closed
+func (discovery *Discovery) Error() error {
+	return discovery.recvError
 }
 
 func (discovery *Discovery) Stop() {
