@@ -64,7 +64,7 @@ func MakeEvents(eventChan chan Event) *Events {
 }
 
 func (events *Events) run(eventChan chan Event) {
-	var event Event
+	var state = Event(struct{}{})
 
 	clients := make(clientSet)
 	defer clients.close()
@@ -79,7 +79,7 @@ func (events *Events) run(eventChan chan Event) {
 			clients.register(clientChan)
 
 			// initial state
-			clients.send(clientChan, event)
+			clients.send(clientChan, state)
 
 		case clientChan := <-events.unregisterChan:
 			clients.unregister(clientChan)
@@ -89,7 +89,12 @@ func (events *Events) run(eventChan chan Event) {
 				return
 			}
 
+			// log.Printf("web:Events: publish: %v", event)
+
 			clients.publish(event)
+
+			// XXX
+			state = event
 		}
 	}
 }
@@ -112,6 +117,8 @@ func (events *Events) ServeWebsocket(websocketConn *websocket.Conn) {
 	defer events.unregister(eventChan)
 
 	for event := range eventChan {
+		// log.Printf("web:Events: write %v: %v", websocketConn, event)
+
 		if err := websocket.JSON.Send(websocketConn, event); err != nil {
 			log.Printf("webSocket.JSON.Send: %v\n", err)
 			return
