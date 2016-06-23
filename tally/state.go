@@ -85,7 +85,7 @@ func (state *State) addLink(link Link) {
 }
 
 // Update finaly Tally state from links
-func (state *State) update() error {
+func (state *State) update() {
 	for _, link := range state.Links {
 		status := state.Tally[link.Tally]
 
@@ -98,8 +98,6 @@ func (state *State) update() error {
 
 		state.Tally[link.Tally] = status
 	}
-
-	return nil
 }
 
 func (state State) Print() {

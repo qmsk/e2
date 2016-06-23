@@ -61,7 +61,13 @@ func (tally *Tally) register(stateChan chan State) {
 
 // mainloop, owns Tally state
 func (tally *Tally) Run() error {
+	// initial state is empty
+	var state State
+
 	for {
+		// update
+		tally.apply(state)
+
 		select {
 		case <-tally.closeChan:
 			log.Printf("Tally: stopping...")
@@ -101,9 +107,7 @@ func (tally *Tally) Run() error {
 				tally.sources[source.String()] = source
 			}
 
-			if err := tally.update(); err != nil {
-				return fmt.Errorf("Tally.update: %v\n", err)
-			}
+			state = tally.update()
 		}
 
 		// stopping?
@@ -114,21 +118,7 @@ func (tally *Tally) Run() error {
 	}
 }
 
-// Compute new output state from sources
-func (tally *Tally) update() error {
-	var state = makeState()
-
-	for _, source := range tally.sources {
-		if err := source.updateState(&state); err != nil {
-			return err
-		}
-	}
-
-	if err := state.update(); err != nil {
-		return err
-	}
-
-	// proagate
+func (tally *Tally) apply(state State) {
 	log.Printf("tally: Update: sources=%d inputs=%d outputs=%d tallys=%d",
 		len(tally.sources), len(state.Inputs), len(state.Outputs), len(state.Tally),
 	)
@@ -136,8 +126,21 @@ func (tally *Tally) update() error {
 	for stateChan, _ := range tally.dests {
 		stateChan <- state
 	}
+}
 
-	return nil
+// Compute new output state from sources
+func (tally *Tally) update() State {
+	var state = makeState()
+
+	for _, source := range tally.sources {
+		if err := source.updateState(&state); err != nil {
+			state.setError(source.String(), err)
+		}
+	}
+
+	state.update()
+
+	return state
 }
 
 // Termiante any Run()

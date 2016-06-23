@@ -14,6 +14,9 @@ func newSource(tally *Tally, clientOptions client.Options) (Source, error) {
 		clientOptions: clientOptions,
 	}
 
+	// give updates every 10s when idle
+	clientOptions.ReadKeepalive = true
+
 	if xmlClient, err := clientOptions.XMLClient(); err != nil {
 		return source, err
 	} else {
@@ -63,8 +66,7 @@ func (source Source) updateState(state *State) error {
 	tallySource := source.String()
 
 	if source.err != nil {
-		state.setError(tallySource, source.err)
-		return nil
+		return source.err
 	}
 
 	system := source.system
