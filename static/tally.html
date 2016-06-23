@@ -26,6 +26,7 @@
         
         <!-- qmsk.e2 -->
         <link rel="stylesheet" href="/static/qmsk-e2.css">
+        <link rel="stylesheet" href="/static/qmsk.e2/tally.css">
 
         <script src="/static/qmsk.e2/tally.js"></script>
         <script src="/static/qmsk.e2/web.js"></script>
@@ -41,6 +42,9 @@
                 </div>
 
                 <ul class="nav navbar-nav">
+                    <li ng-class="{'active': isActive('/sources')}">
+                        <a href="#/sources">Sources</a>
+                    </li>
                     <li ng-class="{'active': isActive('/tally')}">
                         <a href="#/tally">Tally</a>
                     </li>

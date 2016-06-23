@@ -1,0 +1,24 @@
+<div class="container" id="tally">
+    <div class="source tally-source" ng-repeat="source in sources">
+        <h1>{{source.Source}}</h1>
+
+        <div class="alert alert-danger" ng-if="source.Error">
+            <pre>{{source.Error}}</pre>
+        </div>
+
+        <dl class="dl-horizontal">
+            <dt>First Seen</dt>
+            <dd>{{source.FirstSeen}}</dd>
+            <dt>Last Seen</dt>
+            <dd>{{source.LastSeen}}</dd>
+
+            <dt ng-repeat-start="(meta, value) in source.Discovery">
+                {{meta}}
+            </dt>
+            <dd ng-repeat-end>
+                {{value}}
+            </dd>
+        </dl>
+    </div>
+</div>
+

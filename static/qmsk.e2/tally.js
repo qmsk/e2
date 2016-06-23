@@ -9,6 +9,12 @@ angular.module('qmsk.e2.tally', [
 
 .config(function($routeProvider) {
     $routeProvider
+        .when('/sources', {
+            templateUrl: '/static/qmsk.e2/tally-sources.html',
+            controller: 'SourcesCtrl',
+            reloadOnSearch: false,
+        })
+
         .when('/tally', {
             templateUrl: '/static/qmsk.e2/tally.html',
             controller: 'TallyCtrl',
@@ -19,8 +25,16 @@ angular.module('qmsk.e2.tally', [
         });
 })
 
+.factory('Sources', function($http) {
+    return $http.get('/api/sources').then(
+        function success(r) {
+            return r.data;
+        }
+    );
+})
+
 .factory('Tally', function($http) {
-    return $http.get('/api/tally/').then(
+    return $http.get('/api/tally').then(
         function success(r) {
             return r.data;
         }
@@ -35,8 +49,16 @@ angular.module('qmsk.e2.tally', [
     };
 })
 
+.controller('SourcesCtrl', function($scope, Sources) {
+    Sources.then(function(sources){
+        $scope.sources = sources;
+    });
+})
+
 .controller('TallyCtrl', function($scope, Tally) {
     Tally.then(function(tally){
         $scope.tally = tally;
     });
 })
+
+
