@@ -73,11 +73,13 @@ type XMLClient struct {
 	listenChan chan System
 	closeChan  chan struct{}
 	closed     bool
+	readKeepalive bool
 }
 
 func (options Options) XMLClient() (*XMLClient, error) {
 	xmlClient := &XMLClient{
 		timeout: options.Timeout,
+		readKeepalive: options.ReadKeepalive,
 	}
 
 	if tcpAddr, err := net.ResolveTCPAddr("tcp4", net.JoinHostPort(options.Address, options.XMLPort)); err != nil {
@@ -212,8 +214,13 @@ func (xmlClient *XMLClient) reader() {
 
 				xmlClient.listenChan <- system
 
+			} else if xmlClient.readKeepalive {
+				log.Printf("xmlClient.read: pong")
+
+				xmlClient.listenChan <- system
+
 			} else {
-				// log.Printf("xmlClient.read: pong")
+				// skip pongs
 			}
 		}
 	}
