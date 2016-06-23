@@ -67,10 +67,12 @@ type XMLClient struct {
 	conn       net.Conn
 	connReader *bufio.Reader
 
+	writeError error // if set, the conn is closed
 	readChan   chan xmlPacket
 	readError  error // set once readChan is closed, nil on clean EOF
 	listenChan chan System
 	closeChan  chan struct{}
+	closed     bool
 }
 
 func (options Options) XMLClient() (*XMLClient, error) {
@@ -181,7 +183,7 @@ func (xmlClient *XMLClient) reader() {
 		if err := xmlClient.read(&packet); err != nil {
 			log.Printf("xmlClient.read: %v\n", err)
 
-			if err == io.EOF {
+			if xmlClient.closed {
 				// done
 				return
 
@@ -234,6 +236,9 @@ func (xmlClient *XMLClient) writer() {
 		case <-timer.C:
 			if err := xmlClient.writePing(); err != nil {
 				log.Printf("xmlClient.writePing: %v\n", err)
+
+				xmlClient.writeError = err
+
 				return
 			}
 
@@ -284,16 +289,20 @@ func (xmlClient *XMLClient) ListenError() error {
 func (xmlClient *XMLClient) Read() (System, error) {
 	if system, ok := <-xmlClient.listenChan; ok {
 		return system, nil
+	} else if xmlClient.writeError != nil {
+		// a writeError will close the conn, and lead to a readError
+		return system, xmlClient.writeError
 	} else if xmlClient.readError != nil {
 		// chan was closed with an error
 		return system, xmlClient.readError
 	} else {
-		// chan was closed after EOF
+		// conn was closed
 		return system, io.EOF
 	}
 }
 
 // Close connection, erroring any concurrent or future Read() with io.EOF
 func (xmlClient *XMLClient) Close() {
+	xmlClient.closed = true
 	close(xmlClient.closeChan)
 }
