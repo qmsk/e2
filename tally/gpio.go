@@ -92,17 +92,19 @@ func (gpio *GPIO) register(tally *Tally) {
 func (gpio *GPIO) close() {
 	defer gpio.waitGroup.Done()
 
-	var closed = 0
+	log.Printf("tally:GPIO: Closeing pins..")
 
-	for _, pin := range gpio.tallyPins {
-		if err := pin.Close(); err != nil {
-			log.Printf("tally:GPIO: close pin %v: %v", pin, err)
-		} else {
-			closed++
-		}
+	if gpio.statusGreenPin != nil {
+		gpio.statusGreenPin.Close(&gpio.waitGroup)
+	}
+	if gpio.statusRedPin != nil {
+		gpio.statusRedPin.Close(&gpio.waitGroup)
 	}
 
-	log.Printf("tally:GPIO: Closed %d pins", closed)
+	for _, pin := range gpio.tallyPins {
+		pin.Close(&gpio.waitGroup)
+	}
+
 }
 
 func (gpio *GPIO) update(state State) {
@@ -146,16 +148,15 @@ func (gpio *GPIO) update(state State) {
 
 	if gpio.statusRedPin == nil {
 
+	} else if statusRed {
+		gpio.statusRedPin.BlinkCycle(true, 500 * time.Millisecond, 500 * time.Millisecond)
 	} else {
-		gpio.statusRedPin.Set(statusRed)
+		gpio.statusRedPin.Set(false)
 	}
 }
 
 func (gpio *GPIO) run() {
 	defer gpio.close()
-
-	// initial
-	gpio.update(State{})
 
 	for state := range gpio.stateChan {
 		gpio.update(state)
@@ -164,7 +165,7 @@ func (gpio *GPIO) run() {
 	log.Printf("tally:GPIO: End")
 }
 
-// Close and Wait
+// Close and Wait..
 func (gpio *GPIO) Close() {
 	log.Printf("tally:GPIO: Closing..")
 

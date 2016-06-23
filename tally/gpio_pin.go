@@ -3,8 +3,9 @@ package tally
 import (
 	"github.com/kidoman/embd"
 	"fmt"
-	"time"
 	"log"
+	"sync"
+	"time"
 )
 
 type gpioState struct {
@@ -20,6 +21,7 @@ type GPIOPin struct {
 	embdPin	 embd.DigitalPin
 
 	c		chan gpioState
+	closeWg	*sync.WaitGroup
 }
 
 func (gp *GPIOPin) String() string {
@@ -59,15 +61,29 @@ func (gp *GPIOPin) write(value bool) error {
 	return gp.embdPin.Write(embdValue)
 }
 
+func (gp *GPIOPin) close() {
+	gp.embdPin.Close()
+
+	if gp.closeWg != nil {
+		gp.closeWg.Done()
+	}
+}
 
 func (gp *GPIOPin) run() {
+	defer gp.close()
+
 	var state gpioState
 	var timerChan <-chan time.Time
 
 	for {
 		select {
-		case setState := <-gp.c:
-			state = setState
+		case setState, valid := <-gp.c:
+			if valid {
+				state = setState
+			} else {
+				// Close()
+				return
+			}
 
 		case <-timerChan:
 			state.value = !state.value
@@ -112,6 +128,12 @@ func (gp *GPIOPin) BlinkCycle(value bool, blink time.Duration, cycle time.Durati
 	gp.c <- gpioState{value:value, blink:blink, cycle:cycle}
 }
 
-func (gp *GPIOPin) Close() error {
-	return gp.embdPin.Close()
+func (gp *GPIOPin) Close(wg *sync.WaitGroup) {
+	if wg != nil {
+		wg.Add(1)
+
+		gp.closeWg = wg
+	}
+
+	close(gp.c)
 }
