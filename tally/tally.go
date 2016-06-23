@@ -78,12 +78,12 @@ func (tally *Tally) Run() error {
 				return fmt.Errorf("discovery: %v", tally.discovery.Error())
 			} else if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
 				log.Printf("Tally: invalid discovery client options: %v\n", err)
-			} else if _, exists := tally.sources[clientOptions.String()]; exists {
-				// already known
+			} else if source, exists := tally.sources[clientOptions.String()]; exists && source.err == nil {
+				// already running
 			} else if source, err := newSource(tally, clientOptions); err != nil {
 				log.Printf("Tally: unable to connect to discovered system: %v\n", err)
 			} else {
-				log.Printf("Tally: connected to new source: %v\n", source)
+				log.Printf("Tally: connected to source: %v\n", source)
 
 				tally.sources[clientOptions.String()] = source
 			}
@@ -91,13 +91,11 @@ func (tally *Tally) Run() error {
 		case source := <-tally.sourceChan:
 			if err := source.err; err != nil {
 				log.Printf("Tally: Source %v Error: %v\n", source, err)
-
-				delete(tally.sources, source.String())
 			} else {
 				log.Printf("Tally: Source %v: Update\n", source)
-
-				tally.sources[source.String()] = source
 			}
+
+			tally.sources[source.String()] = source
 
 			if err := tally.update(); err != nil {
 				return fmt.Errorf("Tally.update: %v\n", err)

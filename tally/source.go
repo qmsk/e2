@@ -25,6 +25,8 @@ func newSource(tally *Tally, clientOptions client.Options) (Source, error) {
 }
 
 // E2 XML source
+//
+// A source can either be in a running state with err == nil, or in a failed state with err != nil
 type Source struct {
 	clientOptions client.Options
 	xmlClient     *client.XMLClient
@@ -55,6 +57,12 @@ func (source Source) run(updateChan chan Source) {
 
 func (source Source) updateState(state *State) error {
 	tallySource := source.String()
+
+	if source.err != nil {
+		state.setError(tallySource, source.err)
+		return nil
+	}
+
 	system := source.system
 
 	for sourceID, source := range system.SrcMgr.SourceCol.List() {

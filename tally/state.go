@@ -47,7 +47,8 @@ type State struct {
 
 	Links []Link
 
-	Tally map[ID]Status
+	Tally  map[ID]Status
+	Errors map[string]error
 }
 
 func makeState() State {
@@ -55,7 +56,12 @@ func makeState() State {
 		Inputs:  make(map[Input]ID),
 		Outputs: make(map[Output]bool),
 		Tally:   make(map[ID]Status),
+		Errors:	 make(map[string]error),
 	}
+}
+
+func (state *State) setError(source string, err error) {
+	state.Errors[source] = err
 }
 
 func (state *State) addInput(source string, name string, id ID) Input {
