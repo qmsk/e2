@@ -1,11 +1,13 @@
 <div class="container" id="tally">
-    <div class="alert alert-danger" ng-repeat="error in tally.Errors">
-        <h2>{{error.Source}}</h2>
+    <div class="row">
+        <div class="alert alert-danger" ng-repeat="error in tally.Errors">
+            <h2>{{error.Source}}</h2>
 
-        <pre>{{error.Error}}</pre>
+            <pre>{{error.Error}}</pre>
+        </div>
     </div>
 
-    <div class="inputs">
+    <div class="row inputs">
         <table class="table">
             <thead>
                 <tr>
