@@ -1,7 +1,6 @@
-package server
+package web
 
 import (
-	"github.com/qmsk/e2/client"
 	"golang.org/x/net/websocket"
 	"log"
 	"net/http"
@@ -9,9 +8,7 @@ import (
 
 const EVENTS_BUFFER = 100
 
-type Event struct {
-	System client.System `json:"system"`
-}
+type Event interface {}
 
 type clientSet map[chan Event]bool
 
@@ -51,32 +48,22 @@ func (clientSet clientSet) close() {
 }
 
 type Events struct {
-	listenChan chan client.System
-
 	registerChan   chan chan Event
 	unregisterChan chan chan Event
 }
 
-func (server *Server) Events() (*Events, error) {
+func MakeEvents(eventChan chan Event) *Events {
 	events := Events{
 		registerChan:   make(chan chan Event),
 		unregisterChan: make(chan chan Event),
 	}
 
-	if xmlClient, err := server.clientOptions.XMLClient(); err != nil {
-		return nil, err
-	} else if listenChan, err := xmlClient.Listen(); err != nil {
-		return nil, err
-	} else {
-		events.listenChan = listenChan
-	}
+	go events.run(eventChan)
 
-	go events.run()
-
-	return &events, nil
+	return &events
 }
 
-func (events *Events) run() {
+func (events *Events) run(eventChan chan Event) {
 	var event Event
 
 	clients := make(clientSet)
@@ -97,18 +84,10 @@ func (events *Events) run() {
 		case clientChan := <-events.unregisterChan:
 			clients.unregister(clientChan)
 
-		case system, ok := <-events.listenChan:
+		case event, ok := <-eventChan:
 			if !ok {
-				// TODO: recover..
-				panic("Events died")
+				return
 			}
-
-			// update state
-			event = Event{
-				System: system,
-			}
-
-			// log.Printf("Events: %v\n", event)
 
 			clients.publish(event)
 		}
