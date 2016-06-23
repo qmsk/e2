@@ -88,25 +88,33 @@ func (state *State) addOutput(source string, name string) Output {
 }
 
 func (state *State) addLink(link Link) {
+	if _, exists := state.Inputs[link.Input]; !exists {
+		panic(fmt.Errorf("addLink with unknown Input: %#v", link))
+	}
+
 	state.Links = append(state.Links, link)
 }
 
 // Update finaly Tally state from links
 func (state *State) update() {
+	for input, id := range state.Inputs {
+		tally, exists := state.Tally[id]
+		if !exists {
+			tally = TallyState{
+				Inputs:	make(map[Input]bool),
+				Outputs: make(map[Output]Status),
+			}
+		}
+
+		tally.Inputs[input] = true
+
+		state.Tally[id] = tally
+	}
+
 	for _, link := range state.Links {
 		tallyState := state.Tally[link.Tally]
 
-		if tallyState.Inputs == nil {
-			tallyState.Inputs = map[Input]bool{link.Input: true}
-		} else {
-			tallyState.Inputs[link.Input] = true
-		}
-
-		if tallyState.Outputs == nil {
-			tallyState.Outputs = map[Output]Status{link.Output: link.Status}
-		} else {
-			tallyState.Outputs[link.Output] = link.Status
-		}
+		tallyState.Outputs[link.Output] = link.Status
 
 		if link.Status.Program {
 			tallyState.Status.Program = true
