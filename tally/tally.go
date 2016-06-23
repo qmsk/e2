@@ -5,6 +5,7 @@ import (
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
 	"log"
+	"time"
 )
 
 type Options struct {
@@ -19,13 +20,15 @@ func (options Options) Tally(clientOptions client.Options, discoveryOptions disc
 	var tally = Tally{
 		options:    options,
 		closeChan:  make(chan struct{}),
-		sources:    make(map[string]Source),
+		sources:    make(sources),
 		sourceChan: make(chan Source),
 		dests:      make(map[chan State]bool),
 	}
 
 	return &tally, tally.init(options)
 }
+
+type sources map[string]Source
 
 // Concurrent tally support for multiple sources and destinations
 type Tally struct {
@@ -36,7 +39,7 @@ type Tally struct {
 	discovery     *discovery.Discovery
 	discoveryChan chan discovery.Packet
 
-	sources    map[string]Source
+	sources    sources
 	sourceChan chan Source
 
 	state State
@@ -85,7 +88,7 @@ func (tally *Tally) Run() error {
 				log.Printf("Tally: invalid discovery client options: %v\n", err)
 			} else if source, exists := tally.sources[clientOptions.String()]; exists && source.err == nil {
 				// already running
-			} else if source, err := newSource(tally, clientOptions); err != nil {
+			} else if source, err := newSource(tally, discoveryPacket, clientOptions); err != nil {
 				log.Printf("Tally: unable to connect to discovered system: %v\n", err)
 			} else {
 				log.Printf("Tally: connected to source: %v\n", source)
@@ -99,6 +102,8 @@ func (tally *Tally) Run() error {
 			} else {
 				log.Printf("Tally: Source %v: Update\n", source)
 			}
+
+			source.updated = time.Now()
 
 			if source.closed {
 				delete(tally.sources, source.String())
@@ -117,8 +122,13 @@ func (tally *Tally) Run() error {
 	}
 }
 
-func (tally *Tally) get() State {
+func (tally *Tally) getState() State {
 	return tally.state
+}
+
+func (tally *Tally) getSources() sources {
+	// XXX: unsafe
+	return tally.sources
 }
 
 func (tally *Tally) apply(state State) {

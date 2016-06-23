@@ -3,15 +3,19 @@ package tally
 import (
 	"fmt"
 	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/discovery"
 	"io"
 	"regexp"
+	"time"
 )
 
 var INPUT_CONTACT_REGEXP = regexp.MustCompile("tally=(\\d+)")
 
-func newSource(tally *Tally, clientOptions client.Options) (Source, error) {
+func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions client.Options) (Source, error) {
 	source := Source{
-		clientOptions: clientOptions,
+		created:		 time.Now(),
+		discoveryPacket: discoveryPacket,
+		clientOptions:   clientOptions,
 	}
 
 	// give updates every 10s when idle
@@ -32,8 +36,12 @@ func newSource(tally *Tally, clientOptions client.Options) (Source, error) {
 //
 // A source can either be in a running state with err == nil, or in a failed state with err != nil
 type Source struct {
-	clientOptions client.Options
-	xmlClient     *client.XMLClient
+	created			time.Time
+	updated			time.Time
+
+	discoveryPacket	discovery.Packet
+	clientOptions	client.Options
+	xmlClient       *client.XMLClient
 
 	system client.System
 	closed bool
