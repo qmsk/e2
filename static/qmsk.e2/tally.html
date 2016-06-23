@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="tally in tally.Tally">
+                <tr ng-repeat="tally in tally.Tally | orderBy: 'ID'">
                     <td>
                         <div class="preset" ng-class="{'preview': tally.Preview, 'program': tally.Program}">
                             {{tally.ID}}
