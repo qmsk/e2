@@ -107,9 +107,9 @@ func (source Source) updateState(state *State) error {
 
 			if status.Preview || status.Program {
 				state.addLink(Link{
+					Tally:  tallyID,
 					Input:  input,
 					Output: output,
-					Tally:  tallyID,
 					Status: status,
 				})
 			}
@@ -120,9 +120,9 @@ func (source Source) updateState(state *State) error {
 
 			if aux.PvwLastSrcIndex == sourceID || aux.PgmLastSrcIndex == sourceID {
 				state.addLink(Link{
+					Tally:  tallyID,
 					Input:  input,
 					Output: output,
-					Tally:  tallyID,
 					Status: Status{
 						Preview: (aux.PvwLastSrcIndex == sourceID),
 						Program: (aux.PgmLastSrcIndex == sourceID),

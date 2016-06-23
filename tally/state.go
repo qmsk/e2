@@ -35,10 +35,17 @@ func (status Status) String() string {
 }
 
 type Link struct {
+	Tally  ID
 	Input  Input
 	Output Output
-	Tally  ID
 	Status Status
+}
+
+type TallyState struct {
+	Inputs	map[Input]bool
+	Outputs	map[Output]Status
+
+	Status	Status
 }
 
 type State struct {
@@ -47,7 +54,7 @@ type State struct {
 
 	Links []Link
 
-	Tally  map[ID]Status
+	Tally  map[ID]TallyState
 	Errors map[string]error
 }
 
@@ -55,7 +62,7 @@ func makeState() State {
 	return State{
 		Inputs:  make(map[Input]ID),
 		Outputs: make(map[Output]bool),
-		Tally:   make(map[ID]Status),
+		Tally:   make(map[ID]TallyState),
 		Errors:	 make(map[string]error),
 	}
 }
@@ -87,16 +94,28 @@ func (state *State) addLink(link Link) {
 // Update finaly Tally state from links
 func (state *State) update() {
 	for _, link := range state.Links {
-		status := state.Tally[link.Tally]
+		tallyState := state.Tally[link.Tally]
+
+		if tallyState.Inputs == nil {
+			tallyState.Inputs = map[Input]bool{link.Input: true}
+		} else {
+			tallyState.Inputs[link.Input] = true
+		}
+
+		if tallyState.Outputs == nil {
+			tallyState.Outputs = map[Output]Status{link.Output: link.Status}
+		} else {
+			tallyState.Outputs[link.Output] = link.Status
+		}
 
 		if link.Status.Program {
-			status.Program = true
+			tallyState.Status.Program = true
 		}
 		if link.Status.Preview {
-			status.Preview = true
+			tallyState.Status.Preview = true
 		}
 
-		state.Tally[link.Tally] = status
+		state.Tally[link.Tally] = tallyState
 	}
 }
 

@@ -121,7 +121,7 @@ func (gpio *GPIO) update(state State) {
 		} else {
 			statusGreen = true
 
-			if status.Program {
+			if status.Status.Program {
 				log.Printf("tally:GPIO:\tpin %v high: %v", pin, status)
 
 				pinState = true

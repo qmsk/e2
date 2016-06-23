@@ -9,8 +9,15 @@ type restInput struct {
 	ID
 }
 
+type restStatus struct {
+	Output
+	Status
+}
+
 type restTally struct {
 	ID			ID
+	Inputs		[]Input
+	Outputs		[]restStatus
 	Status
 }
 
@@ -32,8 +39,22 @@ func (state State) Get() (interface{}, error) {
 		rs.Inputs = append(rs.Inputs, restInput{Input:input, ID:id})
 	}
 
-	for id, status := range state.Tally {
-		rs.Tally = append(rs.Tally, restTally{ID:id, Status:status})
+	for id, tallyState := range state.Tally {
+		var tally = restTally{
+			ID:	id,
+			Status: tallyState.Status,
+		}
+
+		for input, _ := range tallyState.Inputs {
+			tally.Inputs = append(tally.Inputs, input)
+		}
+
+		for output, status := range tallyState.Outputs {
+			tally.Outputs = append(tally.Outputs, restStatus{Output: output, Status: status })
+		}
+
+
+		rs.Tally = append(rs.Tally, tally)
 	}
 
 	for source, err := range state.Errors {
