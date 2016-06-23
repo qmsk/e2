@@ -39,6 +39,7 @@ type Tally struct {
 	sources    map[string]Source
 	sourceChan chan Source
 
+	state State
 	dests map[chan State]bool
 }
 
@@ -61,12 +62,10 @@ func (tally *Tally) register(stateChan chan State) {
 
 // mainloop, owns Tally state
 func (tally *Tally) Run() error {
-	// initial state is empty
-	var state State
 
 	for {
 		// update
-		tally.apply(state)
+		tally.apply(tally.state)
 
 		select {
 		case <-tally.closeChan:
@@ -107,7 +106,7 @@ func (tally *Tally) Run() error {
 				tally.sources[source.String()] = source
 			}
 
-			state = tally.update()
+			tally.state = tally.update()
 		}
 
 		// stopping?
@@ -116,6 +115,10 @@ func (tally *Tally) Run() error {
 			return nil
 		}
 	}
+}
+
+func (tally *Tally) get() State {
+	return tally.state
 }
 
 func (tally *Tally) apply(state State) {
