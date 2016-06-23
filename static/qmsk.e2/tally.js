@@ -20,13 +20,11 @@ angular.module('qmsk.e2.tally', [
 })
 
 .factory('Tally', function($http) {
-    return function() {
-        return $http.get('/api/tally/').then(
-            function success(r) {
-                return r.data;
-            }
-        );
-    };
+    return $http.get('/api/tally/').then(
+        function success(r) {
+            return r.data;
+        }
+    );
 })
 
 .controller('HeaderCtrl', function($scope, $location, httpState) {
@@ -38,5 +36,7 @@ angular.module('qmsk.e2.tally', [
 })
 
 .controller('TallyCtrl', function($scope, Tally) {
-    $scope.tally = Tally;
+    Tally.then(function(tally){
+        $scope.tally = tally;
+    });
 })

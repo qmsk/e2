@@ -1,3 +1,39 @@
 <div class="container" id="tally">
-    Tally LOL
+    <div class="alert alert-danger" ng-repeat="error in tally.errors">
+        <h2>{{error.source}}</h2>
+
+        <p>{{error.error}}</p>
+    </div>
+
+    <div class="inputs">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tally #</th>
+                    <th>Input</th>
+                    <th>Output</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="tally in tally.Tally">
+                    <td>
+                        <div class="preset" ng-class="{'preview': tally.Preview, 'program': tally.Program}">
+                            {{tally.ID}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="source" ng-repeat="input in tally.Inputs">
+                            {{input.Name}}
+                            <!-- {{input.Source}} -->
+                        </div>
+                    </td>
+                    <td>
+                        <div class="screen" ng-repeat="output in tally.Outputs" ng-class="{'preview': output.Preview, 'program': output.Program}">
+                            {{output.Name}}
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
