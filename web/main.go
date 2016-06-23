@@ -23,6 +23,7 @@ func RoutePrefix(prefix string, handler http.Handler) Route {
 	}
 }
 
+// Return a route that services the tree relative to --http-static=
 func (options Options) RouteStatic(prefix string) Route {
 	var route = Route{Pattern:prefix}
 
@@ -35,17 +36,17 @@ func (options Options) RouteStatic(prefix string) Route {
 	return route
 }
 
-// Return a route that serves a named static file on /
-func (options Options) RouteDefaultFile(name string) Route {
-	path := path.Join(options.Static, name)
+// Return a route that serves a named static file, relative to --http-static=
+func (options Options) RouteFile(url string, file string) Route {
+	file = path.Join(options.Static, file)
 
 	return Route{
-		Pattern: "/",
+		Pattern: url,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/" {
+			if r.URL.Path != url {
 				w.WriteHeader(404)
 			} else {
-				http.ServeFile(w, r, path)
+				http.ServeFile(w, r, file)
 			}
 		}),
 	}
