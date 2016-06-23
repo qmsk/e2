@@ -9,13 +9,16 @@ import (
 )
 
 type GPIOOptions struct {
-	TallyPins []string `long:"gpio-tally-pin"`
+	StatusGreenPin	string	 `long:"gpio-green-pin"`
+	StatusRedPin	string	 `long:"gpio-red-pin"`
+
+	TallyPins		[]string `long:"gpio-tally-pin"`
 }
 
 func (options GPIOOptions) Make(tally *Tally) (*GPIO, error) {
 	var gpio = GPIO{
 		options:   options,
-		TallyPins: make(map[ID]embd.DigitalPin),
+		tallyPins: make(map[ID]embd.DigitalPin),
 	}
 
 	if err := gpio.init(options); err != nil {
@@ -30,10 +33,28 @@ func (options GPIOOptions) Make(tally *Tally) (*GPIO, error) {
 type GPIO struct {
 	options GPIOOptions
 
-	TallyPins map[ID]embd.DigitalPin
+	tallyPins		map[ID]embd.DigitalPin
+
+	// red pin is high if there are sources with errors
+	statusRedPin	embd.DigitalPin
+
+	// green pin is high if there are sources with tallys
+	statusGreenPin	embd.DigitalPin
 
 	stateChan chan State
 	waitGroup sync.WaitGroup
+}
+
+func openPinOut(pinName string) (embd.DigitalPin, error) {
+	if pin, err := embd.NewDigitalPin(pinName); err != nil {
+		return nil, fmt.Errorf("embd.NewDigitalPin %v: %v", pinName, err)
+
+		// Writing as "out" defaults to initializing the value as low.
+	} else if err := pin.SetDirection(embd.Out); err != nil {
+		return nil, fmt.Errorf("pin.SetDirection %v: %v", pinName, err)
+	} else {
+		return pin, nil
+	}
 }
 
 func (gpio *GPIO) init(options GPIOOptions) error {
@@ -42,15 +63,26 @@ func (gpio *GPIO) init(options GPIOOptions) error {
 	}
 
 	for i, pinName := range options.TallyPins {
-		if pin, err := embd.NewDigitalPin(pinName); err != nil {
-			return fmt.Errorf("embd.NewDigitalPin %v: %v", pinName, err)
-
-			// Writing as "out" defaults to initializing the value as low.
-		} else if err := pin.SetDirection(embd.Out); err != nil {
-			return fmt.Errorf("pin.SetDirection %v: %v", pinName, err)
+		if pin, err := openPinOut(pinName); err != nil {
+			return err
 		} else {
-			gpio.TallyPins[ID(i+1)] = pin
+			gpio.tallyPins[ID(i+1)] = pin
 		}
+	}
+
+	if options.StatusGreenPin == "" {
+
+	} else if pin, err := openPinOut(options.StatusGreenPin); err != nil {
+		return err
+	} else {
+		gpio.statusGreenPin = pin
+	}
+	if options.StatusRedPin == "" {
+
+	} else if pin, err := openPinOut(options.StatusRedPin); err != nil {
+		return err
+	} else {
+		gpio.statusRedPin = pin
 	}
 
 	return nil
@@ -70,7 +102,7 @@ func (gpio *GPIO) close() {
 
 	var closed = 0
 
-	for id, pin := range gpio.TallyPins {
+	for id, pin := range gpio.tallyPins {
 		if err := pin.Close(); err != nil {
 			log.Printf("tally:GPIO: close pin %v:%v: %v", id, pin, err)
 		} else {
@@ -81,27 +113,55 @@ func (gpio *GPIO) close() {
 	log.Printf("tally:GPIO: Closed %d pins", closed)
 }
 
-func (gpio *GPIO) run() {
-	defer gpio.close()
+func (gpio *GPIO) update(state State) {
+	log.Printf("tally:GPIO: Update:")
 
-	for state := range gpio.stateChan {
-		log.Printf("tally:GPIO: Update:")
+	var statusGreenValue = embd.Low
+	var statusRedValue = embd.Low
 
-		for id, pin := range gpio.TallyPins {
-			pinValue := embd.Low
+	for id, pin := range gpio.tallyPins {
+		pinValue := embd.Low
 
-			if status, exists := state.Tally[id]; !exists {
-				// missing tally state for pin
-			} else if status.Program {
+		if status, exists := state.Tally[id]; !exists {
+			// missing tally state for pin
+		} else {
+			statusGreenValue = embd.High
+
+			if status.Program {
 				log.Printf("tally:GPIO:\tpin %v:%v high: %v", id, gpio.options.TallyPins[id-1], status)
 
 				pinValue = embd.High
 			}
-
-			if err := pin.Write(pinValue); err != nil {
-				log.Printf("tally:GPIO: write pin %v:%v: %v", id, pin, err)
-			}
 		}
+
+		if err := pin.Write(pinValue); err != nil {
+			log.Printf("tally:GPIO: write pin %v:%v: %v", id, pin, err)
+		}
+	}
+
+	if len(state.Errors) > 0 {
+		statusRedValue = embd.High
+	}
+
+	// update status leds
+	if gpio.statusGreenPin == nil {
+
+	} else if err := gpio.statusGreenPin.Write(statusGreenValue); err != nil {
+		log.Printf("tally:GPIO: write pin status-green:%v: %v", gpio.options.StatusGreenPin, err)
+	}
+
+	if gpio.statusRedPin == nil {
+
+	} else if err := gpio.statusRedPin.Write(statusRedValue); err != nil {
+		log.Printf("tally:GPIO: write pin status-red:%v: %v", gpio.options.StatusRedPin, err)
+	}
+}
+
+func (gpio *GPIO) run() {
+	defer gpio.close()
+
+	for state := range gpio.stateChan {
+		gpio.update(state)
 	}
 
 	log.Printf("tally:GPIO: End")
