@@ -55,10 +55,8 @@ angular.module('qmsk.e2.tally', [
     });
 })
 
-.controller('TallyCtrl', function($scope, Tally) {
-    Tally.then(function(tally){
-        $scope.tally = tally;
+.controller('TallyCtrl', function($scope, Events) {
+    $scope.$on('qmsk.e2.event', function($e, event){
+        $scope.tally = Events.state.tally;
     });
 })
-
-
