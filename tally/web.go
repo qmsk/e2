@@ -43,6 +43,10 @@ type restSource struct {
 	Error	  string	`json:",omitempty"`
 }
 
+type event struct {
+	Tally	*restState `json:"tally,omitempty"`
+}
+
 func (sources sources) Get() (interface{}, error) {
 	var rss []restSource
 
@@ -67,9 +71,7 @@ func (sources sources) Get() (interface{}, error) {
 	return rss, nil
 }
 
-func (state State) Get() (interface{}, error) {
-	var rs restState
-
+func (state State) toRest() (rs restState) {
 	for input, id := range state.Inputs {
 		rs.Inputs = append(rs.Inputs, restInput{Input:input, ID:id})
 	}
@@ -96,7 +98,11 @@ func (state State) Get() (interface{}, error) {
 		rs.Errors = append(rs.Errors, restError{Source:source, Error:err.Error()})
 	}
 
-	return rs, nil
+	return
+}
+
+func (state State) Get() (interface{}, error) {
+	return state.toRest(), nil
 }
 
 func (tally *Tally) Index(name string) (web.Resource, error) {
@@ -124,7 +130,11 @@ func (tally *Tally) WebEvents() *web.Events {
 
 	go func(){
 		for state := range stateChan {
-			eventChan <- state
+			restState := state.toRest()
+
+			var event = event{Tally: &restState}
+
+			eventChan <- event
 		}
 	}()
 

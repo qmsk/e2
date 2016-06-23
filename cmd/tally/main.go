@@ -58,9 +58,12 @@ func main() {
 	}()
 
 	// Web
+	webAPI := tally.WebAPI()
+	webEvents := tally.WebEvents()
+
 	go options.WebOptions.Server(
-		web.RoutePrefix("/api/", tally.WebAPI()),
-		web.RoutePrefix("/events/", tally.WebEvents()),
+		web.RoutePrefix("/api/", webAPI),
+		web.RoutePrefix("/events", webEvents),
 		options.WebOptions.RouteStatic("/static/"),
 		options.WebOptions.RouteFile("/", "tally.html"),
 	)
