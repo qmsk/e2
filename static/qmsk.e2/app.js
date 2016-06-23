@@ -144,52 +144,6 @@ angular.module('qmsk.e2', [
     }, {stripTrailingSlashes: false});
 })
 
-.factory('Events', function($location, $websocket, $rootScope) {
-    var Events = {
-        url:    'ws://' + window.location.host + '/events',
-        open:   false,
-        error:  null,
-
-        events: [],
-        system: null,
-    }
-
-    var ws = $websocket(Events.url);
-
-    ws.onOpen(function() {
-        console.log("WebSocket Open")
-        Events.open = true;
-        
-        // XXX: https://github.com/AngularClass/angular-websocket/issues/53
-        $rootScope.$apply();
-    });
-    ws.onError(function(error) {
-        console.log("WebSocket Error: " + error)
-        Events.error = error;
-
-        // XXX: https://github.com/AngularClass/angular-websocket/issues/53
-        $rootScope.$apply();
-    });
-    ws.onClose(function() {
-        console.log("WebSocket Closed")
-        Events.open = false;
-
-        // XXX: https://github.com/AngularClass/angular-websocket/issues/53
-        $rootScope.$apply();
-    });
-
-    ws.onMessage(function(message){
-        var event = JSON.parse(message.data);
-    
-        Events.events.push({line: "WebSocket update"})
-        Events.system = event.system;
-
-        $rootScope.$broadcast('qmsk.e2.event', event);
-    });
-
-    return Events;
-})
-
 .filter('dimensions', function() {
     return function(dimensions) {
         if (dimensions && dimensions.width && dimensions.height) {

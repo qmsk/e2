@@ -6,14 +6,17 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "angular": "~1.5.0",
+    "angular": "~1.5.7",
     "jquery": "~2.2.0",
     "bootstrap": "~3.3.6",
     "angular-bootstrap": "~1.1.2",
-    "angular-websocket": "~1.0.13",
+    "angular-websocket": "~2.0.0",
     "angular-route": "~1.5.0",
     "angular-resource": "~1.5.0",
     "angular-scroll-glue": "~2.0.6",
     "json-formatter": "~0.4.2"
+  },
+  "resolutions": {
+    "angular": "1.5.7"
   }
 }
