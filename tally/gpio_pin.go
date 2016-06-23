@@ -3,7 +3,6 @@ package tally
 import (
 	"github.com/kidoman/embd"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 )
@@ -98,7 +97,7 @@ func (gp *GPIOPin) run() {
 			}
 		}
 
-		log.Printf("GPIOPin %v: value=%v blink=%v", gp, state.value, state.blink)
+		// log.Printf("GPIOPin %v: value=%v blink=%v", gp, state.value, state.blink)
 
 		gp.write(state.value)
 

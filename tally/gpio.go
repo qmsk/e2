@@ -139,9 +139,13 @@ func (gpio *GPIO) update(state State) {
 	if gpio.statusGreenPin == nil {
 
 	} else if statusGreen {
+		log.Printf("tally:GPIO: status:green high: blink")
+
 		// when connected, blink off for 100ms on every update
 		gpio.statusGreenPin.Blink(false, 100 * time.Millisecond)
 	} else {
+		log.Printf("tally:GPIO: status:green low: cycle")
+
 		// when not connected, blink on for 100ms every 1s
 		gpio.statusGreenPin.BlinkCycle(true, 100 * time.Millisecond, 1 * time.Second)
 	}
@@ -149,6 +153,8 @@ func (gpio *GPIO) update(state State) {
 	if gpio.statusRedPin == nil {
 
 	} else if statusRed {
+		log.Printf("tally:GPIO: status:red blink: cycle")
+
 		gpio.statusRedPin.BlinkCycle(true, 500 * time.Millisecond, 500 * time.Millisecond)
 	} else {
 		gpio.statusRedPin.Set(false)
