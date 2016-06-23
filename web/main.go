@@ -3,6 +3,7 @@ package web
 import (
 	"net/http"
 	"log"
+	"path"
 )
 
 type Options struct {
@@ -22,17 +23,43 @@ func RoutePrefix(prefix string, handler http.Handler) Route {
 	}
 }
 
+func (options Options) RouteStatic(prefix string) Route {
+	var route = Route{Pattern:prefix}
+
+	if options.Static != "" {
+		log.Printf("Serve static %v from %v\n", prefix, options.Static)
+
+		route.Handler = http.StripPrefix(prefix, http.FileServer(http.Dir(options.Static)))
+	}
+
+	return route
+}
+
+// Return a route that serves a named static file on /
+func (options Options) RouteDefaultFile(name string) Route {
+	path := path.Join(options.Static, name)
+
+	return Route{
+		Pattern: "/",
+		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/" {
+				w.WriteHeader(404)
+			} else {
+				http.ServeFile(w, r, path)
+			}
+		}),
+	}
+}
+
 func (options Options) Server(routes ...Route) {
 	var serveMux = http.NewServeMux()
 
 	for _, route := range routes {
+		if route.Handler == nil {
+			continue
+		}
+
 		serveMux.Handle(route.Pattern, route.Handler)
-	}
-
-	if options.Static != "" {
-		log.Printf("Serve / from %v\n", options.Static)
-
-		serveMux.Handle("/", http.FileServer(http.Dir(options.Static)))
 	}
 
 	if options.Listen != "" {
