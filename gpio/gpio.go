@@ -1,63 +1,62 @@
-package tally
+package gpio
 
 import (
 	"fmt"
 	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
+	"github.com/qmsk/e2/tally"
 	"log"
 	"sync"
 	"time"
 )
 
-type GPIOOptions struct {
+type Options struct {
 	StatusGreenPin	string	 `long:"gpio-green-pin"`
 	StatusRedPin	string	 `long:"gpio-red-pin"`
 
 	TallyPins		[]string `long:"gpio-tally-pin"`
 }
 
-func (options GPIOOptions) Make(tally *Tally) (*GPIO, error) {
+func (options Options) Make() (*GPIO, error) {
 	var gpio = GPIO{
 		options:   options,
-		tallyPins: make(map[ID]*GPIOPin),
+		tallyPins: make(map[tally.ID]*Pin),
 	}
 
 	if err := gpio.init(options); err != nil {
 		return nil, err
 	}
 
-	gpio.register(tally)
-
 	return &gpio, nil
 }
 
 type GPIO struct {
-	options GPIOOptions
+	options Options
 
-	tallyPins		map[ID]*GPIOPin
+	tallyPins		map[tally.ID]*Pin
 
 	// red pin is high if there are sources with errors
-	statusRedPin	*GPIOPin
+	statusRedPin	*Pin
 
 	// green pin is high if there are sources with tallys
-	statusGreenPin	*GPIOPin
+	statusGreenPin	*Pin
 
-	stateChan chan State
+	tallyChan chan tally.State
 	waitGroup sync.WaitGroup
 }
 
-func (gpio *GPIO) init(options GPIOOptions) error {
+func (gpio *GPIO) init(options Options) error {
 	if err := embd.InitGPIO(); err != nil {
 		return fmt.Errorf("embd.InitGPIO: %v", err)
 	}
 
 	for i, pinName := range options.TallyPins {
-		id := ID(i+1)
+		id := tally.ID(i+1)
 
 		if pin, err := openPin(fmt.Sprintf("tally:%d", id), pinName); err != nil {
 			return err
 		} else {
-			gpio.tallyPins[ID(i+1)] = pin
+			gpio.tallyPins[tally.ID(i+1)] = pin
 		}
 	}
 
@@ -80,19 +79,19 @@ func (gpio *GPIO) init(options GPIOOptions) error {
 	return nil
 }
 
-func (gpio *GPIO) register(tally *Tally) {
-	gpio.stateChan = make(chan State)
+func (gpio *GPIO) RegisterTally(t *tally.Tally) {
+	gpio.tallyChan = make(chan tally.State)
 	gpio.waitGroup.Add(1)
 
 	go gpio.run()
 
-	tally.register(gpio.stateChan)
+	t.Register(gpio.tallyChan)
 }
 
 func (gpio *GPIO) close() {
 	defer gpio.waitGroup.Done()
 
-	log.Printf("tally:GPIO: Closeing pins..")
+	log.Printf("GPIO: Close pins..")
 
 	if gpio.statusGreenPin != nil {
 		gpio.statusGreenPin.Close(&gpio.waitGroup)
@@ -107,8 +106,8 @@ func (gpio *GPIO) close() {
 
 }
 
-func (gpio *GPIO) update(state State) {
-	log.Printf("tally:GPIO: Update:")
+func (gpio *GPIO) updateTally(state tally.State) {
+	log.Printf("GPIO: Update tally State:")
 
 	var statusGreen = false
 	var statusRed = false
@@ -122,7 +121,7 @@ func (gpio *GPIO) update(state State) {
 			statusGreen = true
 
 			if status.Status.Program {
-				log.Printf("tally:GPIO:\tpin %v high: %v", pin, status)
+				log.Printf("GPIO:\ttally pin %v high: %v", pin, status)
 
 				pinState = true
 			}
@@ -139,12 +138,12 @@ func (gpio *GPIO) update(state State) {
 	if gpio.statusGreenPin == nil {
 
 	} else if statusGreen {
-		log.Printf("tally:GPIO: status:green high: blink")
+		log.Printf("GPIO: status:green high: blink")
 
 		// when connected, blink off for 100ms on every update
 		gpio.statusGreenPin.Blink(false, 100 * time.Millisecond)
 	} else {
-		log.Printf("tally:GPIO: status:green low: cycle")
+		log.Printf("GPIO: status:green low: cycle")
 
 		// when not connected, blink on for 100ms every 1s
 		gpio.statusGreenPin.BlinkCycle(true, 100 * time.Millisecond, 1 * time.Second)
@@ -153,7 +152,7 @@ func (gpio *GPIO) update(state State) {
 	if gpio.statusRedPin == nil {
 
 	} else if statusRed {
-		log.Printf("tally:GPIO: status:red blink: cycle")
+		log.Printf("GPIO: status:red blink: cycle")
 
 		gpio.statusRedPin.BlinkCycle(true, 500 * time.Millisecond, 500 * time.Millisecond)
 	} else {
@@ -164,18 +163,20 @@ func (gpio *GPIO) update(state State) {
 func (gpio *GPIO) run() {
 	defer gpio.close()
 
-	for state := range gpio.stateChan {
-		gpio.update(state)
+	for state := range gpio.tallyChan {
+		gpio.updateTally(state)
 	}
 
-	log.Printf("tally:GPIO: End")
+	log.Printf("GPIO: Done")
 }
 
 // Close and Wait..
 func (gpio *GPIO) Close() {
-	log.Printf("tally:GPIO: Closing..")
+	log.Printf("GPIO: Close..")
 
-	close(gpio.stateChan)
+	if gpio.tallyChan != nil {
+		close(gpio.tallyChan)
+	}
 
 	gpio.waitGroup.Wait()
 }

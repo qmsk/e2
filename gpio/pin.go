@@ -1,4 +1,4 @@
-package tally
+package gpio
 
 import (
 	"github.com/kidoman/embd"
@@ -7,28 +7,28 @@ import (
 	"time"
 )
 
-type gpioState struct {
+type pinState struct {
 	value	bool
 	blink	time.Duration
 	cycle	time.Duration
 }
 
 // Output pin
-type GPIOPin struct {
+type Pin struct {
 	label    string
 	name	 string
 	embdPin	 embd.DigitalPin
 
-	c		chan gpioState
+	c		chan pinState
 	closeWg	*sync.WaitGroup
 }
 
-func (gp *GPIOPin) String() string {
+func (gp *Pin) String() string {
 	return fmt.Sprintf("%v=%v", gp.label, gp.name)
 }
 
-func openPin(label string, name string) (*GPIOPin, error) {
-	var gp = GPIOPin{
+func openPin(label string, name string) (*Pin, error) {
+	var gp = Pin{
 		label: label,
 		name: name,
 	}
@@ -43,14 +43,14 @@ func openPin(label string, name string) (*GPIOPin, error) {
 		gp.embdPin = embdPin
 	}
 
-	gp.c = make(chan gpioState)
+	gp.c = make(chan pinState)
 
 	go gp.run()
 
 	return &gp, nil
 }
 
-func (gp *GPIOPin) write(value bool) error {
+func (gp *Pin) write(value bool) error {
 	embdValue := embd.Low
 
 	if value {
@@ -60,7 +60,7 @@ func (gp *GPIOPin) write(value bool) error {
 	return gp.embdPin.Write(embdValue)
 }
 
-func (gp *GPIOPin) close() {
+func (gp *Pin) close() {
 	gp.embdPin.Close()
 
 	if gp.closeWg != nil {
@@ -68,10 +68,10 @@ func (gp *GPIOPin) close() {
 	}
 }
 
-func (gp *GPIOPin) run() {
+func (gp *Pin) run() {
 	defer gp.close()
 
-	var state gpioState
+	var state pinState
 	var timerChan <-chan time.Time
 
 	for {
@@ -97,7 +97,7 @@ func (gp *GPIOPin) run() {
 			}
 		}
 
-		// log.Printf("GPIOPin %v: value=%v blink=%v", gp, state.value, state.blink)
+		// log.Printf("Pin %v: value=%v blink=%v", gp, state.value, state.blink)
 
 		gp.write(state.value)
 
@@ -109,25 +109,25 @@ func (gp *GPIOPin) run() {
 	}
 }
 
-func (gp *GPIOPin) Set(value bool) {
-	gp.c <- gpioState{value:value}
+func (gp *Pin) Set(value bool) {
+	gp.c <- pinState{value:value}
 }
 
 // Set to value, and return to !value
-func (gp *GPIOPin) Blink(value bool, blink time.Duration) {
-	gp.c <- gpioState{value:value, blink:blink}
+func (gp *Pin) Blink(value bool, blink time.Duration) {
+	gp.c <- pinState{value:value, blink:blink}
 }
 
 // Set to value, and cycle between !value and value
-func (gp *GPIOPin) Cycle(value bool, cycle time.Duration) {
-	gp.c <- gpioState{value:value, blink:cycle, cycle:cycle}
+func (gp *Pin) Cycle(value bool, cycle time.Duration) {
+	gp.c <- pinState{value:value, blink:cycle, cycle:cycle}
 }
 
-func (gp *GPIOPin) BlinkCycle(value bool, blink time.Duration, cycle time.Duration) {
-	gp.c <- gpioState{value:value, blink:blink, cycle:cycle}
+func (gp *Pin) BlinkCycle(value bool, blink time.Duration, cycle time.Duration) {
+	gp.c <- pinState{value:value, blink:blink, cycle:cycle}
 }
 
-func (gp *GPIOPin) Close(wg *sync.WaitGroup) {
+func (gp *Pin) Close(wg *sync.WaitGroup) {
 	if wg != nil {
 		wg.Add(1)
 
