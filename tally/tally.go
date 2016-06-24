@@ -59,7 +59,7 @@ func (tally *Tally) init(options Options) error {
 }
 
 // Register watcher for state
-func (tally *Tally) register(stateChan chan State) {
+func (tally *Tally) Register(stateChan chan State) {
 	tally.dests[stateChan] = true
 }
 
@@ -123,11 +123,12 @@ func (tally *Tally) Run() error {
 }
 
 func (tally *Tally) getState() State {
+	// XXX: unsafe, tally.state access is not atomic
 	return tally.state
 }
 
 func (tally *Tally) getSources() sources {
-	// XXX: unsafe
+	// XXX: unsafe, shared map access
 	return tally.sources
 }
 

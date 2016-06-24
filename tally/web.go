@@ -126,7 +126,7 @@ func (tally *Tally) WebEvents() *web.Events {
 	stateChan := make(chan State)
 	eventChan := make(chan web.Event)
 
-	tally.register(stateChan)
+	tally.Register(stateChan)
 
 	go func(){
 		for state := range stateChan {
