@@ -148,7 +148,7 @@ func (tally *Tally) update() State {
 
 	for _, source := range tally.sources {
 		if err := source.updateState(&state); err != nil {
-			state.setError(source.String(), err)
+			state.setSourceError(source.String(), err)
 		}
 	}
 

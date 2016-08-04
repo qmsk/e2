@@ -17,6 +17,11 @@ type Input struct {
 	Name   string
 }
 
+type InputState struct {
+	ID     ID
+	Status string
+}
+
 type Status struct {
 	Program bool
 	Preview bool
@@ -46,10 +51,11 @@ type TallyState struct {
 	Outputs	map[Output]Status
 
 	Status	Status
+	Errors  []error
 }
 
 type State struct {
-	Inputs  map[Input]ID
+	Inputs  map[Input]InputState
 	Outputs map[Output]bool
 
 	Links []Link
@@ -60,21 +66,32 @@ type State struct {
 
 func makeState() State {
 	return State{
-		Inputs:  make(map[Input]ID),
+		Inputs:  make(map[Input]InputState),
 		Outputs: make(map[Output]bool),
 		Tally:   make(map[ID]TallyState),
 		Errors:	 make(map[string]error),
 	}
 }
 
-func (state *State) setError(source string, err error) {
+func (state *State) setSourceError(source string, err error) {
 	state.Errors[source] = err
 }
 
-func (state *State) addInput(source string, name string, id ID) Input {
+func (state *State) addTallyError(id ID, input Input, err error) {
+	tallyState := state.Tally[id]
+
+	tallyState.Errors = append(tallyState.Errors, err)
+
+	state.Tally[id] = tallyState
+}
+
+func (state *State) addInput(source string, name string, id ID, status string) Input {
 	input := Input{source, name}
 
-	state.Inputs[input] = id
+	state.Inputs[input] = InputState{
+		ID:		id,
+		Status: status,
+	}
 
 	return input
 }
@@ -97,23 +114,23 @@ func (state *State) addLink(link Link) {
 
 // Update finaly Tally state from links
 func (state *State) update() {
-	for input, id := range state.Inputs {
-		tally, exists := state.Tally[id]
-		if !exists {
-			tally = TallyState{
-				Inputs:	make(map[Input]bool),
-				Outputs: make(map[Output]Status),
-			}
+	for input, inputState:= range state.Inputs {
+		tallyState := state.Tally[inputState.ID]
+
+		if tallyState.Inputs == nil {
+			tallyState.Inputs = make(map[Input]bool)
 		}
+		tallyState.Inputs[input] = true
 
-		tally.Inputs[input] = true
-
-		state.Tally[id] = tally
+		state.Tally[inputState.ID] = tallyState
 	}
 
 	for _, link := range state.Links {
 		tallyState := state.Tally[link.Tally]
 
+		if tallyState.Outputs == nil {
+			tallyState.Outputs = make(map[Output]Status)
+		}
 		tallyState.Outputs[link.Output] = link.Status
 
 		if link.Status.Program {

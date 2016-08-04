@@ -9,6 +9,7 @@ import (
 type restInput struct {
 	Input
 	ID
+	Status		string
 }
 
 type restStatus struct {
@@ -18,9 +19,10 @@ type restStatus struct {
 
 type restTally struct {
 	ID			ID
-	Inputs		[]Input
+	Inputs		[]restInput
 	Outputs		[]restStatus
 	Status
+	Errors		[]string
 }
 
 type restError struct {
@@ -72,8 +74,8 @@ func (sources sources) Get() (interface{}, error) {
 }
 
 func (state State) toRest() (rs restState) {
-	for input, id := range state.Inputs {
-		rs.Inputs = append(rs.Inputs, restInput{Input:input, ID:id})
+	for input, inputState := range state.Inputs {
+		rs.Inputs = append(rs.Inputs, restInput{Input:input, ID:inputState.ID, Status:inputState.Status})
 	}
 
 	for id, tallyState := range state.Tally {
@@ -83,13 +85,18 @@ func (state State) toRest() (rs restState) {
 		}
 
 		for input, _ := range tallyState.Inputs {
-			tally.Inputs = append(tally.Inputs, input)
+			inputState := state.Inputs[input]
+
+			tally.Inputs = append(tally.Inputs, restInput{Input:input, ID:id, Status:inputState.Status})
 		}
 
 		for output, status := range tallyState.Outputs {
 			tally.Outputs = append(tally.Outputs, restStatus{Output: output, Status: status })
 		}
 
+		for _, err := range tallyState.Errors {
+			tally.Errors = append(tally.Errors, err.Error())
+		}
 
 		rs.Tally = append(rs.Tally, tally)
 	}

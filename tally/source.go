@@ -85,7 +85,9 @@ func (source Source) updateState(state *State) error {
 			continue
 		}
 		inputCfg := system.SrcMgr.InputCfgCol[source.InputCfgIndex]
+		inputName := inputCfg.Name
 
+		// resolve ID
 		var tallyID ID
 
 		if match := INPUT_CONTACT_REGEXP.FindStringSubmatch(inputCfg.ConfigContact); match == nil {
@@ -94,7 +96,12 @@ func (source Source) updateState(state *State) error {
 			return fmt.Errorf("Invalid Input Contact=%v: %v\n", inputCfg.ConfigContact, err)
 		}
 
-		input := state.addInput(tallySource, inputCfg.Name, tallyID)
+		input := state.addInput(tallySource, inputName, tallyID, inputCfg.InputCfgVideoStatus.String())
+
+		// input state
+		if inputCfg.InputCfgVideoStatus == client.InputVideoStatusBad {
+			state.addTallyError(tallyID, input, fmt.Errorf("Source %v Input %v video status: %v", tallySource, inputName, inputCfg.InputCfgVideoStatus))
+		}
 
 		// lookup active Links
 		for _, screen := range system.DestMgr.ScreenDestCol {

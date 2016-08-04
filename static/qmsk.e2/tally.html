@@ -25,7 +25,10 @@
                     </td>
                     <td>
                         <div class="source" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
-                            {{input.Name}}
+                            <span class="pull-left label label-success" ng-if="input.Status == 'ok'"><span class="glyphicon glyphicon-ok" title="OK"></span></span>
+                            <span class="pull-left label label-danger" ng-if="input.Status == 'bad'"><span class="glyphicon glyphicon-warning-sign" title="Bad"></span></span>
+
+                            <span>{{input.Name}}</span>
                             <!-- {{input.Source}} -->
                         </div>
                     </td>
