@@ -40,7 +40,7 @@ type Options struct {
 	Intensity	uint8	`long:"spiled-intensity" metavar:"0-255" default:"255"`
 	Refresh		float64 `long:"spiled-refresh" metavar:"HZ" default:"10"`
 
-	TallyIdle		LED		`long:"spiled-tally-idle"    metavar:"RRGGBB" default:"000040"`
+	TallyIdle		LED		`long:"spiled-tally-idle"    metavar:"RRGGBB" default:"000010"`
 	TallyPreview	LED		`long:"spiled-tally-preview" metavar:"RRGGBB" default:"00ff00"`
 	TallyProgram	LED		`long:"spiled-tally-program" metavar:"RRGGBB" default:"ff0000"`
 	TallyBoth		LED		`long:"spiled-tally-both"    metavar:"RRGGBB" default:"ff4000"`
