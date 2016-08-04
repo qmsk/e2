@@ -1,4 +1,16 @@
 // Support for SPI-based RGB LED chains (APA-102).
+//
+// The first LED is the status LED:
+//	blue: idle
+//  green: connected
+//  red: errors
+//  orange: connected+errors
+//
+// The remaining LEDs are tally LEDs, using the sequential ID numbering
+//  blue: found
+//  green: preview
+//  red: program
+//  orange: program+preview
 package spiled
 
 import (
@@ -139,17 +151,26 @@ func (spiled *SPILED) close() {
 	}
 }
 
-func (spiled *SPILED) updateTally(state tally.State) {
+func (spiled *SPILED) updateTally(tallyState tally.State) {
 	log.Printf("SPI-LED: Update tally State:")
 
 	leds := make([]LED, spiled.count)
 
-	for i, led := range leds {
-		id := tally.ID(i+1)
+	var found, errors int
 
-		if tally, exists := state.Tally[id]; !exists {
+	for i, led := range leds {
+		if i == 0 {
+			// skip status
+			continue
+		}
+
+		id := tally.ID(i)
+
+		if tally, exists := tallyState.Tally[id]; !exists {
 			// missing tally state for pin
 		} else {
+			found++
+
 			led.Intensity = 0xff
 
 			if tally.Status.Program && tally.Status.Preview {
@@ -164,13 +185,35 @@ func (spiled *SPILED) updateTally(state tally.State) {
 			}
 
 			log.Printf("SPI-LED %v: id=%v status=%v led=%v", i, id, tally.Status, led)
+
 		}
 
 		leds[i] = led
 	}
 
+	errors = len(tallyState.Errors)
+
+	// status LED
+	var statusLED = LED{Intensity: 0xff}
+
+	if found > 0 && errors > 0{
+		statusLED.Red = 0xff
+		statusLED.Green = 0xff
+	} else if errors > 0 {
+		statusLED.Red = 0xff
+	} else if found > 0 {
+		statusLED.Green = 0xff
+	} else {
+		statusLED.Blue = 0xff
+	}
+
+	log.Printf("SPI-LED: found=%v errors=%v led=%v", found, errors, statusLED)
+
+	leds[0] = statusLED
+
+	// write
 	if err := spiled.write(leds); err != nil {
-		log.Printf("SPI-LED: Write rror: %v", err)
+		log.Printf("SPI-LED: Write error: %v", err)
 	}
 }
 
