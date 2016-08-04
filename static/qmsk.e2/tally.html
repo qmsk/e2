@@ -24,13 +24,13 @@
                         </div>
                     </td>
                     <td>
-                        <div class="source" ng-repeat="input in tally.Inputs">
+                        <div class="source" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
                             {{input.Name}}
                             <!-- {{input.Source}} -->
                         </div>
                     </td>
                     <td>
-                        <div class="screen" ng-repeat="output in tally.Outputs" ng-class="{'preview': output.Preview, 'program': output.Program}">
+                        <div class="screen" ng-repeat="output in tally.Outputs | orderBy: 'Name'" ng-class="{'preview': output.Preview, 'program': output.Program}">
                             {{output.Name}}
                         </div>
                     </td>
