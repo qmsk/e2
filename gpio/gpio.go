@@ -1,3 +1,15 @@
+// GPIO pin output from tally state
+//
+// Supports two status pins and N tally pins.
+//
+// The green status pin is high to indicate tally activity. In the idle state (no tally sources discovered), the green
+// status pin blinks on slowly. In the active state (at least one tally source connected), the green status pin is on,
+// and blinks off on changes.
+//
+// The red status pin is normally low, and is set high when there are any tally source errors.
+//
+// Each tally pin corresponds to the sequentially numbered tally ID. It will be set high when the tally ID is out on
+// any output program.
 package gpio
 
 import (
