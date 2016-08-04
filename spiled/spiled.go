@@ -36,6 +36,17 @@ type Options struct {
 	Protocol	string	`long:"spiled-protocol" metavar:"apa102|apa102x" description:"Type of LED"`
 	Count		uint	`long:"spiled-count" metavar:"COUNT" description:"Number of LEDs"`
 	Debug		bool	`long:"spiled-debug" description:"Dump SPI output"`
+	Intensity	uint8	`long:"spiled-intensity" metavar:"0-255" default:"255"`
+
+	TallyIdle		LED		`long:"spiled-tally-idle"    metavar:"RRGGBB" default:"000040"`
+	TallyPreview	LED		`long:"spiled-tally-preview" metavar:"RRGGBB" default:"00ff00"`
+	TallyProgram	LED		`long:"spiled-tally-program" metavar:"RRGGBB" default:"ff0000"`
+	TallyBoth		LED		`long:"spiled-tally-both"    metavar:"RRGGBB" default:"ff4000"`
+
+	StatusIdle		LED		`long:"spiled-status-idle"    metavar:"RRGGBB" default:"0000ff"`
+	StatusOK		LED		`long:"spiled-status-ok"      metavar:"RRGGBB" default:"00ff00"`
+	StatusWarn	    LED		`long:"spiled-status-warn"    metavar:"RRGGBB" default:"ffff00"`
+	StatusError		LED		`long:"spiled-status-error"   metavar:"RRGGBB" default:"ff0000"`
 }
 
 func (options Options) Make() (*SPILED, error) {
@@ -66,6 +77,7 @@ func (spiled *SPILED) init(options Options) error {
 		return fmt.Errorf("embd.InitSPI: %v", err)
 	}
 
+	// SPI
 	var spiMode byte = embd.SPIMode0
 	var spiChannel byte = options.Channel // /dev/spidev0.X
 	var spiSpeed int = options.Speed // Hz
@@ -171,18 +183,17 @@ func (spiled *SPILED) updateTally(tallyState tally.State) {
 		} else {
 			found++
 
-			led.Intensity = 0xff
-
 			if tally.Status.Program && tally.Status.Preview {
-				led.Red = 0xff
-				led.Green = 0x20
+				led = spiled.options.TallyBoth
 			} else if tally.Status.Preview {
-				led.Green = 0xff
+				led = spiled.options.TallyPreview
 			} else if tally.Status.Program {
-				led.Red = 0xff
+				led = spiled.options.TallyProgram
 			} else {
-				led.Blue = 0x80
+				led = spiled.options.TallyIdle
 			}
+
+			led.Intensity = spiled.options.Intensity
 
 			log.Printf("SPI-LED %v: id=%v status=%v led=%v", i, id, tally.Status, led)
 
@@ -194,18 +205,19 @@ func (spiled *SPILED) updateTally(tallyState tally.State) {
 	errors = len(tallyState.Errors)
 
 	// status LED
-	var statusLED = LED{Intensity: 0xff}
+	var statusLED LED
 
-	if found > 0 && errors > 0{
-		statusLED.Red = 0xff
-		statusLED.Green = 0xff
+	if found > 0 && errors > 0 {
+		statusLED = spiled.options.StatusWarn
 	} else if errors > 0 {
-		statusLED.Red = 0xff
+		statusLED = spiled.options.StatusError
 	} else if found > 0 {
-		statusLED.Green = 0xff
+		statusLED = spiled.options.StatusOK
 	} else {
-		statusLED.Blue = 0xff
+		statusLED = spiled.options.StatusIdle
 	}
+
+	statusLED.Intensity = spiled.options.Intensity
 
 	log.Printf("SPI-LED: found=%v errors=%v led=%v", found, errors, statusLED)
 
