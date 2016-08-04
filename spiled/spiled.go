@@ -23,6 +23,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 )
 
 type Protocol string
@@ -37,6 +38,7 @@ type Options struct {
 	Count		uint	`long:"spiled-count" metavar:"COUNT" description:"Number of LEDs"`
 	Debug		bool	`long:"spiled-debug" description:"Dump SPI output"`
 	Intensity	uint8	`long:"spiled-intensity" metavar:"0-255" default:"255"`
+	Refresh		float64 `long:"spiled-refresh" metavar:"HZ" default:"10"`
 
 	TallyIdle		LED		`long:"spiled-tally-idle"    metavar:"RRGGBB" default:"000040"`
 	TallyPreview	LED		`long:"spiled-tally-preview" metavar:"RRGGBB" default:"00ff00"`
@@ -67,6 +69,8 @@ type SPILED struct {
 	count		uint
 
 	spiBus	embd.SPIBus
+
+	leds		[]LED
 
 	tallyChan chan tally.State
 	waitGroup sync.WaitGroup
@@ -99,13 +103,9 @@ func (spiled *SPILED) init(options Options) error {
 	spiled.spiBus = embd.NewSPIBus(spiMode, spiChannel, spiSpeed, spiBitsPerWord, spiDelay)
 
 	// initial output
-	leds := make([]LED, spiled.count)
+	spiled.leds = make([]LED, spiled.count)
 
-	for i, _ := range leds {
-		leds[i] = LED{0xff, 0x00, 0x00, 0xff}
-	}
-
-	if err := spiled.write(leds); err != nil {
+	if err := spiled.write(spiled.leds, time.Time{}); err != nil {
 		return err
 	}
 
@@ -114,7 +114,7 @@ func (spiled *SPILED) init(options Options) error {
 	return nil
 }
 
-func (spiled *SPILED) write(leds []LED) error {
+func (spiled *SPILED) write(leds []LED, renderTime time.Time) error {
 	var packet bytes.Buffer
 
 	var stopByte = []byte{0xff}
@@ -133,7 +133,9 @@ func (spiled *SPILED) write(leds []LED) error {
 
 	// data
 	for _, led := range leds {
-		packet.Write(led.Bytes())
+		var ledFrame = led.render(renderTime)
+
+		packet.Write(ledFrame)
 	}
 
 	// stop
@@ -195,7 +197,11 @@ func (spiled *SPILED) updateTally(tallyState tally.State) {
 
 			led.Intensity = spiled.options.Intensity
 
-			log.Printf("SPI-LED %v: id=%v status=%v led=%v", i, id, tally.Status, led)
+			if tally.Errors != nil {
+				led.Strobe(1 * time.Second)
+			}
+
+			log.Printf("SPI-LED %v: id=%v status=%v errors=%v led=%v", i, id, tally.Status, len(tally.Errors), led)
 
 		}
 
@@ -223,17 +229,28 @@ func (spiled *SPILED) updateTally(tallyState tally.State) {
 
 	leds[0] = statusLED
 
-	// write
-	if err := spiled.write(leds); err != nil {
-		log.Printf("SPI-LED: Write error: %v", err)
-	}
+	// refresh
+	spiled.leds = leds
 }
 
 func (spiled *SPILED) run() {
 	defer spiled.close()
 
-	for state := range spiled.tallyChan {
-		spiled.updateTally(state)
+	refreshTimer := time.Tick(time.Duration(1.0 / spiled.options.Refresh * float64(time.Second)))
+
+	for {
+		select {
+		case tallyState, ok := <-spiled.tallyChan:
+			if ok {
+				spiled.updateTally(tallyState)
+			} else {
+				return
+			}
+		case refreshTime := <-refreshTimer:
+			if err := spiled.write(spiled.leds, refreshTime); err != nil {
+				log.Printf("SPI-LED: Write error: %v", err)
+			}
+		}
 	}
 
 	log.Printf("SPI-LED: Done")
