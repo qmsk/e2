@@ -151,16 +151,16 @@ func (spiled *SPILED) updateTally(state tally.State) {
 			// missing tally state for pin
 		} else {
 			led.Intensity = 0xff
-			led.Blue = 0x80
 
-			if tally.Status.Program {
+			if tally.Status.Program && tally.Status.Preview {
 				led.Red = 0xff
-				led.Blue = 0x00
-			}
-
-			if tally.Status.Preview {
+				led.Green = 0x20
+			} else if tally.Status.Preview {
 				led.Green = 0xff
-				led.Blue = 0x00
+			} else if tally.Status.Program {
+				led.Red = 0xff
+			} else {
+				led.Blue = 0x80
 			}
 
 			log.Printf("SPI-LED %v: id=%v status=%v led=%v", i, id, tally.Status, led)
