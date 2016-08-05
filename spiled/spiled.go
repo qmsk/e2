@@ -192,9 +192,9 @@ func (spiled *SPILED) updateTally(tallyState tally.State) {
 		} else {
 			found++
 
-			if tally.Status.Program && tally.Status.Preview {
+			if tally.Status.Program && tally.Status.Preview && tally.Status.Active {
 				led = spiled.options.TallyBoth
-			} else if tally.Status.Preview {
+			} else if tally.Status.Preview && tally.Status.Active {
 				led = spiled.options.TallyPreview
 			} else if tally.Status.Program {
 				led = spiled.options.TallyProgram
