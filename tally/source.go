@@ -157,7 +157,6 @@ func (source Source) updateState(state *State) error {
 				continue
 			}
 
-			// TODO: active
 
 			output := state.addOutput(tallySource, aux.Name)
 
@@ -169,6 +168,7 @@ func (source Source) updateState(state *State) error {
 					Status: Status{
 						Preview: (aux.PvwLastSrcIndex == sourceID),
 						Program: (aux.PgmLastSrcIndex == sourceID),
+						Active: (aux.IsActive > 0),
 					},
 				})
 			}
