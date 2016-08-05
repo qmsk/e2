@@ -18,13 +18,26 @@ func xmlAttr(e xml.StartElement, name string) (value string) {
 	return ""
 }
 
-func xmlID(e xml.StartElement) (id int, err error) {
+// Unmarshal the "id" attr from the XML element into the given reflection value, which must be a Pointer value,
+// e.g. using reflect.New()
+func xmlID(e xml.StartElement, idValue reflect.Value) error {
 	value := xmlAttr(e, "id")
 
-	if _, err := fmt.Sscanf(value, "%d", &id); err != nil {
-		return id, err
+	var valueFmt string
+
+	switch idValue.Elem().Kind() {
+	case reflect.Int, reflect.Uint:
+		valueFmt = "%d"
+	case reflect.String:
+		valueFmt = "%s"
+	default:
+		return fmt.Errorf("Invalid xmlCol map key type: %v", idValue.Type())
+	}
+
+	if _, err := fmt.Sscanf(value, valueFmt, idValue.Interface()); err != nil {
+		return fmt.Errorf("fmt.Sscanf %#v %#v %#v: %v", value, valueFmt, err)
 	} else {
-		return id, nil
+		return nil
 	}
 }
 
@@ -40,6 +53,7 @@ type xmlCol struct {
 	colMap interface{} // *map[int]T
 
 	mapValue reflect.Value // existing map to read items for update
+	keyType  reflect.Type  // type of key
 	itemName string        // XML element name for type
 	itemType reflect.Type  // type of new items
 
@@ -56,16 +70,17 @@ func makeXmlCol(colMap interface{}) (xmlCol xmlCol, err error) {
 	ptrValue := reflect.ValueOf(xmlCol.colMap)
 
 	if ptrValue.Kind() != reflect.Ptr {
-		return xmlCol, fmt.Errorf("xmlCol.colMap must be *map[int]...")
+		return xmlCol, fmt.Errorf("xmlCol.colMap must be *map[...]...")
 	}
 
 	xmlCol.mapValue = ptrValue.Elem()
 	mapType := xmlCol.mapValue.Type()
 
-	if mapType.Kind() != reflect.Map || mapType.Key().Kind() != reflect.Int {
-		return xmlCol, fmt.Errorf("xmlCol.colMap must be *map[int]...")
+	if mapType.Kind() != reflect.Map {
+		return xmlCol, fmt.Errorf("xmlCol.colMap must be *map[...]...")
 	}
 
+	xmlCol.keyType = mapType.Key()
 	xmlCol.itemType = mapType.Elem()
 	xmlCol.itemName = xmlCol.itemType.Name() // matching element name
 
@@ -104,12 +119,14 @@ func (xmlCol *xmlCol) setScope(scope string) error {
 // unmarshal a <Foo> element
 func (xmlCol *xmlCol) unmarshalItem(d *xml.Decoder, e xml.StartElement) error {
 	// index by id
-	id, err := xmlID(e)
-	if err != nil {
+	idValue := reflect.New(xmlCol.keyType)
+
+	if err := xmlID(e, idValue); err != nil {
 		return err
 	}
 
-	idValue := reflect.ValueOf(id)
+	// deref
+	idValue = idValue.Elem()
 
 	if xmlCol.scope == xmlColRemove {
 		log.Printf("XML remove %s[%d]\n", xmlCol.itemType.Name(), idValue.Interface())
