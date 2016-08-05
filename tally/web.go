@@ -42,6 +42,7 @@ type restSource struct {
 	FirstSeen time.Time
 	LastSeen  string
 
+	Connected bool
 	Error	  string	`json:",omitempty"`
 }
 
@@ -61,6 +62,10 @@ func (sources sources) Get() (interface{}, error) {
 
 		if !source.updated.IsZero() {
 			rs.LastSeen = time.Now().Sub(source.updated).String()
+		}
+
+		if source.xmlClient != nil {
+			rs.Connected = true
 		}
 
 		if source.err != nil {

@@ -1,5 +1,7 @@
 <div class="container" id="tally">
-    <div class="source tally-source" ng-repeat="source in sources | orderBy: 'Source'">
+    <div class="source tally-source" ng-repeat="source in sources | orderBy: 'Source'"
+                                     ng-class="{'inactive': !source.Connected}"
+    >
         <h1>{{source.Source}}</h1>
 
         <div class="alert alert-danger" ng-if="source.Error">

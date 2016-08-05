@@ -18,6 +18,11 @@ func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions cli
 		clientOptions:   clientOptions,
 	}
 
+	// do not connect to slave VPs
+	if discoveryPacket.MasterMac != discoveryPacket.MacAddress {
+		return source, nil
+	}
+
 	// give updates every 10s when idle
 	clientOptions.ReadKeepalive = true
 
@@ -75,6 +80,11 @@ func (source Source) updateState(state *State) error {
 
 	if source.err != nil {
 		return source.err
+	}
+
+	if source.xmlClient == nil {
+		// not connected
+		return nil
 	}
 
 	system := source.system
