@@ -13,6 +13,7 @@ var INPUT_CONTACT_REGEXP = regexp.MustCompile("tally=(\\d+)")
 
 func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions client.Options) (Source, error) {
 	source := Source{
+		options:		 tally.options,
 		created:		 time.Now(),
 		discoveryPacket: discoveryPacket,
 		clientOptions:   clientOptions,
@@ -41,6 +42,7 @@ func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions cli
 //
 // A source can either be in a running state with err == nil, or in a failed state with err != nil
 type Source struct {
+	options			Options
 	created			time.Time
 	updated			time.Time
 
@@ -89,12 +91,12 @@ func (source Source) updateState(state *State) error {
 
 	system := source.system
 
-	for sourceID, source := range system.SrcMgr.SourceCol.List() {
+	for sourceID, systemSource := range system.SrcMgr.SourceCol.List() {
 		// lookup Input from inputCfg with tally=
-		if source.InputCfgIndex < 0 {
+		if systemSource.InputCfgIndex < 0 {
 			continue
 		}
-		inputCfg := system.SrcMgr.InputCfgCol[source.InputCfgIndex]
+		inputCfg := system.SrcMgr.InputCfgCol[systemSource.InputCfgIndex]
 		inputName := inputCfg.Name
 
 		// resolve ID
@@ -115,6 +117,11 @@ func (source Source) updateState(state *State) error {
 
 		// lookup active Links
 		for _, screen := range system.DestMgr.ScreenDestCol {
+			// ignore?
+			if source.options.ignoreDestRegexp != nil && source.options.ignoreDestRegexp.MatchString(screen.Name) {
+				continue
+			}
+
 			var status Status
 
 			if screen.IsActive > 0 {
@@ -145,6 +152,13 @@ func (source Source) updateState(state *State) error {
 		}
 
 		for _, aux := range system.DestMgr.AuxDestCol {
+			// ignore?
+			if source.options.ignoreDestRegexp != nil && source.options.ignoreDestRegexp.MatchString(aux.Name) {
+				continue
+			}
+
+			// TODO: active
+
 			output := state.addOutput(tallySource, aux.Name)
 
 			if aux.PvwLastSrcIndex == sourceID || aux.PgmLastSrcIndex == sourceID {

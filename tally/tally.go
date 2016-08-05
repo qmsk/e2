@@ -6,16 +6,29 @@ import (
 	"github.com/qmsk/e2/discovery"
 	"log"
 	"time"
+	"regexp"
 )
 
 type Options struct {
 	clientOptions    client.Options
 	discoveryOptions discovery.Options
+
+	IgnoreDest		string	`long:"tally-ignore-dest" metavar:"REGEXP" description:"Ignore matching destinations (case-insensitive regexp)"`
+	ignoreDestRegexp	*regexp.Regexp
 }
 
 func (options Options) Tally(clientOptions client.Options, discoveryOptions discovery.Options) (*Tally, error) {
 	options.clientOptions = clientOptions
 	options.discoveryOptions = discoveryOptions
+
+	if options.IgnoreDest == "" {
+
+	// case-insensitive match
+	} else if regexp, err := regexp.Compile("(?i)" + options.IgnoreDest); err != nil {
+		return nil, fmt.Errorf("Invalid --tally-ignore-dest=%v: %v", options.IgnoreDest, err)
+	} else {
+		options.ignoreDestRegexp = regexp
+	}
 
 	var tally = Tally{
 		options:    options,
@@ -32,7 +45,7 @@ type sources map[string]Source
 
 // Concurrent tally support for multiple sources and destinations
 type Tally struct {
-	options Options
+	options         Options
 
 	closeChan chan struct{}
 
