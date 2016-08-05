@@ -158,10 +158,17 @@ func (spiled *SPILED) write(leds []LED, renderTime time.Time) error {
 func (spiled *SPILED) close() {
 	defer spiled.waitGroup.Done()
 
-	log.Printf("SPI-LED: Close...")
+	log.Printf("SPI-LED: Flush and close...")
+
+	// flush empty output
+	leds := make([]LED, spiled.count)
+
+	if err := spiled.write(leds, time.Time{}); err != nil {
+		log.Printf("SPILED.close: embd.SPIBus.Write: %v", err)
+	}
 
 	if err := spiled.spiBus.Close(); err != nil {
-		log.Printf("embd.SPIBus.Close: %v", err)
+		log.Printf("SPILED.close: embd.SPIBus.Close: %v", err)
 	}
 }
 
