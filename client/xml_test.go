@@ -104,6 +104,9 @@ func testXMLClient(test testXML) *XMLClient {
 func testXMLClientRead(test testXML) System {
 	xmlClient := testXMLClient(test)
 
+	// fake "closed" mode, as we are expecting it
+	xmlClient.closed = true
+
 	var system System
 
 	for {
@@ -123,6 +126,9 @@ func TestXmlRead(t *testing.T) {
 		fileGlob:  "./test-xml/test1-*.xml",
 		fileDelay: 10 * time.Millisecond,
 	})
+
+	// fake "closed" mode, as we are expecting it
+	xmlClient.closed = true
 
 	listenChan, err := xmlClient.Listen()
 	if err != nil {
