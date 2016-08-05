@@ -25,6 +25,7 @@ type InputState struct {
 type Status struct {
 	Program bool
 	Preview bool
+	Active	bool
 }
 
 func (status Status) String() string {
@@ -138,6 +139,9 @@ func (state *State) update() {
 		}
 		if link.Status.Preview {
 			tallyState.Status.Preview = true
+		}
+		if link.Status.Active {
+			tallyState.Status.Active = true
 		}
 
 		state.Tally[link.Tally] = tallyState

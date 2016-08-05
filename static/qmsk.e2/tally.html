@@ -19,7 +19,7 @@
             <tbody>
                 <tr ng-repeat="tally in tally.Tally | orderBy: 'ID'">
                     <td>
-                        <div class="preset" ng-class="{'preview': tally.Preview, 'program': tally.Program}">
+                        <div class="preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}">
                             {{tally.ID}}
                         </div>
                     </td>
@@ -33,7 +33,9 @@
                         </div>
                     </td>
                     <td>
-                        <div class="screen" ng-repeat="output in tally.Outputs | orderBy: 'Name'" ng-class="{'preview': output.Preview, 'program': output.Program}">
+                        <div class="screen" ng-repeat="output in tally.Outputs | orderBy: 'Name'"
+                            ng-class="{'preview': output.Preview, 'program': output.Program, 'active': output.Active}"
+                        >
                             {{output.Name}}
                         </div>
                     </td>

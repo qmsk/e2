@@ -117,6 +117,10 @@ func (source Source) updateState(state *State) error {
 		for _, screen := range system.DestMgr.ScreenDestCol {
 			var status Status
 
+			if screen.IsActive > 0 {
+				status.Active = true
+			}
+
 			for _, layer := range screen.LayerCollection {
 				if layer.LastSrcIdx == sourceID {
 					if layer.PvwMode > 0 {
