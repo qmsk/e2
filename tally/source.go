@@ -5,11 +5,8 @@ import (
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
 	"io"
-	"regexp"
 	"time"
 )
-
-var INPUT_CONTACT_REGEXP = regexp.MustCompile("tally=(\\d+)")
 
 func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions client.Options) (Source, error) {
 	source := Source{
@@ -102,7 +99,7 @@ func (source Source) updateState(state *State) error {
 		// resolve ID
 		var tallyID ID
 
-		if match := INPUT_CONTACT_REGEXP.FindStringSubmatch(inputCfg.ConfigContact); match == nil {
+		if match := source.options.contactIDRegexp.FindStringSubmatch(inputCfg.ConfigContact); match == nil {
 			continue
 		} else if _, err := fmt.Sscanf(match[1], "%d", &tallyID); err != nil {
 			return fmt.Errorf("Invalid Input Contact=%v: %v\n", inputCfg.ConfigContact, err)
