@@ -41,6 +41,14 @@ Run the tally software using a network interface connected to the same network a
 
     $GOPATH/bin/tally --discovery-interface=eth0
 
+## Configuration
+
+Use `--tally-ignore-dest=REGEXP` to ignore matching destinations for tally state.
+For example, if you have a local monitor connected to an Aux output named "Monitor", and you do not want to indicate tally inputs as being active on program if they are viewed on the Aux monitor, use `--tally-ignore-dest=Monitor`.
+
+Multiple separate tally systems can be run, using the `--tally-contact-name=` to select the `tally=ID` name used to configure the Input's tally ID.
+For example, using `--tally-contact-name=tally-test` would follow the input with a Contact field containing `tally-test=2` as the #2 tally output.
+
 ## Outputs
 
 The tally state can be output on a HTTP REST/WebSocket API, on GPIO pins, or RGB LEDs on the SPI bus.
@@ -137,6 +145,33 @@ The `--gpio-green-pin=` and `--gpio-red-pin=` are used for the status of the tal
 Each `--gpio-tally-pin=` is used for sequentially numbered tally ID output. Passing eight `--gpio-tally-pin=` options will enable tally output for IDs 1, 2, 3, 4, 5, 6, 7 and 8.
 The GPIO pin will be set high if the tally input is output on program, and low otherwise.
 
+If running the tally binary as root, it will handle exporting and setup of the `/sys/class/gpio` devices itself.
+If running as a user in the gpio group, the permissions on the exported GPIO pins must be configured by udev before running the tally binary.
+Use the included `cmd/tally/gpio-export.sh ...` script to pre-export the GPIO pins.
+
+The tally program will exit and drive the GPIO pins low on SIGINT. If the tally program crashes or is killed, the GPIO pins will remain stuck
+in their previous state. Use the `cmd/tally/gpio-unexport.sh ...` script to clear the GPIO output.
+
+Example systemd service to pre-export the GPIO pins, and drive them low if the tally program exits:
+
+	[Unit]
+	Description=github.com/qmsk/e2 tally
+	After=network.target
+
+	[Service]
+	User=e2-tally
+	ExecStartPre=/opt/qmsk-e2/bin/gpio-export.sh 23 24 21 20 16 12 26 19 13 6
+	ExecStart=/opt/qmsk-e2/bin/tally \
+		--discovery-interface=eth0 \
+		--gpio --gpio-green-pin=23 --gpio-red-pin=24 \
+		--gpio-tally-pin=21 --gpio-tally-pin=20 --gpio-tally-pin=16 --gpio-tally-pin=12 --gpio-tally-pin=26 --gpio-tally-pin=19 --gpio-tally-pin=13 --gpio-tally-pin=6 \
+
+	KillSignal=SIGINT
+	ExecStopPost=/opt/qmsk-e2/bin/gpio-unexport.sh 23 24 21 20 16 12 26 19 13 6
+
+	[Install]
+	WantedBy=multi-user.target
+
 ## SPI-LED
 
 ![Tally APA102 LEDs](/docs/tally-spiled.jpg?raw=true)
@@ -187,6 +222,11 @@ The remaining LEDs are used for sequentially numbered tally ID output. Use the `
 | `--spiled-tally-preview=` | 00ff00 (Green)    | Preview on active destination
 | `--spiled-tally-program=` | ff0000 (Red)      | Program on destination
 | `--spiled-tally-both=`    | ff4000 (Orange)   | Program on destination, and Preview on active destination
+
+The tally output LED will start pulsing if the input connector is disconnected or has an invalid video signal.
+
+The tally program will exit and drive the SPI LEDs off on SIGINT. If the tally program crashes or is killed, the SPI bus will remain stuck in its previous state.
+Use the included `cmd/tally/spiled-down.sh <count>` script to force the SPI LEDs off.
 
 ## Server (Web UI)
     

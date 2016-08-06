@@ -17,6 +17,7 @@ DEVICE=${2:-/dev/spidev0.0}
     done
     
     # stop frame
+    # XXX: different protocol variants!
     printf '\0\0\0\0\0\0\0\0'
 
 ) > $DEVICE
