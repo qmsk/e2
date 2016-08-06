@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/web"
 )
 
 type Auxes struct {
@@ -35,7 +36,7 @@ func (auxes *Auxes) Get() (interface{}, error) {
 	return auxes.auxMap, nil
 }
 
-func (auxes *Auxes) Index(name string) (apiResource, error) {
+func (auxes *Auxes) Index(name string) (web.Resource, error) {
 	if aux, found := auxes.auxMap[name]; !found {
 		return nil, nil
 	} else {

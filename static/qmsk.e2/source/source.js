@@ -23,6 +23,6 @@ angular.module('qmsk.e2.source', [
             source: '=source',
             detail: '=detail',
         },
-        templateUrl: 'qmsk.e2/source/source.html',
+        templateUrl: '/static/qmsk.e2/source/source.html',
     }
 })

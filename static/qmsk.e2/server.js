@@ -1,5 +1,6 @@
 angular.module('qmsk.e2', [
         'qmsk.e2.source',
+        'qmsk.e2.web',
         'ngResource',
         'ngRoute',
         'ngWebSocket',
@@ -10,74 +11,33 @@ angular.module('qmsk.e2', [
 .config(function($routeProvider) {
     $routeProvider
         .when('/main', {
-            templateUrl: 'qmsk.e2/main.html',
+            templateUrl: '/static/qmsk.e2/server/main.html',
             controller: 'MainCtrl',
             reloadOnSearch: false,
         })
         .when('/sources', {
-            templateUrl: 'qmsk.e2/sources.html',
+            templateUrl: '/static/qmsk.e2/server/sources.html',
             controller: 'SourcesCtrl',
         })
         .when('/screens', {
-            templateUrl: 'qmsk.e2/screens.html',
+            templateUrl: '/static/qmsk.e2/server/screens.html',
             controller: 'ScreensCtrl',
         })
         .when('/auxes', {
-            templateUrl: 'qmsk.e2/auxes.html',
+            templateUrl: '/static/qmsk.e2/server/auxes.html',
             controller: 'AuxesCtrl',
         })
         .when('/presets', {
-            templateUrl: 'qmsk.e2/presets.html',
+            templateUrl: '/static/qmsk.e2/server/presets.html',
             controller: 'PresetsCtrl',
         })
         .when('/system', {
-            templateUrl: 'qmsk.e2/system.html',
+            templateUrl: '/static/qmsk.e2/server/system.html',
             controller: 'SystemCtrl',
         })
         .otherwise({
             redirectTo: '/main',
         });
-})
-
-// track global http state
-.factory('httpState', function($q) {
-    var httpState = {
-        error:  null,
-        busy:   0,
-
-        request: function(config) {
-            httpState.busy++;
-
-            return config;
-        },
-        requestError: function(err) {
-            console.log("Request Error: " + err);
-
-            httpState.busy--;
-
-            return $q.reject(err);
-        },
-
-        response: function(r) {
-            httpState.busy--;
-
-            return r;
-        },
-        responseError: function(e) {
-            console.log("Response Error: " + e);
-
-            httpState.busy--;
-            httpState.error = e;
-
-            return $q.reject(e);
-        },
-    };
-
-    return httpState
-})
-
-.config(function($httpProvider) {
-    $httpProvider.interceptors.push('httpState');
 })
 
 .factory('Status', function($http) {

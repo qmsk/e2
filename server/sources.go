@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/web"
 	"sort"
 )
 
@@ -40,7 +41,7 @@ func (sources *Sources) load(client *client.Client) error {
 	return nil
 }
 
-func (sources *Sources) Index(name string) (apiResource, error) {
+func (sources *Sources) Index(name string) (web.Resource, error) {
 	if source, found := sources.sourceMap[name]; !found {
 		return nil, nil
 	} else {

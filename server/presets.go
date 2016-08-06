@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/web"
 )
 
 type Presets struct {
@@ -42,7 +43,7 @@ func (presets *Presets) Get() (interface{}, error) {
 	return presets.presetMap, nil
 }
 
-func (presets *Presets) Index(name string) (apiResource, error) {
+func (presets *Presets) Index(name string) (web.Resource, error) {
 	if name == "" {
 		var presetStates PresetStates
 

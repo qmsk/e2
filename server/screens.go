@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/web"
 	"sort"
 )
 
@@ -43,7 +44,7 @@ func (screens *Screens) Get() (interface{}, error) {
 	return screens.screenMap, nil
 }
 
-func (screens *Screens) Index(name string) (apiResource, error) {
+func (screens *Screens) Index(name string) (web.Resource, error) {
 	if screen, found := screens.screenMap[name]; !found {
 		return nil, nil
 	} else if screenState, err := screen.loadState(screens.client); err != nil {
