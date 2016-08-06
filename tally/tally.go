@@ -123,16 +123,15 @@ func (tally *Tally) Run() error {
 
 		case source := <-tally.sourceChan:
 			if err := source.err; err != nil {
-				log.Printf("Tally: Source %v Error: %v\n", source, err)
-			} else {
-				log.Printf("Tally: Source %v: Update\n", source)
-			}
+				log.Printf("Tally: Source %v Error: %v", source, err)
 
-			source.updated = time.Now()
+				tally.sources[source.String()] = source
 
-			if source.closed {
-				delete(tally.sources, source.String())
 			} else {
+				log.Printf("Tally: Source %v: Update", source)
+
+				source.updated = time.Now()
+
 				tally.sources[source.String()] = source
 			}
 
@@ -140,9 +139,19 @@ func (tally *Tally) Run() error {
 		}
 
 		// stopping?
-		if tally.closeChan == nil && len(tally.sources) == 0 {
-			log.Printf("Tally: stopped")
-			return nil
+		if tally.closeChan == nil {
+			var closed = true
+
+			for _, source := range tally.sources {
+				if !source.isClosed() {
+					closed = false
+				}
+			}
+
+			if closed {
+				log.Printf("Tally: stopped")
+				return nil
+			}
 		}
 	}
 }

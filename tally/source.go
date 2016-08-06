@@ -5,6 +5,7 @@ import (
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
 	"io"
+	"log"
 	"time"
 )
 
@@ -68,8 +69,9 @@ func (source Source) run(updateChan chan Source) {
 
 		updateChan <- source
 
-		if source.err != nil {
-			break
+		if source.closed || source.err != nil {
+			log.Printf("tally:Source %v: closed", source)
+			return
 		}
 	}
 }
@@ -176,5 +178,11 @@ func (source Source) updateState(state *State) error {
 
 // close, causing run() to exit
 func (source Source) close() {
-	source.xmlClient.Close()
+	if source.xmlClient != nil {
+		source.xmlClient.Close()
+	}
+}
+
+func (source Source) isClosed() bool {
+	return source.xmlClient == nil || source.closed
 }
