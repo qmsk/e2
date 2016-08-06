@@ -23,6 +23,10 @@ Input sources can be tagged with a `tally=ID` in their *Contact* field.
 Each tally ID has *program*, *preview* and *active* status if any input with a matching tally ID is used as the
 program or preview source on any screen destination layer, or Aux output.
 
+Multiple E2 systems can be connected, and their input/output state is merged.
+The tally system will indicate an error status if any E2 system is disconnected (stops responding within the `--e2-timeout=`).
+The tally system will reconnect to any E2 system once is starts responding to discovery packets again.
+
 ## Usage
 
 Build the golang binary:
@@ -45,7 +49,7 @@ The tally state can be output on a HTTP REST/WebSocket API, on GPIO pins, or RGB
 
 The Web output provides an JSON REST API, a JSON WebSocket API, and an AngularJS frontend.
 
-    --http-listen=:8001 --http-static=./static
+    tally --http-listen=:8001 --http-static=./static
 
 The `--http-static` is optional, and is only needed for the UI.
 
@@ -134,6 +138,8 @@ Each `--gpio-tally-pin=` is used for sequentially numbered tally ID output. Pass
 The GPIO pin will be set high if the tally input is output on program, and low otherwise.
 
 ## SPI-LED
+
+![Tally APA102 LEDs](/docs/tally-spiled.jpg?raw=true)
 
 Support for APA102 RGB LEDs connected to the Linux RaspberryPI SPI bus using `/dev/spidev`. Use the `--spiled` options to configure:
 
