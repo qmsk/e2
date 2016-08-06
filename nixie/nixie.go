@@ -95,10 +95,6 @@ func (nixie *Nixie) init(options Options) error {
 	nixie.Send(nixie_no_number | nixie_white)
 	nixie.Send(nixie_no_number | nixie_white)
 
-	if err := embd.InitGPIO(); err != nil {
-		return fmt.Errorf("embd.InitGPIO: %v", err)
-	}
-
 	if options.LivePin == "" {
 
 	} else if pin, err := embd.NewDigitalPin(options.LivePin); err != nil {
