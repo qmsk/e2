@@ -228,30 +228,41 @@ angular.module('qmsk.e2', [
         });
     });
 
-    $scope.activePreset = null;
-    $scope.takePreset = null;
-    $scope.activatePreset = function(preset) {
+    // active preset on server; reset while changing...
+    $scope.activePresetID = null;
+    $scope.$watch('state.System', function(system) {
+        $scope.activePresetID = system.PresetMgr.LastRecall
+    });
+
+    // select preset for preview
+    $scope.previewPreset = null
+    $scope.select = function(preset) {
+        $scope.activePresetID = null;
         Preset.activate({id: preset.id},
             function success(r) {
-                $scope.activePreset = preset;
+                $scope.previewPreset = preset;
             },
             function error(e) {
 
             }
         );
     };
+    
+    // take preset for program
+    $scope.programPreset = null;
     $scope.take = function() {
         var preset;
 
-        if (!$scope.activePreset) {
+        if (!$scope.previewPreset) {
             return
         } else {
-            preset = $scope.activePreset;
+            preset = $scope.previewPreset;
         }
 
-        Preset.activate({id: $scope.activePreset.id, live: true},
+        $scope.activePresetID = null;
+        Preset.activate({id: $scope.previewPreset.id, live: true},
             function success(r) {
-                $scope.takePreset = preset;
+                $scope.programPreset = preset;
             },
             function error(e) {
 

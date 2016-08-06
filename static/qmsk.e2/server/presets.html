@@ -22,8 +22,8 @@
         <div ng-show="!collapseGroups[group.id]">
             <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'"
                                                  id="preset-{{preset.id}}"
-                                                 ng-class="{'active': preset.id == state.System.PresetMgr.LastRecall, 'preview': preset.id == activePreset.id, 'program': preset.id == takePreset.id }"
-                                                 ng-click="activatePreset(preset)"
+                                                 ng-class="{'active': preset.id == activePresetID, 'preview': preset.id == previewPreset.id, 'program': preset.id == programPreset.id }"
+                                                 ng-click="select(preset)"
              >
                 {{preset.Name}}
         
