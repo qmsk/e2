@@ -20,14 +20,16 @@
         </div>
 
         <div ng-show="!collapseGroups[group.id]">
-            <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'">
-                {{preset.name}}
-
-                <div ng-repeat="aux_id in preset.auxes">
-                    <span class="dest">{{auxes[aux_id].name}}</span>
+            <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'"
+                                                 id="preset-{{preset.id}}"
+                                                 ng-class="{'active': preset.id == state.System.PresetMgr.LastRecall}">
+                {{preset.Name}}
+        
+                <div ng-repeat="id in preset.auxes">
+                    <span class="dest">{{state.System.DestMgr.AuxDestCol[id].Name}}</span>
                 </div>
-                <div ng-repeat="screen_id in preset.screens">
-                    <span class="dest">{{screens[screen_id].name}}</span>
+                <div ng-repeat="id in preset.screens">
+                    <span class="dest">{{state.System.DestMgr.ScreenDestCol[id].Name}}</span>
                 </div>
             </button>
         </div>

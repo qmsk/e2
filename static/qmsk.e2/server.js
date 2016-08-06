@@ -115,6 +115,8 @@ angular.module('qmsk.e2', [
     $scope.sources = [];
 
     $scope.$watch('state.System', function(system) {
+        // compute a merged state mapping sources to their active destinations
+        // TODO: aux destinations
         $scope.sources = $.map(system.SrcMgr.SourceCol, function(source, sourceID){
             var item = {
                 id: sourceID,
@@ -195,12 +197,12 @@ angular.module('qmsk.e2', [
     $scope.state = State;
 })
 
-.controller('PresetsCtrl', function($scope, Preset, Screen, Aux) {
+.controller('PresetsCtrl', function($scope, State, Preset) {
+    $scope.state = State;
+
+    // TODO: from URL params
     $scope.collapseGroups = { };
 
-    $scope.screens = Screen.query();
-    $scope.auxes = Aux.query();
-    
     // group
     $scope.presets = Preset.all(function (presets) {
         var groups = { };
