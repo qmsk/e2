@@ -211,7 +211,7 @@ func (nixie *Nixie) listenKvm() {
 	defer close(nixie.kvmChan)
 
 	if client, err := nixie.options.KvmOptions.Client(); err != nil {
-		return err
+		return
 	} else {
 		for {
 			if dcpDevice, err := client.Read(); err != nil {
