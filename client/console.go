@@ -34,7 +34,7 @@ func (value ConsoleButtonType) MarshalJSON() ([]byte, error) {
 }
 
 type ConsoleButton struct {
-	ID                     int		`xml:"id,attr"`
+	ID                     int		`xml:"id,attr" json:"id"`
 	ConsoleButtonType      ConsoleButtonType
 	ConsoleButtonTypeIndex int
 }
