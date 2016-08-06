@@ -1,6 +1,15 @@
 <div id="presets">
     <div id="tools">
-        <button name="take" id="take" type="submit" ng-click="take()">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default" ng-click="selectGrouping('sno')" ng-class="{'btn-primary': groupBy == 'sno'}">
+                X.Y
+            </button>
+            <button type="button" class="btn btn-default" ng-click="selectGrouping('console')" ng-class="{'btn-primary': groupBy == 'console'}">
+                PG
+            </button>
+        </div>
+
+        <button class="tool" name="take" id="take" type="submit" ng-click="take()">
             Take
         </button>
     <!--
@@ -8,6 +17,7 @@
             Auto Trans
         </button>
     -->
+
     </div>
 
     <div class="group" ng-repeat="group in groups | orderBy:'id'">
@@ -16,11 +26,11 @@
                 <span class="glyphicon" ng-class="collapseGroups[group.id] ? 'glyphicon-plus' : 'glyphicon-minus'"></span>
             </button>
 
-            <h3>{{group.id}}</h3>
+            <h3>&nbsp; {{group.name}}</h3>
         </div>
 
         <div ng-show="!collapseGroups[group.id]">
-            <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'"
+            <button type="button" class="preset" ng-repeat="preset in group.presets | orderBy:'groupIndex' track by preset.groupIndex"
                                                  id="preset-{{preset.id}}"
                                                  ng-class="{'active': preset.id == activePresetID, 'preview': preset.id == previewPreset.id, 'program': preset.id == programPreset.id, 'other': preset.id != previewPreset.id && preset.id != programPreset.id  }"
                                                  ng-click="select(preset)"

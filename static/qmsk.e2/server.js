@@ -201,31 +201,102 @@ angular.module('qmsk.e2', [
     $scope.state = State;
 })
 
-.controller('PresetsCtrl', function($scope, State, Preset) {
+.controller('PresetsCtrl', function($scope, State, Preset, $location) {
     $scope.state = State;
 
     // TODO: from URL params
     $scope.collapseGroups = { };
 
-    // group
-    $scope.presets = Preset.all(function (presets) {
+    // grouping
+    $scope.groupBy = $location.search().groupBy || 'sno';
+
+    $scope.selectGrouping = function(groupBy) {
+        $scope.groupBy = groupBy;
+        $location.search('groupBy', groupBy);
+    };
+
+    function groupBySno(presets) {
         var groups = { };
 
         $.each(presets, function(id, preset) {
+            var groupID = preset.group; // from sno=X.Y
+            
+            preset.groupIndex = preset.index;
 
             // group it
-            var group = groups[preset.group];
+            var group = groups[groupID];
 
             if (!group) {
-                group = groups[preset.group] = [];
+                group = groups[groupID] = {
+                    id: groupID,
+                    name: groupID,
+                    presets: []
+                };
             }
 
-            group.push(preset);
+            group.presets.push(preset);
         });
 
-        $scope.groups = $.map(groups, function(presets, id){
-            return {id: id, presets: presets};
+        return $.map(groups, function(group, id){
+            return group;
         });
+    };
+    function groupByConsole(presets) {
+        var groups = { };
+        var presetsByID = { };
+
+        $.each(presets, function(presetID, preset){
+            presetsByID[preset.id] = preset;
+        });
+
+        $.each(State.System.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl, function(buttonID, button) {
+            var groupID = Math.floor(button.id / 12); // rows of 12 keys
+            var group = groups[groupID];
+            var preset = presetsByID[button.ConsoleButtonTypeIndex];
+
+            if (button.ConsoleButtonType != 'preset' || !preset) {
+                return;
+            }
+            
+            // copy with groupIndex, since the same preset can be included multiple times
+            preset = $.extend({ groupIndex: button.id }, preset);
+
+            if (!group) {
+                group = groups[groupID] = {
+                    id: groupID,
+                    name: "Preset PG" + (groupID+1),
+                    presets: []
+                };
+            }
+
+            group.presets.push(preset);
+
+        });
+
+        return $.map(groups, function(group) {
+            return group;
+        });
+    }
+
+    $scope.presets = [];
+    $scope.groups = [];
+        
+    Preset.all(function(presets){
+        $scope.presets = presets;
+    });
+    
+    $scope.$watchGroup(['groupBy', 'presets'], function() {
+        var groups;
+
+        if ($scope.groupBy == 'sno') {
+            groups = groupBySno($scope.presets);
+        } else if ($scope.groupBy == 'console') {
+            groups = groupByConsole($scope.presets);
+        } else {
+            groups = [{id:0, name:"", presets:$scope.presets}];
+        }
+
+        $scope.groups = groups;
     });
 
     // active preset on server; reset while changing...

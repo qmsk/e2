@@ -74,7 +74,7 @@
     z-index: 1000;
 }
 
-#tools button {
+#tools button.tool {
     width: 120px;
     height: 120px;
 
@@ -112,7 +112,7 @@
         width: 20%;
     }
 
-    #tools button {
+    #tools button.tool {
         width: 100%;
         display: block;
         margin: 1em auto;
@@ -126,7 +126,7 @@
         height: 150px;
     }
 
-    #tools button {
+    #tools button.tool {
         display: inline;
         float: left;
         margin: 0.2em 0.5em;
