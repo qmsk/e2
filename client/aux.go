@@ -6,18 +6,17 @@ import (
 )
 
 type AuxDest struct {
-	ID   int    `json:"id" xml:"id,attr"`
-	Name string `json:"name" xml:"Name"`
+	ID   int  `xml:"id,attr"`
+	Name string
 
-	AuxStreamMode   int `xml:"AuxStreamMode"`
-	IsActive        int `xml:"IsActive"`
-	PvwLastSrcIndex int `xml:"PvwLastSrcIndex"`
-	PgmLastSrcIndex int `xml:"PgmLastSrcIndex"`
+	AuxStreamMode   int
+	IsActive        int
+	PvwLastSrcIndex int
+	PgmLastSrcIndex int
 
-	Transition *Transition `xml:"Transition"`
-
-	// XXX: there are two different sources, id=0 and id=1
-	Source *Source `xml:"Source"`
+	// XXX: XML Collections
+	Transition *Transition
+	Source *Source
 }
 
 type AuxDestCol map[int]AuxDest
