@@ -9,6 +9,7 @@ type Options struct {
 	JSONPort string        `long:"e2-jsonrpc-port" value-name:"PORT" default:"9999"`
 	XMLPort  string        `long:"e2-xml-port" value-name:"PORT" default:"9876"`
 	Timeout  time.Duration `long:"e2-timeout" default:"10s"`
+	Safe	 bool          `long:"e2-safe" description:"Safe mode, do not allow modifications"`
 
 	ReadKeepalive bool // return keepalive updates from XMLClient.Read()
 }

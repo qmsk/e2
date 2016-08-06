@@ -19,7 +19,7 @@ func (server *Server) Index(name string) (web.Resource, error) {
 
 	case "status":
 		status := Status{
-			options: server.options,
+			clientOptions: server.clientOptions,
 		}
 
 		return &status, nil
