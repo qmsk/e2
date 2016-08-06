@@ -20,6 +20,14 @@ func (err Error) Error() string {
 	}
 }
 
+func RequestError(err error) Error {
+	return Error{400, err}
+}
+
+func DecodeRequest(request *http.Request, value interface{}) error {
+	return json.NewDecoder(request.Body).Decode(value)
+}
+
 type Resource interface{}
 
 // Resource that supports sub-Resources
@@ -32,6 +40,11 @@ type GetResource interface {
 	// Perform any independent post-processing + JSON encoding in the request handler goroutine.
 	// Must be goroutine-safe!
 	Get() (interface{}, error)
+}
+
+// apiResource that supports POST
+type PostResource interface {
+	Post(request *http.Request) (interface{}, error)
 }
 
 type API struct {
@@ -75,6 +88,21 @@ func (api API) handle(w http.ResponseWriter, r *http.Request) error {
 		if getResource, ok := resource.(GetResource); !ok {
 			return Error{http.StatusMethodNotAllowed, nil}
 		} else if ret, err := getResource.Get(); err != nil {
+			return err
+		} else if ret == nil {
+			return Error{http.StatusNotFound, nil}
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+
+			json.NewEncoder(w).Encode(ret)
+
+			return nil
+		}
+
+	case "POST":
+		if postResource, ok := resource.(PostResource); !ok {
+			return Error{http.StatusMethodNotAllowed, nil}
+		} else if ret, err := postResource.Post(r); err != nil {
 			return err
 		} else if ret == nil {
 			return Error{http.StatusNotFound, nil}
