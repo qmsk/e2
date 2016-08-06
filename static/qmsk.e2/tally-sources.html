@@ -1,5 +1,5 @@
-<div class="container" id="tally">
-    <div class="source tally-source" ng-repeat="source in sources | orderBy: 'Source'"
+<div class="container" id="tally-sources">
+    <div class="source tally-source" ng-repeat="source in tally.Sources | orderBy: 'Source'"
                                      ng-class="{'inactive': !source.Connected}"
     >
         <h1>{{source.Source}}</h1>

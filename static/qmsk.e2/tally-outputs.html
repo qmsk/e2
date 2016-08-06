@@ -1,0 +1,27 @@
+<div class="container" id="tally-outputs">
+    <div class="row outputs">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Output</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="output in tally.Outputs | orderBy: ['Source','Name']">
+                    <td>
+                        <div class="source">
+                            {{output.Source}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="screen">
+                            <span>{{output.Name}}</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

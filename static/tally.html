@@ -32,7 +32,7 @@
         <script src="/static/qmsk.e2/web.js"></script>
     </head>
 
-    <body>
+    <body ng-controller="StateCtrl">
         <div id="header" class="navbar" ng-controller="HeaderCtrl">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -43,10 +43,28 @@
 
                 <ul class="nav navbar-nav">
                     <li ng-class="{'active': isActive('/sources')}">
-                        <a href="#/sources">Sources</a>
+                        <a href="#/sources">
+                            Sources
+                            <span class="badge">{{tally.Sources.length}}</span>
+                        </a>
                     </li>
                     <li ng-class="{'active': isActive('/tally')}">
-                        <a href="#/tally">Tally</a>
+                        <a href="#/tally">
+                            Tally
+                            <span class="badge">{{tally.Tally.length}}</span>
+                        </a>
+                    </li>
+                    <li ng-class="{'active': isActive('/inputs')}">
+                        <a href="#/inputs">
+                            Inputs
+                            <span class="badge">{{tally.Inputs.length}}</span>
+                        </a>
+                    </li>
+                    <li ng-class="{'active': isActive('/outputs')}">
+                        <a href="#/outputs">
+                            Outputs
+                            <span class="badge">{{tally.Outputs.length}}</span>
+                        </a>
                     </li>
                 </ul>
 

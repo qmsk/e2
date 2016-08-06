@@ -1,0 +1,36 @@
+<div class="container" id="tally-inputs">
+    <div class="row inputs">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Tally ID</th>
+                    <th>Source</th>
+                    <th>Input</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="input in tally.Inputs | orderBy: ['Source','Name']">
+                    <td>
+                        <div class="preset">
+                            {{input.ID}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="source">
+                            {{input.Source}}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="source">
+                            <span class="pull-left label label-success" ng-if="input.Status == 'ok'"><span class="glyphicon glyphicon-ok" title="OK"></span></span>
+                            <span class="pull-left label label-danger" ng-if="input.Status == 'bad'"><span class="glyphicon glyphicon-warning-sign" title="Bad"></span></span>
+
+                            <span>{{input.Name}}</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
