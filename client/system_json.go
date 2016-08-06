@@ -25,3 +25,19 @@ func marshalJSONMap(colMap interface{}) ([]byte, error) {
 
 	return json.Marshal(jsonMap)
 }
+
+func marshalJSONString(value interface{}) ([]byte, error) {
+	valueString := fmt.Sprintf("%v", value)
+
+	return json.Marshal(valueString)
+}
+
+func marshalJSONInteger(value interface{}) ([]byte, error) {
+	valueString := fmt.Sprintf("%d", value)
+
+	return json.Marshal(valueString)
+}
+
+func marshalJSONNull() ([]byte, error) {
+	return json.Marshal(nil)
+}

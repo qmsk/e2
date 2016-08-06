@@ -22,6 +22,14 @@ func (vs InputVideoStatus) String() string {
 	}
 }
 
+func (value InputVideoStatus) MarshalJSON() ([]byte, error) {
+	if value == 0 {
+		return marshalJSONNull()
+	} else {
+		return marshalJSONString(value)
+	}
+}
+
 type InputCfg struct {
 	ID int `json:"id" xml:"id,attr"`
 

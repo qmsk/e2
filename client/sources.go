@@ -25,6 +25,10 @@ func (sourceType SourceType) String() string {
 	}
 }
 
+func (value SourceType) MarshalJSON() ([]byte, error) {
+	return marshalJSONString(value)
+}
+
 type Source struct {
 	ID int `json:"id" xml:"id,attr"`
 
