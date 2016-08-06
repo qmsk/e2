@@ -6,6 +6,7 @@ angular.module('qmsk.e2', [
         'ngWebSocket',
         'luegg.directives',
         'jsonFormatter',
+        'ui.bootstrap',
 ])
 
 .config(function($routeProvider) {
@@ -30,6 +31,7 @@ angular.module('qmsk.e2', [
         .when('/presets', {
             templateUrl: '/static/qmsk.e2/server/presets.html',
             controller: 'PresetsCtrl',
+            reloadOnSearch: false,
         })
         .when('/system', {
             templateUrl: '/static/qmsk.e2/server/system.html',
@@ -204,8 +206,15 @@ angular.module('qmsk.e2', [
 .controller('PresetsCtrl', function($scope, State, Preset, $location) {
     $scope.state = State;
 
+    // size
+    $scope.displaySize = $location.search().size || 'normal';
+
+    $scope.$watch('displaySize', function(displaySize) {
+        $location.search('size', displaySize);
+    });
+
     // collapsing
-    $scope.showGroup = $location.search().group;
+    $scope.showGroup = $location.search().group || null;
     $scope.collapseGroups = {};
 
     $scope.selectGroup = function(groupID) {
@@ -223,13 +232,14 @@ angular.module('qmsk.e2', [
 
     // grouping
     $scope.groupBy = $location.search().groupBy || 'sno';
-
-    $scope.selectGrouping = function(groupBy) {
-        $scope.showGroup = null;
-        $scope.groupBy = groupBy;
+    
+    $scope.$watch('groupBy', function(groupBy) {
         $location.search('groupBy', groupBy);
+            
+        $scope.collapseGroups = {};
+        $scope.showGroup = null;
         $location.search('group', null);
-    };
+    });
 
     function groupBySno(presets) {
         var groups = { };
@@ -237,7 +247,7 @@ angular.module('qmsk.e2', [
         $.each(presets, function(id, preset) {
             var groupID = preset.group; // from sno=X.Y
             
-            preset.groupIndex = preset.index;
+            preset = $.extend({groupIndex: preset.index}, preset);
 
             // group it
             var group = groups[groupID];
@@ -309,14 +319,13 @@ angular.module('qmsk.e2', [
         } else if ($scope.groupBy == 'console') {
             groups = groupByConsole($scope.presets);
         } else {
-            $.each($scope.presets, function(presetID, preset){
-                preset.groupIndex = preset.id;
-            });
 
             groups = [{
                 id: 0,
                 name: "",
-                presets: $scope.presets
+                presets: $.map($scope.presets, function(preset){
+                    return $.extend({groupIndex: preset.id}, preset);
+                }),
             }];
         }
 
@@ -345,13 +354,13 @@ angular.module('qmsk.e2', [
     
     // take preset for program
     $scope.programPreset = null;
-    $scope.take = function() {
-        var preset;
+    $scope.take = function(preset) {
+        if (preset) {
 
-        if (!$scope.previewPreset) {
-            return
-        } else {
+        } else if ($scope.previewPreset) {
             preset = $scope.previewPreset;
+        } else {
+            return;
         }
 
         $scope.activePresetID = null;

@@ -1,15 +1,15 @@
-<div id="presets">
+<div id="presets" ng-class="{'display-small': displaySize == 'small', 'display-large': displaySize == 'large'}">
     <div id="tools">
         <div class="btn-group">
-            <button type="button" class="btn btn-default" ng-click="selectGrouping('all')" ng-class="{'btn-primary': groupBy == 'all'}">
-                All
-            </button>
-            <button type="button" class="btn btn-default" ng-click="selectGrouping('sno')" ng-class="{'btn-primary': groupBy == 'sno'}">
-                X.Y
-            </button>
-            <button type="button" class="btn btn-default" ng-click="selectGrouping('console')" ng-class="{'btn-primary': groupBy == 'console'}">
-                Console
-            </button>
+            <label type="button" class="btn btn-default" ng-model="groupBy" uib-btn-radio="'all'">All</label>
+            <label type="button" class="btn btn-default" ng-model="groupBy" uib-btn-radio="'sno'">X.Y</label>
+            <label type="button" class="btn btn-default" ng-model="groupBy" uib-btn-radio="'console'">PG</label>
+        </div>
+
+        <div class="btn-group">
+            <label type="button" class="btn btn-default" ng-model="displaySize" uib-btn-radio="'small'">Small</label>
+            <label type="button" class="btn btn-default" ng-model="displaySize" uib-btn-radio="'normal'">Normal</label>
+            <label type="button" class="btn btn-default" ng-model="displaySize" uib-btn-radio="'large'">Large</label>
         </div>
 
         <button class="tool" name="take" id="take" type="submit" ng-click="take()">
