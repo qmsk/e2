@@ -140,6 +140,8 @@ The Web UI also includes a list of discovered sources and their status, includin
 
 ## GPIO
 
+![Tally GPIO](/docs/tally-gpio.jpg?raw=true)
+
 Support for Linux RaspberryPI GPIO output using `/sys/class/gpio`. Use the `--gpio` options to configure:
 
       --gpio-green-pin=GPIO-PIN           GPIO pin for green status LED
