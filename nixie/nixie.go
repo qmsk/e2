@@ -202,7 +202,9 @@ func (nixie *Nixie) run() {
 	}
 }
 
-func (nixie *Nixie) listenKvm() error {
+func (nixie *Nixie) listenKvm() {
+	defer close(nixie.kvmChan)
+
 	if client, err := nixie.options.KvmOptions.Client(); err != nil {
 		return err
 	} else {
