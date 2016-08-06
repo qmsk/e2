@@ -10,23 +10,23 @@ angular.module('qmsk.e2.tally', [
 .config(function($routeProvider) {
     $routeProvider
         .when('/sources', {
-            templateUrl: '/static/qmsk.e2/tally-sources.html',
+            templateUrl: '/static/qmsk.e2/tally/sources.html',
             controller: 'SourcesCtrl',
             reloadOnSearch: false,
         })
 
         .when('/tally', {
-            templateUrl: '/static/qmsk.e2/tally.html',
+            templateUrl: '/static/qmsk.e2/tally/tally.html',
             controller: 'TallyCtrl',
             reloadOnSearch: false,
         })
         .when('/inputs', {
-            templateUrl: '/static/qmsk.e2/tally-inputs.html',
+            templateUrl: '/static/qmsk.e2/tally/inputs.html',
             controller: 'InputsCtrl',
             reloadOnSearch: false,
         })
         .when('/outputs', {
-            templateUrl: '/static/qmsk.e2/tally-outputs.html',
+            templateUrl: '/static/qmsk.e2/tally/outputs.html',
             controller: 'OutputsCtrl',
             reloadOnSearch: false,
         })
