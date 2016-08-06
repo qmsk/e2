@@ -1,0 +1,16 @@
+<System id="0">
+  <GuiId></GuiId>
+  <ConsoleLayoutMgr id="0">
+    <ConsoleLayout id="0">
+      <PresetBusColl id="0">
+        <Remove id="0">
+          <ConsoleButton id="12">
+            <ConsoleButtonType Min="0" Max="8">7</ConsoleButtonType>
+            <ConsoleButtonTypeIndex Min="0" Max="2147483647">0</ConsoleButtonTypeIndex>
+          </ConsoleButton>
+        </Remove>
+      </PresetBusColl>
+    </ConsoleLayout>
+  </ConsoleLayoutMgr>
+</System>
+
