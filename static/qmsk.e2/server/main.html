@@ -19,13 +19,18 @@
         <tbody>
             <tr ng-repeat="source in sources | orderBy:orderBy">
                 <td>
-                    <div class="source" ng-class="{'preview': source.preview_screens, 'program': source.program_screens}" e2-source source="source" detail="false"></div>
+                    <div class="source"
+                         ng-class="{'preview': source.preview.length > 0, 'program': source.program.length > 0, 'active': source.active}"
+                         e2-source source="source.source" input="source.input" detail="false"
+                    ></div>
                 </td>
                 <td>
-                    <div ng-repeat="screen_id in source.preview_screens" class="screen preview">{{screens[screen_id].name}}</div>
+                    <div ng-repeat="output in source.preview" class="screen preview"
+                                                              ng-class="{'active': output.active}">
+                        {{output.name}}</div>
                 </td>
                 <td>
-                    <div ng-repeat="screen_id in source.program_screens" class="screen program">{{screens[screen_id].name}}</div>
+                    <div ng-repeat="output in source.program" class="screen program">{{output.name}}</div>
                 </td>
             </tr>
         </tbody>

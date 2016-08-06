@@ -1,5 +1,9 @@
 <div id="sources">
     <ul class="list-group">
-        <li class="source list-group-item" ng-repeat="source in sources" e2-source source="source" detail="true"></li>
+        <li class="source list-group-item"
+            ng-repeat="source in state.System.SrcMgr.SourceCol"
+            e2-source source="source" input="state.System.SrcMgr.InputCfgCol[source.InputCfgIndex]" detail="true"
+        >
+        </li>
     </ul>
 </div>

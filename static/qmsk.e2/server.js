@@ -53,38 +53,16 @@ angular.module('qmsk.e2', [
     return Status;
 })
 
-.factory('Index', function($http) {
-    return function() {
-        return $http.get('/api/').then(
-            function success(r) {
-                return r.data;
-            }
-        );
+.factory('State', function($rootScope, Events) {
+    var State = {
+        System: Events.state.System,
     };
-})
 
-.factory('Screen', function($resource) {
-    return $resource('/api/screens/:id', { }, {
-        get: {
-            method: 'GET',
-        },
-        query: {
-            method: 'GET',
-            isArray: false,
-        }
-    }, {stripTrailingSlashes: true});
-})
+    $rootScope.$on('qmsk.e2.event', function($e, event){
+        State.System = Events.state.System;
+    });
 
-.factory('Aux', function($resource) {
-    return $resource('/api/auxes/:id', { }, {
-        get: {
-            method: 'GET',
-        },
-        query: {
-            method: 'GET',
-            isArray: false,
-        }
-    }, {stripTrailingSlashes: true});
+    return State;
 })
 
 .factory('Preset', function($resource) {
@@ -128,39 +106,62 @@ angular.module('qmsk.e2', [
     $scope.events = Events;
 })
 
-.controller('SystemCtrl', function($scope, Events) {
-    $scope.events = Events;
+.controller('SystemCtrl', function($scope, State) {
+    $scope.state = State;
 })
 
-.controller('MainCtrl', function($scope, $location, Index, $interval) {
-    $scope.busy = false;
-    $scope.error = null;
+.controller('MainCtrl', function($scope, $location, State) {
+    $scope.state = State;
+    $scope.sources = [];
 
-    $scope.reload = function() {
-        if ($scope.busy) {
-            return;
-        } else {
-            $scope.busy = true;
-        }
+    $scope.$watch('state.System', function(system) {
+        $scope.sources = $.map(system.SrcMgr.SourceCol, function(source, sourceID){
+            var item = {
+                id: sourceID,
+                type: source.SrcType,
+                name: source.Name,
+                source: source,
+                active: false,
+                preview: [],
+                program: [],
+            };
 
-        Index().then(
-            function success(index) {
-                $scope.busy = false;
-                $scope.error = null;
-
-                $scope.screens = index.screens
-                $scope.sources = $.map(index.sources, function(source, id){
-                    return source;
-                });
-            },
-            function error(err) {
-                console.log("MainCtrl: Index Error: " + err);
-
-                $scope.busy = false;
-                $scope.error = err;
+            if (source.SrcType == "input") {
+                item.input = system.SrcMgr.InputCfgCol[source.InputCfgIndex];
             }
-        );
-    };
+
+            $.each(system.DestMgr.ScreenDestCol, function(screenID, screen) {
+                var output = {
+                    type: "screen",
+                    id: screenID,
+                    name: screen.Name,
+                    active: screen.IsActive > 0,
+                };
+
+                $.each(screen.LayerCollection, function(layerID, layer) {
+                    if (layer.PgmMode > 0 && layer.LastSrcIdx == sourceID) {
+                        output.program = true;
+                    }
+
+                    if (layer.PvwMode > 0 && layer.LastSrcIdx == sourceID) {
+                        output.preview = true;
+                    }
+                });
+
+                if (output.program) {
+                    item.program.push(output);
+                }
+                if (output.preview) {
+                    item.preview.push(output);
+                }
+                if (output.active && output.preview) {
+                    item.active = true;
+                }
+            });
+
+            return item;
+        });
+    });
 
     $scope.selectOrder = function(order) {
         $scope.order = order;
@@ -180,25 +181,18 @@ angular.module('qmsk.e2', [
         $location.search('order', order || null);
     };
     $scope.selectOrder($location.search().order || 'source');
-
-    $scope.reload();
-
-    $scope.$on('qmsk.e2.event', function($e, event){
-        // dumb :)
-        $scope.reload();
-    });
 })
 
-.controller('SourcesCtrl', function($scope, Source) {
-    $scope.sources = Source.query();
+.controller('SourcesCtrl', function($scope, State) {
+    $scope.state = State;
 })
 
-.controller('ScreensCtrl', function($scope, Screen) {
-    $scope.screens = Screen.query();
+.controller('ScreensCtrl', function($scope, State) {
+    $scope.state = State;
 })
 
-.controller('AuxesCtrl', function($scope, Aux) {
-    $scope.auxes = Aux.query();
+.controller('AuxesCtrl', function($scope, State) {
+    $scope.state = State;
 })
 
 .controller('PresetsCtrl', function($scope, Preset, Screen, Aux) {

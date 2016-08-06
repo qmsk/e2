@@ -14,13 +14,8 @@ func (server *Server) WebAPI() web.API {
 
 func (server *Server) Index(name string) (web.Resource, error) {
 	switch name {
-	case "system":
-		return server, nil
-
 	case "":
-		index := Index{}
-
-		return &index, index.load(server.client)
+		return server, nil
 
 	case "status":
 		status := Status{
@@ -28,23 +23,6 @@ func (server *Server) Index(name string) (web.Resource, error) {
 		}
 
 		return &status, nil
-
-	case "sources":
-		sources := Sources{}
-
-		return &sources, sources.load(server.client)
-
-	case "screens":
-		screens := Screens{
-			client: server.client,
-		}
-
-		return &screens, screens.load(server.client)
-
-	case "auxes":
-		auxes := Auxes{}
-
-		return &auxes, auxes.load(server.client)
 
 	case "presets":
 		presets := Presets{

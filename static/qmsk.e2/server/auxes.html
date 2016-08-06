@@ -1,7 +1,10 @@
 <div id="auxes">
     <ul class="list-group">
-        <li class="aux list-group-item" ng-repeat="aux in auxes">
-            {{aux.name}}
+        <li class="aux list-group-item"
+            ng-repeat="aux in state.System.DestMgr.AuxDestCol"
+            ng-class="{'active': aux.IsActive > 0}"
+        >
+            {{aux.Name}}
         </li>
     </ul>
 </div>

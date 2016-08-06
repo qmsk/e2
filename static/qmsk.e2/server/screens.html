@@ -1,9 +1,12 @@
 <div id="screens">
     <ul class="list-group">
-        <li class="screen list-group-item" ng-repeat="screen in screens">
-            <span class="label label-info pull-right resolution">{{screen.dimensions|dimensions}}</span>
+        <li class="screen list-group-item"
+            ng-repeat="screen in state.System.DestMgr.ScreenDestCol"
+            ng-class="{'active': screen.IsActive > 0}"
+        >
+            <span class="label label-info pull-right resolution">{{{width:screen.HSize,height:screen.VSize}|dimensions}}</span>
 
-            {{screen.name}}
+            {{screen.Name}}
         </li>
     </ul>
 </div>
