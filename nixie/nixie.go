@@ -170,7 +170,12 @@ func (nixie *Nixie) run() {
 	log.Printf("Entering message loop")
 	for {
 		select {
-		case nixie.kvmConsole = <-nixie.kvmChan:
+		case console, open := <-nixie.kvmChan:
+			if !open {
+				log.Printf("KVM channel closed")
+				return
+			}
+			nixie.kvmConsole = console
 			log.Printf("KVM console: %d", nixie.kvmConsole)
 		case state, open := <-nixie.tallyChan:
 			if !open {
