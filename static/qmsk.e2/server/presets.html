@@ -22,7 +22,7 @@
         <div ng-show="!collapseGroups[group.id]">
             <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'"
                                                  id="preset-{{preset.id}}"
-                                                 ng-class="{'active': preset.id == activePresetID, 'preview': preset.id == previewPreset.id, 'program': preset.id == programPreset.id }"
+                                                 ng-class="{'active': preset.id == activePresetID, 'preview': preset.id == previewPreset.id, 'program': preset.id == programPreset.id, 'other': preset.id != previewPreset.id && preset.id != programPreset.id  }"
                                                  ng-click="select(preset)"
              >
                 {{preset.Name}}

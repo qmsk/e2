@@ -38,6 +38,10 @@
     border-style: solid;
 }
 
+#presets .preset.other.active {
+    border: 4px solid #eee;
+}
+
 #presets button.empty {
     background-color: #aaa;
     
