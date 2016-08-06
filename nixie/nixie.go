@@ -172,7 +172,11 @@ func (nixie *Nixie) run() {
 		select {
 		case nixie.kvmConsole = <-nixie.kvmChan:
 			log.Printf("KVM console: %d", nixie.kvmConsole)
-		case state := <-nixie.tallyChan:
+		case state, open := <-nixie.tallyChan:
+			if !open {
+				log.Printf("Tally channel closed")
+				return
+			}
 			nixie.updateTally(state)
 		case _ = <-nixie.closeChan:
 			log.Printf("Nixie: Done")
