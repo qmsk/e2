@@ -12,7 +12,7 @@ type BGColor struct {
 	Blue  int `json:"Blue" xml:"Blue"`
 }
 
-type BGLayer struct {
+type BGLyr struct {
 	ID   int    `json:"id" xml:"id,attr"`
 	Name string `xml:"name"` // XXX: useful?
 

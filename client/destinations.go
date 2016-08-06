@@ -72,7 +72,7 @@ type ListContent struct {
 	Name string `json:"Name"`
 
 	Layers   []*Layer  `json:"Layers"`
-	BGLayers []BGLayer `json:"BgLyr"`
+	BGLayers []BGLyr   `json:"BgLyr"`
 
 	// Transition
 }
