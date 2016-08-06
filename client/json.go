@@ -244,6 +244,38 @@ func (client *JSONClient) ListDestinationsForPreset(presetID int) (result Preset
 	}
 }
 
+type activatePreset struct {
+	ID		int	`json:"id"`
+	Type	int	`json:"type"`
+}
+
+func (client *JSONClient) activatePreset(id int, recallType int) error {
+	if id < 0 {
+		return fmt.Errorf("Invalid Preset ID: %v", id)
+	}
+
+	request := Request{
+		Method: "activatePreset",
+		Params: activatePreset{
+			ID: id,
+			Type: recallType,
+		},
+	}
+
+	if err := client.requestUnsafe(&request, nil); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (client *JSONClient) ActivatePresetPreview(id int) error {
+	return client.activatePreset(id, 0)
+}
+func (client *JSONClient) ActivatePresetProgram(id int) error {
+	return client.activatePreset(id, 1)
+}
+
 // Destinations
 type listDestinations struct {
 	Type int `json:"type"`
