@@ -323,3 +323,25 @@ func TestStacked(t *testing.T) {
 		}
 	}
 }
+
+func TestConsoleLayout(t *testing.T) {
+	system := testXMLClientRead(testXML{
+		fileGlob: "./test-xml/test-console_*.xml",
+	})
+
+	if len(system.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl) != 4 {
+		t.Errorf("Incorrect number of console preset buttons: %d", len(system.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl))
+	}
+
+	if preset12, exists := system.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl[12]; !exists {
+		t.Errorf("Missing Preset button 12")
+	} else {
+		if preset12.ConsoleButtonType.String() != "preset" {
+			t.Errorf("Incorrcet Preset button 12 type: %v", preset12.ConsoleButtonType)
+		}
+
+		if preset12.ConsoleButtonTypeIndex != 3 {
+			t.Errorf("Incorrect Preset button 12 index: %v", preset12.ConsoleButtonTypeIndex)
+		}
+	}
+}

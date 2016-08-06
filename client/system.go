@@ -12,10 +12,11 @@ type System struct {
 	Version   string
 	Name      string
 
-	SrcMgr          SrcMgr    `xml:"SrcMgr"`
-	DestMgr         DestMgr   `xml:"DestMgr"`
-	PresetMgr       PresetMgr `xml:"PresetMgr"`
-	FrameCollection FrameCollection
+	SrcMgr           SrcMgr
+	DestMgr          DestMgr
+	PresetMgr        PresetMgr
+	FrameCollection  FrameCollection
+	ConsoleLayoutMgr ConsoleLayoutMgr
 }
 
 func (system *System) Reset() {
