@@ -1,5 +1,5 @@
 # qmsk-e2
-E2 Client, Tally system, (partial) WebUI
+E2 Client, Tally system, (partial) Web UI
 
 ## Supported Devices
 
@@ -11,7 +11,7 @@ This implementation has been tested with the following device software versions:
 This implementation supports the following device APIs:
 
 * TCP port 9876 XML (read-only, live streaming)
-* TCP port 9999 JSON-RPC port (read-only for now, includes preset destinations)
+* TCP port 9999 JSON-RPC (read-only for now, includes preset destinations)
 * UDP port 40961 discovery
 
 ## Tally
@@ -235,7 +235,9 @@ The tally program will exit and drive the SPI LEDs off on SIGINT. If the tally p
 Use the included `cmd/tally/spiled-down.sh <count>` script to force the SPI LEDs off.
 
 ## Server (Web UI)
-    
+
+Under development.
+
 ### System
 Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
 
@@ -523,27 +525,28 @@ Useful for testing the client library:
 
 ### Usage:
 
-    client [OPTIONS] <command>
+	  client [OPTIONS] <command>
 
-    E2 JSON-RPC:
-          --e2-address=HOST
-          --e2-jsonrpc-port=PORT
-          --e2-xml-port=PORT
-          --e2-timeout=
+	E2 JSON-RPC:
+		  --e2-address=HOST
+		  --e2-jsonrpc-port=PORT
+		  --e2-xml-port=PORT
+		  --e2-timeout=
 
-    Help Options:
-      -h, --help                    Show this help message
+	Help Options:
+	  -h, --help                    Show this help message
 
-    Available commands:
-      aux-list           List Aux destinations
-      discover           Discover available E2 systems
-      list-destinations  List destinations
-      listen             Listen XML packets
-      preset-list        List presets
-      preset-show        Show preset destinations
-      screen-list        List Screen destinations
-      screen-show        Show screen content
-      source-list        List sources
+	Available commands:
+	  aux-list           List Aux destinations
+	  config-dump        Dump XML config
+	  discover           Discover available E2 systems
+	  list-destinations  List destinations
+	  listen             Listen XML packets
+	  preset-list        List presets
+	  preset-show        Show preset destinations
+	  screen-list        List Screen destinations
+	  screen-show        Show screen content
+	  source-list        List sources
 
 ## Legacy
 
