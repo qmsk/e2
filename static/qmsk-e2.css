@@ -145,14 +145,6 @@ table.table tbody tr {
     font-size: inherit;
 }
 
-.preset .dest {
-    color: #444;
-}
-
-.preset.active {
-    border: 4px solid #888;
-}
-
 .inactive {
     background-color: #aaa;
     

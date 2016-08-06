@@ -38,14 +38,22 @@ func (presets *Presets) Get() (interface{}, error) {
 }
 
 func (presets *Presets) Post(request *http.Request) (interface{}, error) {
-	var params struct { ID int `json:"id"` }
+	var params struct {
+		ID   int  `json:"id"`
+		Live bool `json:"live"`
+	}
 
 	if err := web.DecodeRequest(request, &params); err != nil {
 		return nil, err
 	}
 
-	if preset, exists := presets.system.PresetMgr.Preset[params.ID]; !exists {
+	preset, exists := presets.system.PresetMgr.Preset[params.ID]
+	if !exists {
 		return nil, nil // 404
+	}
+
+	if params.Live {
+		return Preset{Preset: preset}.take(presets.jsonClient)
 	} else {
 		return Preset{Preset: preset}.activate(presets.jsonClient)
 	}
@@ -99,6 +107,14 @@ func (preset Preset) Get() (interface{}, error) {
 func (preset Preset) activate(jsonClient *client.JSONClient) (interface{}, error) {
 	if err := jsonClient.ActivatePresetPreview(preset.ID); err != nil {
 		return nil, fmt.Errorf("ActivatePresetPreview %d: %v", preset.ID, err)
+	}
+
+	return preset, nil
+}
+
+func (preset Preset) take(jsonClient *client.JSONClient) (interface{}, error) {
+	if err := jsonClient.ActivatePresetProgram(preset.ID); err != nil {
+		return nil, fmt.Errorf("ActivatePresetProgram %d: %v", preset.ID, err)
 	}
 
 	return preset, nil

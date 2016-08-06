@@ -228,20 +228,33 @@ angular.module('qmsk.e2', [
         });
     });
 
-    $scope.busy = false;
+    $scope.activePreset = null;
+    $scope.takePreset = null;
     $scope.activatePreset = function(preset) {
-        if ($scope.busy) {
-            return;
-        } else {
-            $scope.busy = true;
-        }
-
         Preset.activate({id: preset.id},
             function success(r) {
-                $scope.busy = false;
+                $scope.activePreset = preset;
             },
             function error(e) {
-                $scope.busy = false;
+
+            }
+        );
+    };
+    $scope.take = function() {
+        var preset;
+
+        if (!$scope.activePreset) {
+            return
+        } else {
+            preset = $scope.activePreset;
+        }
+
+        Preset.activate({id: $scope.activePreset.id, live: true},
+            function success(r) {
+                $scope.takePreset = preset;
+            },
+            function error(e) {
+
             }
         );
     };

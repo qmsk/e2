@@ -1,9 +1,9 @@
 <div id="presets">
     <div id="tools">
-    <!--
-        <button name="cut" id="cut" type="submit" ng-click="cut()">
-            Cut
+        <button name="take" id="take" type="submit" ng-click="take()">
+            Take
         </button>
+    <!--
         <button name="autotrans" id="autotrans" ng-click="autotrans()">
             Auto Trans
         </button>
@@ -22,7 +22,7 @@
         <div ng-show="!collapseGroups[group.id]">
             <button type="button" class="preset" ng-repeat="preset in group.presets| orderBy:'index'"
                                                  id="preset-{{preset.id}}"
-                                                 ng-class="{'active': preset.id == state.System.PresetMgr.LastRecall }"
+                                                 ng-class="{'active': preset.id == state.System.PresetMgr.LastRecall, 'preview': preset.id == activePreset.id, 'program': preset.id == takePreset.id }"
                                                  ng-click="activatePreset(preset)"
              >
                 {{preset.Name}}
