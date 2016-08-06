@@ -10,12 +10,15 @@
     background-color: #ccc;
 }
 
-#presets .title h3 {
-    padding: 0.5em 1em;
-    margin: 0;
+#presets .title a {
+    display: block;
+    padding: 0.25em 1em;
+    color: inherit;
+    font-size: 24px;
 }
 
 #presets .title button {
+    display: block;
     margin: 0.25em 0.5em;
     padding: 0.5em; 0.5em;
     border: none;

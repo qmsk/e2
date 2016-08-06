@@ -204,15 +204,31 @@ angular.module('qmsk.e2', [
 .controller('PresetsCtrl', function($scope, State, Preset, $location) {
     $scope.state = State;
 
-    // TODO: from URL params
-    $scope.collapseGroups = { };
+    // collapsing
+    $scope.showGroup = $location.search().group;
+    $scope.collapseGroups = {};
+
+    $scope.selectGroup = function(groupID) {
+        $scope.collapseGroups = {};
+
+        if (groupID != $scope.showGroup) {
+            $scope.showGroup = groupID;
+        
+            $location.search('group', groupID);
+        }
+    }
+    $scope.toggleGroup = function(groupID) {
+        $scope.collapseGroups[groupID] = !$scope.collapseGroups[groupID];
+    };
 
     // grouping
     $scope.groupBy = $location.search().groupBy || 'sno';
 
     $scope.selectGrouping = function(groupBy) {
+        $scope.showGroup = null;
         $scope.groupBy = groupBy;
         $location.search('groupBy', groupBy);
+        $location.search('group', null);
     };
 
     function groupBySno(presets) {
@@ -263,7 +279,7 @@ angular.module('qmsk.e2', [
 
             if (!group) {
                 group = groups[groupID] = {
-                    id: groupID,
+                    id: groupID+1,
                     name: "Preset PG" + (groupID+1),
                     presets: []
                 };
@@ -293,7 +309,15 @@ angular.module('qmsk.e2', [
         } else if ($scope.groupBy == 'console') {
             groups = groupByConsole($scope.presets);
         } else {
-            groups = [{id:0, name:"", presets:$scope.presets}];
+            $.each($scope.presets, function(presetID, preset){
+                preset.groupIndex = preset.id;
+            });
+
+            groups = [{
+                id: 0,
+                name: "",
+                presets: $scope.presets
+            }];
         }
 
         $scope.groups = groups;
