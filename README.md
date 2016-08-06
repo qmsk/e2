@@ -129,7 +129,13 @@ The Web UI also includes a list of discovered sources and their status, includin
 ## GPIO
 
 Support for Linux RaspberryPI GPIO output using `/sys/class/gpio`. Use the `--gpio` options to configure:
-    
+
+      --gpio-green-pin=GPIO-PIN           GPIO pin for green status LED
+      --gpio-red-pin=GPIO-PIN             GPIO pin for red status LED
+      --gpio-tally-pin=GPIO-PIN           Pass each tally pin as a separate option
+      --gpio                              Enable GPIO output
+
+Example:
     $GOPATH/bin/tally ... --gpio --gpio-green-pin=23 --gpio-red-pin=24 --gpio-tally-pin=21 --gpio-tally-pin=20 --gpio-tally-pin=16 --gpio-tally-pin=12 --gpio-tally-pin=26 -gpio-tally-pin=19 --gpio-tally-pin=13 --gpio-tally-pin=6
 
 The `--gpio-green-pin=` and `--gpio-red-pin=` are used for the status of the tally system itself:
@@ -178,22 +184,22 @@ Example systemd service to pre-export the GPIO pins, and drive them low if the t
 
 Support for APA102 RGB LEDs connected to the Linux RaspberryPI SPI bus using `/dev/spidev`. Use the `--spiled` options to configure:
 
-      --spiled-channel=            /dev/spidev0.N
-      --spiled-speed=
-      --spiled-protocol=           Type of LED
-      --spiled-count=              Number of LEDs
-      --spiled-debug               Dump SPI output
-      --spiled-intensity=
-      --spiled-refresh=
-      --spiled-tally-idle=
-      --spiled-tally-preview=
-      --spiled-tally-program=
-      --spiled-tally-both=
-      --spiled-status-idle=
-      --spiled-status-ok=
-      --spiled-status-warn=
-      --spiled-status-error=
-      --spiled                     Enable SPI-LED output
+      --spiled-channel=N                  /dev/spidev0.N
+      --spiled-speed=HZ
+      --spiled-protocol=apa102|apa102x    Type of LED
+      --spiled-count=COUNT                Number of LEDs
+      --spiled-debug                      Dump SPI output
+      --spiled-intensity=0-255
+      --spiled-refresh=HZ
+      --spiled-tally-idle=RRGGBB
+      --spiled-tally-preview=RRGGBB
+      --spiled-tally-program=RRGGBB
+      --spiled-tally-both=RRGGBB
+      --spiled-status-idle=RRGGBB
+      --spiled-status-ok=RRGGBB
+      --spiled-status-warn=RRGGBB
+      --spiled-status-error=RRGGBB
+      --spiled                            Enable SPI-LED output
 
 Supported protocols:
 

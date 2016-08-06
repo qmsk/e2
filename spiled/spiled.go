@@ -32,23 +32,23 @@ const APA102	Protocol	= "apa102"
 const APA102X				= "apa102x"
 
 type Options struct {
-	Channel		byte	`long:"spiled-channel" metavar:"N" description:"/dev/spidev0.N"`
-	Speed		int		`long:"spiled-speed" metavar:"HZ"`
-	Protocol	string	`long:"spiled-protocol" metavar:"apa102|apa102x" description:"Type of LED"`
-	Count		uint	`long:"spiled-count" metavar:"COUNT" description:"Number of LEDs"`
+	Channel		byte	`long:"spiled-channel" value-name:"N" description:"/dev/spidev0.N"`
+	Speed		int		`long:"spiled-speed" value-name:"HZ"`
+	Protocol	string	`long:"spiled-protocol" value-name:"apa102|apa102x" description:"Type of LED"`
+	Count		uint	`long:"spiled-count" value-name:"COUNT" description:"Number of LEDs"`
 	Debug		bool	`long:"spiled-debug" description:"Dump SPI output"`
-	Intensity	uint8	`long:"spiled-intensity" metavar:"0-255" default:"255"`
-	Refresh		float64 `long:"spiled-refresh" metavar:"HZ" default:"10"`
+	Intensity	uint8	`long:"spiled-intensity" value-name:"0-255" default:"255"`
+	Refresh		float64 `long:"spiled-refresh" value-name:"HZ" default:"10"`
 
-	TallyIdle		LED		`long:"spiled-tally-idle"    metavar:"RRGGBB" default:"000010"`
-	TallyPreview	LED		`long:"spiled-tally-preview" metavar:"RRGGBB" default:"00ff00"`
-	TallyProgram	LED		`long:"spiled-tally-program" metavar:"RRGGBB" default:"ff0000"`
-	TallyBoth		LED		`long:"spiled-tally-both"    metavar:"RRGGBB" default:"ff4000"`
+	TallyIdle		LED		`long:"spiled-tally-idle"    value-name:"RRGGBB" default:"000010"`
+	TallyPreview	LED		`long:"spiled-tally-preview" value-name:"RRGGBB" default:"00ff00"`
+	TallyProgram	LED		`long:"spiled-tally-program" value-name:"RRGGBB" default:"ff0000"`
+	TallyBoth		LED		`long:"spiled-tally-both"    value-name:"RRGGBB" default:"ff4000"`
 
-	StatusIdle		LED		`long:"spiled-status-idle"    metavar:"RRGGBB" default:"0000ff"`
-	StatusOK		LED		`long:"spiled-status-ok"      metavar:"RRGGBB" default:"00ff00"`
-	StatusWarn	    LED		`long:"spiled-status-warn"    metavar:"RRGGBB" default:"ffff00"`
-	StatusError		LED		`long:"spiled-status-error"   metavar:"RRGGBB" default:"ff0000"`
+	StatusIdle		LED		`long:"spiled-status-idle"    value-name:"RRGGBB" default:"0000ff"`
+	StatusOK		LED		`long:"spiled-status-ok"      value-name:"RRGGBB" default:"00ff00"`
+	StatusWarn	    LED		`long:"spiled-status-warn"    value-name:"RRGGBB" default:"ffff00"`
+	StatusError		LED		`long:"spiled-status-error"   value-name:"RRGGBB" default:"ff0000"`
 }
 
 func (options Options) Make() (*SPILED, error) {

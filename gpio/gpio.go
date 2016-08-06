@@ -23,10 +23,10 @@ import (
 )
 
 type Options struct {
-	StatusGreenPin	string	 `long:"gpio-green-pin"`
-	StatusRedPin	string	 `long:"gpio-red-pin"`
+	StatusGreenPin	string	 `long:"gpio-green-pin" value-name:"GPIO-PIN" description:"GPIO pin for green status LED"`
+	StatusRedPin	string	 `long:"gpio-red-pin" value-name:"GPIO-PIN" description:"GPIO pin for red status LED"`
 
-	TallyPins		[]string `long:"gpio-tally-pin"`
+	TallyPins		[]string `long:"gpio-tally-pin" value-name:"GPIO-PIN" description:"Pass each tally pin as a separate option"`
 }
 
 func (options Options) Make() (*GPIO, error) {

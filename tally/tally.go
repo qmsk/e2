@@ -13,9 +13,9 @@ type Options struct {
 	clientOptions    client.Options
 	discoveryOptions discovery.Options
 
-	IgnoreDest		string	`long:"tally-ignore-dest" metavar:"REGEXP" description:"Ignore matching destinations (case-insensitive regexp)"`
+	IgnoreDest		string	`long:"tally-ignore-dest" value-name:"REGEXP" description:"Ignore matching destinations (case-insensitive regexp)"`
 	ignoreDestRegexp	*regexp.Regexp
-	ContactName		string	`long:"tally-contact-name" metavar:"NAME" default:"tally" description:"Resolve Input ID from Contact 'tally=\\d' field"`
+	ContactName		string	`long:"tally-contact-name" value-name:"NAME" default:"tally" description:"Resolve Input ID from Contact 'tally=\\d' field"`
 	contactIDRegexp		*regexp.Regexp
 }
 
