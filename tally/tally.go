@@ -1,6 +1,7 @@
 package tally
 
 import (
+	"sync/atomic"
 	"fmt"
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
@@ -63,7 +64,7 @@ type Tally struct {
 	sources    sources
 	sourceChan chan Source
 
-	state State
+	state atomic.Value
 	dests map[chan State]bool
 }
 
@@ -86,10 +87,12 @@ func (tally *Tally) Register(stateChan chan State) {
 
 // mainloop, owns Tally state
 func (tally *Tally) Run() error {
+    // use a nil state to catch anyone trying to change it... :)
+	var state *State = &State{}
 
 	for {
 		// update
-		tally.apply(tally.state)
+		tally.apply(state)
 
 		select {
 		case <-tally.closeChan:
@@ -132,7 +135,7 @@ func (tally *Tally) Run() error {
 				tally.sources[source.String()] = source
 			}
 
-			tally.state = tally.update()
+			state = tally.update()
 		}
 
 		// stopping?
@@ -143,33 +146,34 @@ func (tally *Tally) Run() error {
 	}
 }
 
-func (tally *Tally) getState() State {
-	// XXX: unsafe, tally.state access is not atomic
-	return tally.state
+// Return a pointer to a copy of the current State
+func (tally *Tally) Get() State {
+	return *tally.state.Load().(*State)
 }
 
-func (tally *Tally) getSources() sources {
-	// XXX: unsafe, shared map access
-	return tally.sources
-}
-
-func (tally *Tally) apply(state State) {
+// store and distribute the new State. This is a shared read-only pointer.
+func (tally *Tally) apply(state *State) {
 	log.Printf("tally: Update: sources=%d inputs=%d outputs=%d tallys=%d",
 		len(tally.sources), len(state.Inputs), len(state.Outputs), len(state.Tally),
 	)
 
+	// the state
+	tally.state.Store(state)
+
 	for stateChan, _ := range tally.dests {
-		stateChan <- state
+		stateChan <- *state
 	}
 }
 
 // Compute new output state from sources
-func (tally *Tally) update() State {
-	var state = makeState()
+func (tally *Tally) update() *State {
+	var state = newState()
 
 	for _, source := range tally.sources {
-		if err := source.updateState(&state); err != nil {
-			state.setSourceError(source.String(), err)
+		if err := source.updateState(state); err != nil {
+			state.setSourceError(source, err)
+		} else {
+			state.setSource(source)
 		}
 	}
 

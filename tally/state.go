@@ -2,14 +2,25 @@ package tally
 
 import (
 	"fmt"
+	"github.com/qmsk/e2/discovery"
+	"time"
 )
 
 // Tally ID
 type ID int
 
+type SourceState struct {
+	Discovery discovery.Packet
+	FirstSeen time.Time
+	LastSeen  time.Time
+
+	Connected bool
+	Error     error
+}
+
 type Output struct {
-	Source string
-	Name   string
+	Source  string
+	Name    string
 }
 
 type Input struct {
@@ -50,32 +61,46 @@ type Link struct {
 type TallyState struct {
 	Inputs  map[Input]bool
 	Outputs map[Output]Status
+	Errors  []error
 
-	Status Status
-	Errors []error
+	Status  Status
 }
 
 type State struct {
+	Sources map[string]SourceState
+
 	Inputs  map[Input]InputState
 	Outputs map[Output]bool
 
-	Links []Link
+	links []Link
 
 	Tally  map[ID]TallyState
-	Errors map[string]error
+	Errors	[]error
 }
 
-func makeState() State {
-	return State{
+func newState() *State {
+	return &State{
+		Sources: make(map[string]SourceState),
 		Inputs:  make(map[Input]InputState),
 		Outputs: make(map[Output]bool),
 		Tally:   make(map[ID]TallyState),
-		Errors:  make(map[string]error),
 	}
 }
 
-func (state *State) setSourceError(source string, err error) {
-	state.Errors[source] = err
+func (state *State) setSource(source Source) {
+	state.setSourceError(source, nil)
+}
+
+func (state *State) setSourceError(source Source, err error) {
+	sourceState := SourceState{
+		Discovery: source.discoveryPacket,
+		FirstSeen: source.created,
+		LastSeen:  source.updated,
+		Connected: (source.xmlClient != nil),
+		Error:	   err,
+	}
+
+	state.Sources[source.String()] = sourceState
 }
 
 func (state *State) addTallyError(id ID, input Input, err error) {
@@ -110,11 +135,17 @@ func (state *State) addLink(link Link) {
 		panic(fmt.Errorf("addLink with unknown Input: %#v", link))
 	}
 
-	state.Links = append(state.Links, link)
+	state.links = append(state.links, link)
 }
 
 // Update finaly Tally state from links
 func (state *State) update() {
+	for _, sourceState := range state.Sources {
+		if sourceState.Error != nil {
+			state.Errors = append(state.Errors, sourceState.Error)
+		}
+	}
+
 	for input, inputState := range state.Inputs {
 		tallyState := state.Tally[inputState.ID]
 
@@ -126,7 +157,7 @@ func (state *State) update() {
 		state.Tally[inputState.ID] = tallyState
 	}
 
-	for _, link := range state.Links {
+	for _, link := range state.links {
 		tallyState := state.Tally[link.Tally]
 
 		if tallyState.Outputs == nil {
@@ -153,8 +184,8 @@ func (state State) Print() {
 	for input, id := range state.Inputs {
 		fmt.Printf("\t%d: %s/%s\n", id, input.Source, input.Name)
 	}
-	fmt.Printf("Link: %d\n", len(state.Links))
-	for _, link := range state.Links {
+	fmt.Printf("Link: %d\n", len(state.links))
+	for _, link := range state.links {
 		fmt.Printf("\t%d: %20s / %-15s <- %20s / %-15s = %v\n", link.Tally,
 			link.Output.Source, link.Output.Name,
 			link.Input.Source, link.Input.Name,

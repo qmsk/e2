@@ -1,7 +1,6 @@
 package tally
 
 import (
-	"github.com/qmsk/e2/discovery"
 	"github.com/qmsk/e2/web"
 	"time"
 )
@@ -10,6 +9,10 @@ type restInput struct {
 	Input
 	ID
 	Status string
+}
+
+type restOutput struct {
+	Output
 }
 
 type restStatus struct {
@@ -30,57 +33,50 @@ type restError struct {
 	Error  string
 }
 
-type restState struct {
-	Inputs []restInput
-	Tally  []restTally
-	Errors []restError
-}
-
 type restSource struct {
 	Source    string
-	Discovery discovery.Packet
-	FirstSeen time.Time
-	LastSeen  string
+	LastSeen  string // duration
+	Error	  string `json:",omitempty"`
 
-	Connected bool
-	Error     string `json:",omitempty"`
+	SourceState
+}
+
+type restState struct {
+	Sources []restSource
+	Inputs  []restInput
+	Outputs []restOutput
+	Tally   []restTally
+	Errors  []restError
 }
 
 type event struct {
 	Tally *restState `json:"tally,omitempty"`
 }
 
-func (sources sources) Get() (interface{}, error) {
-	var rss []restSource
-
-	for sourceName, source := range sources {
-		var rs = restSource{
-			Source:    sourceName,
-			Discovery: source.discoveryPacket,
-			FirstSeen: source.created,
+func (state State) toRest() (rs restState) {
+	for sourceName, sourceState := range state.Sources {
+		s := restSource{
+			Source:		 sourceName,
+			SourceState: sourceState,
 		}
 
-		if !source.updated.IsZero() {
-			rs.LastSeen = time.Now().Sub(source.updated).String()
+		if !sourceState.LastSeen.IsZero() {
+			s.LastSeen = time.Now().Sub(sourceState.LastSeen).String()
 		}
 
-		if source.xmlClient != nil {
-			rs.Connected = true
+		if sourceState.Error != nil {
+			s.Error = sourceState.Error.Error()
 		}
 
-		if source.err != nil {
-			rs.Error = source.err.Error()
-		}
-
-		rss = append(rss, rs)
+		rs.Sources = append(rs.Sources, s)
 	}
 
-	return rss, nil
-}
-
-func (state State) toRest() (rs restState) {
 	for input, inputState := range state.Inputs {
 		rs.Inputs = append(rs.Inputs, restInput{Input: input, ID: inputState.ID, Status: inputState.Status})
+	}
+
+	for output, _ := range state.Outputs {
+		rs.Outputs = append(rs.Outputs, restOutput{Output: output})
 	}
 
 	for id, tallyState := range state.Tally {
@@ -106,8 +102,8 @@ func (state State) toRest() (rs restState) {
 		rs.Tally = append(rs.Tally, tally)
 	}
 
-	for source, err := range state.Errors {
-		rs.Errors = append(rs.Errors, restError{Source: source, Error: err.Error()})
+	for _, err := range state.Errors {
+		rs.Errors = append(rs.Errors, restError{Error: err.Error()})
 	}
 
 	return
@@ -119,11 +115,8 @@ func (state State) Get() (interface{}, error) {
 
 func (tally *Tally) Index(name string) (web.Resource, error) {
 	switch name {
-	case "sources":
-		return tally.getSources(), nil
-
 	case "tally":
-		return tally.getState(), nil
+		return tally.Get(), nil
 
 	default:
 		return nil, nil
