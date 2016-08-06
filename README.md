@@ -1,8 +1,189 @@
 # qmsk-e2
-E2 Client + REST + WebSocket Server + Web UI
+E2 Client, Tally system, (partial) WebUI
 
-## Web UI
+## Supported Devices
 
+This implementation has been tested with the following device software versions:
+
+* E2 version 3.2
+* S3 version 3.2
+
+This implementation supports the following device APIs:
+
+* TCP port 9876 XML (read-only, live streaming)
+* TCP port 9999 JSON-RPC port (read-only for now, includes preset destinations)
+* UDP port 40961 discovery
+
+## Tally
+
+Tally implementation for following which inputs are active on destinations.
+The tally process connects to any discovered E2 systems, and follows their system state using a read-only
+implementation of the XML protocol.
+Input sources can be tagged with a `tally=ID` in their *Contact* field.
+Each tally ID has *program*, *preview* and *active* status if any input with a matching tally ID is used as the
+program or preview source on any screen destination layer, or Aux output.
+
+## Usage
+
+Build the golang binary:
+
+    go get ./cmd/tally
+
+Tag the relevant inputs in EMTS with `tally=ID` in their Contact details field:
+
+![EMTS Contact field](/docs/tally-emts-contact.png?raw=true)
+
+Run the tally software using a network interface connected to the same network as the E2 device:
+
+    $GOPATH/bin/tally --discovery-interface=eth0
+
+## Outputs
+
+The tally state can be output on a HTTP REST/WebSocket API, on GPIO pins, or RGB LEDs on the SPI bus.
+
+### Web API and UI
+
+The Web output provides an JSON REST API, a JSON WebSocket API, and an AngularJS frontend.
+
+    --http-listen=:8001 --http-static=./static
+
+The `--http-static` is optional, and is only needed for the UI.
+
+Example JSON `http://localhost:8001/api/tally` output:
+
+	{
+	   "Inputs" : [
+		  {
+			 "Name" : "DVI 1",
+			 "Source" : "192.168.2.102",
+			 "ID" : 2,
+			 "Status" : "ok"
+		  }
+	   ],
+	   "Errors" : null,
+	   "Tally" : [
+		  {
+			 "Outputs" : [
+				{
+				   "Name" : "ScreenDest1",
+				   "Active" : true,
+				   "Program" : true,
+				   "Preview" : true,
+				   "Source" : "192.168.2.102"
+				},
+				{
+				   "Preview" : true,
+				   "Source" : "192.168.2.102",
+				   "Program" : true,
+				   "Active" : true,
+				   "Name" : "ScreenDest2"
+				},
+				{
+				   "Program" : true,
+				   "Source" : "192.168.2.102",
+				   "Preview" : true,
+				   "Name" : "Mon",
+				   "Active" : false
+				}
+			 ],
+			 "Inputs" : [
+				{
+				   "Source" : "192.168.2.102",
+				   "ID" : 2,
+				   "Status" : "ok",
+				   "Name" : "DVI 1"
+				}
+			 ],
+			 "Errors" : null,
+			 "Active" : true,
+			 "ID" : 2,
+			 "Preview" : true,
+			 "Program" : true
+		  }
+	   ]
+	}
+
+The same JSON document is also published on `ws://localhost:8001/events` in the `{"tally": { ... }}` format whenever it is updated.
+A HTTP `Origin:` header must be set.
+
+The Web UI uses this WebSocket stream to display a live-updating tally state:
+
+![Tally Web UI](/docs/tally-web.png?raw=true)
+
+The Web UI also includes a list of discovered sources and their status, including possible connection errors:
+
+![Tally Web UI](/docs/tally-sources.png?raw=true)
+
+## GPIO
+
+Support for Linux RaspberryPI GPIO output using `/sys/class/gpio`. Use the `--gpio` options to configure:
+    
+    $GOPATH/bin/tally ... --gpio --gpio-green-pin=23 --gpio-red-pin=24 --gpio-tally-pin=21 --gpio-tally-pin=20 --gpio-tally-pin=16 --gpio-tally-pin=12 --gpio-tally-pin=26 -gpio-tally-pin=19 --gpio-tally-pin=13 --gpio-tally-pin=6
+
+The `--gpio-green-pin=` and `--gpio-red-pin=` are used for the status of the tally system itself:
+
+| Green     | Red      | Status                          |
+|-----------|----------|---------------------------------|
+| Off       | Off      | Not running.                    |
+| Off/Blink | Off      | Discovering.                    |
+| On/Blink  | Off      | Connected with tally inputs.    |
+| On/Blink  | Blinking | Partially connected.            |
+| Off/Blink | Blinking | Reconnecting.                   |
+
+Each `--gpio-tally-pin=` is used for sequentially numbered tally ID output. Passing eight `--gpio-tally-pin=` options will enable tally output for IDs 1, 2, 3, 4, 5, 6, 7 and 8.
+The GPIO pin will be set high if the tally input is output on program, and low otherwise.
+
+## SPI-LED
+
+Support for APA102 RGB LEDs connected to the Linux RaspberryPI SPI bus using `/dev/spidev`. Use the `--spiled` options to configure:
+
+      --spiled-channel=            /dev/spidev0.N
+      --spiled-speed=
+      --spiled-protocol=           Type of LED
+      --spiled-count=              Number of LEDs
+      --spiled-debug               Dump SPI output
+      --spiled-intensity=
+      --spiled-refresh=
+      --spiled-tally-idle=
+      --spiled-tally-preview=
+      --spiled-tally-program=
+      --spiled-tally-both=
+      --spiled-status-idle=
+      --spiled-status-ok=
+      --spiled-status-warn=
+      --spiled-status-error=
+      --spiled                     Enable SPI-LED output
+
+Supported protocols:
+
+* `apa102` standard APA102 LEDs
+* `apa102x` variant of APA-102 using 0x00 stop frames.
+
+Example:
+
+	tally ... --spiled --spiled-channel=0 --spiled-speed=100000 --spiled-protocol=apa102x --spiled-count=2 --spiled-tally-idle=000010
+
+The first SPI-LED is used as a status LED, use the `--spiled-status-*` options to configure output colors:
+
+| Option                   | Default Color   | Meaning
+|--------------------------|-----------------|-----------
+| `--spiled-status-idle=`  | 0000ff (Blue)   | Discovering
+| `--spiled-status-ok=`    | 00ff00 (Green)  | Connected
+| `--spiled-status-warn=`  | ffff00 (Orange) | Partially connected
+| `--spiled-status-error=` | ff0000 (Red)    | Disconnected
+
+The remaining LEDs are used for sequentially numbered tally ID output. Use the `--spiled-tally-*` options to configure output colors:
+
+| Option                    | Default Color     | Meaning
+|---------------------------|-------------------|------
+|                           | Off               | No tally input configured
+| `--spiled-tally-idle=`    | 000010 (Dim Blue) | Not active on any outputs
+| `--spiled-tally-preview=` | 00ff00 (Green)    | Preview on active destination
+| `--spiled-tally-program=` | ff0000 (Red)      | Program on destination
+| `--spiled-tally-both=`    | ff4000 (Orange)   | Program on destination, and Preview on active destination
+
+## Server (Web UI)
+    
 ### System
 Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
 
@@ -282,19 +463,11 @@ The same output can be followed using `client listen` and `client listen --json`
 
 ## Client
     
-    go get ./cmd/server
+    go install ./cmd/client
 
 Useful for testing the client library:
 
     $GOPATH/bin/client --e2-address=192.168.0.100 listen
-
-### Support
-
-The client library (`github.com/qmsk/e2/client`) provides partial support for the following E2 APIs:
-* TCP XML (read-only, streaming)
-* JSON-RPC (read-only for now, includes preset destinations)
-
-The discovery library (`github.com/qmsk/e2/discovery`) supports UDP broadcast discovery of connected E2 systems.
 
 ### Usage:
 
