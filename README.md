@@ -24,8 +24,12 @@ Each tally ID has *program*, *preview* and *active* status if any input with a m
 program or preview source on any screen destination layer, or Aux output.
 
 Multiple E2 systems can be connected, and their input/output state is merged.
+Stacked systems are supported, the tally system will only connect to the stack master.
+The tally system should be restarted if the stack master changes.
+
 The tally system will indicate an error status if any E2 system is disconnected (stops responding within the `--e2-timeout=`).
 The tally system will reconnect to any E2 system once is starts responding to discovery packets again.
+
 
 ## Usage
 
