@@ -1,10 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
 	"github.com/qmsk/e2/web"
 	"log"
+	"sync/atomic"
 )
 
 type Options struct {
@@ -48,51 +50,35 @@ type Server struct {
 	clientOptions client.Options
 	client        *client.Client
 	xmlClient	  *client.XMLClient
+
+	state		  atomic.Value
+	eventChan     chan web.Event
 }
 
-func (server *Server) WebAPI() web.API {
-	return web.MakeAPI(server)
+type State struct {
+	System	*client.System
 }
 
-func (server *Server) Index(name string) (web.Resource, error) {
-	switch name {
-	case "":
-		index := Index{}
-
-		return &index, index.load(server.client)
-
-	case "status":
-		status := Status{
-			client: server.client,
-		}
-
-		return &status, nil
-
-	case "sources":
-		sources := Sources{}
-
-		return &sources, sources.load(server.client)
-
-	case "screens":
-		screens := Screens{
-			client: server.client,
-		}
-
-		return &screens, screens.load(server.client)
-
-	case "auxes":
-		auxes := Auxes{}
-
-		return &auxes, auxes.load(server.client)
-
-	case "presets":
-		presets := Presets{
-			client: server.client,
-		}
-
-		return &presets, presets.load(server.client)
-
-	default:
-		return nil, nil
+func (server *Server) Run() error {
+	if server.eventChan != nil {
+		defer close(server.eventChan)
 	}
+
+	for {
+		if system, err := server.xmlClient.Read(); err != nil {
+			return fmt.Errorf("xmlClient.Read: %v", err)
+		} else {
+			var state = State{System: &system}
+
+			server.state.Store(state)
+
+			if server.eventChan != nil {
+				server.eventChan <- state
+			}
+		}
+	}
+}
+
+func (server *Server) GetState() State {
+	return server.state.Load().(State)
 }

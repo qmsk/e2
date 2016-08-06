@@ -24,12 +24,16 @@ func main() {
 		log.Fatalf("Server %#v: %v", options.ServerOptions, err)
 	}
 
-	options.WebOptions.Server(
+	go options.WebOptions.Server(
 		web.RoutePrefix("/api/", server.WebAPI()),
 		web.RoutePrefix("/events", server.WebEvents()),
 		options.WebOptions.RouteStatic("/static/"),
 		options.WebOptions.RouteFile("/", "server.html"),
 	)
 
-	log.Printf("Exit")
+	if err := server.Run(); err != nil {
+		log.Fatalf("server.Run: %v", err)
+	} else {
+		log.Printf("Exit")
+	}
 }
