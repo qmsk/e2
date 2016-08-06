@@ -81,6 +81,7 @@ func (tally *Tally) init(options Options) error {
 }
 
 // Register watcher for state
+// TODO: optimize to send a pointer to a shared read-only State?
 func (tally *Tally) Register(stateChan chan State) {
 	tally.dests[stateChan] = true
 }
@@ -146,7 +147,8 @@ func (tally *Tally) Run() error {
 	}
 }
 
-// Return a pointer to a copy of the current State
+// Return a copy of the current State.
+// TODO: optimize to return a pointer to a shared read-only State?
 func (tally *Tally) Get() State {
 	return *tally.state.Load().(*State)
 }
