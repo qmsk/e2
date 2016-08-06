@@ -212,11 +212,6 @@ angular.module('qmsk.e2', [
         var groups = { };
 
         $.each(presets, function(id, preset) {
-            // XXX: this is broken for non-array query()
-            if (id[0] == '$' || !preset.group) {
-                return;
-            }
-
             var group = groups[preset.group];
 
             if (!group) {
