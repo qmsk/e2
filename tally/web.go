@@ -34,9 +34,9 @@ type restError struct {
 }
 
 type restSource struct {
-	Source    string
-	LastSeen  string // duration
-	Error	  string `json:",omitempty"`
+	Source   string
+	LastSeen string // duration
+	Error    string `json:",omitempty"`
 
 	SourceState
 }
@@ -56,7 +56,7 @@ type event struct {
 func (state State) toRest() (rs restState) {
 	for sourceName, sourceState := range state.Sources {
 		s := restSource{
-			Source:		 sourceName,
+			Source:      sourceName,
 			SourceState: sourceState,
 		}
 

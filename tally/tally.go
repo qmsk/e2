@@ -1,12 +1,12 @@
 package tally
 
 import (
-	"sync/atomic"
 	"fmt"
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
 	"log"
 	"regexp"
+	"sync/atomic"
 	"time"
 )
 
@@ -88,7 +88,7 @@ func (tally *Tally) Register(stateChan chan State) {
 
 // mainloop, owns Tally state
 func (tally *Tally) Run() error {
-    // use a nil state to catch anyone trying to change it... :)
+	// use a nil state to catch anyone trying to change it... :)
 	var state *State = &State{}
 
 	for {

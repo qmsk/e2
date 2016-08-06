@@ -19,8 +19,8 @@ type SourceState struct {
 }
 
 type Output struct {
-	Source  string
-	Name    string
+	Source string
+	Name   string
 }
 
 type Input struct {
@@ -63,7 +63,7 @@ type TallyState struct {
 	Outputs map[Output]Status
 	Errors  []error
 
-	Status  Status
+	Status Status
 }
 
 type State struct {
@@ -75,7 +75,7 @@ type State struct {
 	links []Link
 
 	Tally  map[ID]TallyState
-	Errors	[]error
+	Errors []error
 }
 
 func newState() *State {
@@ -97,7 +97,7 @@ func (state *State) setSourceError(source Source, err error) {
 		FirstSeen: source.created,
 		LastSeen:  source.updated,
 		Connected: (source.xmlClient != nil),
-		Error:	   err,
+		Error:     err,
 	}
 
 	state.Sources[source.String()] = sourceState
