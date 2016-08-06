@@ -23,10 +23,10 @@ import (
 )
 
 type Options struct {
-	StatusGreenPin	string	 `long:"gpio-green-pin" value-name:"GPIO-PIN" description:"GPIO pin for green status LED"`
-	StatusRedPin	string	 `long:"gpio-red-pin" value-name:"GPIO-PIN" description:"GPIO pin for red status LED"`
+	StatusGreenPin string `long:"gpio-green-pin" value-name:"GPIO-PIN" description:"GPIO pin for green status LED"`
+	StatusRedPin   string `long:"gpio-red-pin" value-name:"GPIO-PIN" description:"GPIO pin for red status LED"`
 
-	TallyPins		[]string `long:"gpio-tally-pin" value-name:"GPIO-PIN" description:"Pass each tally pin as a separate option"`
+	TallyPins []string `long:"gpio-tally-pin" value-name:"GPIO-PIN" description:"Pass each tally pin as a separate option"`
 }
 
 func (options Options) Make() (*GPIO, error) {
@@ -45,13 +45,13 @@ func (options Options) Make() (*GPIO, error) {
 type GPIO struct {
 	options Options
 
-	tallyPins		map[tally.ID]*Pin
+	tallyPins map[tally.ID]*Pin
 
 	// red pin is high if there are sources with errors
-	statusRedPin	*Pin
+	statusRedPin *Pin
 
 	// green pin is high if there are sources with tallys
-	statusGreenPin	*Pin
+	statusGreenPin *Pin
 
 	tallyChan chan tally.State
 	waitGroup sync.WaitGroup
@@ -63,7 +63,7 @@ func (gpio *GPIO) init(options Options) error {
 	}
 
 	for i, pinName := range options.TallyPins {
-		id := tally.ID(i+1)
+		id := tally.ID(i + 1)
 
 		if pin, err := openPin(fmt.Sprintf("tally:%d", id), pinName); err != nil {
 			return err
@@ -153,12 +153,12 @@ func (gpio *GPIO) updateTally(state tally.State) {
 		log.Printf("GPIO: status:green high: blink")
 
 		// when connected, blink off for 100ms on every update
-		gpio.statusGreenPin.Blink(false, 100 * time.Millisecond)
+		gpio.statusGreenPin.Blink(false, 100*time.Millisecond)
 	} else {
 		log.Printf("GPIO: status:green low: cycle")
 
 		// when not connected, blink on for 100ms every 1s
-		gpio.statusGreenPin.BlinkCycle(true, 100 * time.Millisecond, 1 * time.Second)
+		gpio.statusGreenPin.BlinkCycle(true, 100*time.Millisecond, 1*time.Second)
 	}
 
 	if gpio.statusRedPin == nil {
@@ -166,7 +166,7 @@ func (gpio *GPIO) updateTally(state tally.State) {
 	} else if statusRed {
 		log.Printf("GPIO: status:red blink: cycle")
 
-		gpio.statusRedPin.BlinkCycle(true, 500 * time.Millisecond, 500 * time.Millisecond)
+		gpio.statusRedPin.BlinkCycle(true, 500*time.Millisecond, 500*time.Millisecond)
 	} else {
 		gpio.statusRedPin.Set(false)
 	}

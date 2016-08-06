@@ -9,9 +9,9 @@ import (
 type SPILEDModule struct {
 	spiled.Options
 
-	spiled		*spiled.SPILED
+	spiled *spiled.SPILED
 
-	Enabled		bool	`long:"spiled" description:"Enable SPI-LED output"`
+	Enabled bool `long:"spiled" description:"Enable SPI-LED output"`
 }
 
 func init() {

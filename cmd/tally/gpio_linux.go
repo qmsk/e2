@@ -9,9 +9,9 @@ import (
 type GPIOModule struct {
 	gpio.Options
 
-	gpio		*gpio.GPIO
+	gpio *gpio.GPIO
 
-	Enabled		bool	`long:"gpio" description:"Enable GPIO output"`
+	Enabled bool `long:"gpio" description:"Enable GPIO output"`
 }
 
 func init() {

@@ -8,13 +8,13 @@ import (
 
 // 24-bit colors + 8-bit intensity
 type LED struct {
-	Intensity	uint8
-	Red			uint8
-	Green		uint8
-	Blue		uint8
+	Intensity uint8
+	Red       uint8
+	Green     uint8
+	Blue      uint8
 
 	// animations
-	strobeStart	 time.Time
+	strobeStart  time.Time
 	strobePeriod time.Duration
 }
 
@@ -23,7 +23,7 @@ func (led LED) String() string {
 	return fmt.Sprintf("#%02x%02x%02x%02x", led.Red, led.Green, led.Blue, led.Intensity)
 }
 
-func (led *LED) UnmarshalFlag (value string) error {
+func (led *LED) UnmarshalFlag(value string) error {
 	if _, err := fmt.Sscanf(value, "%02x%02x%02x%02x", &led.Red, &led.Green, &led.Blue, &led.Intensity); err == nil {
 
 	} else if _, err := fmt.Sscanf(value, "%02x%02x%02x", &led.Red, &led.Green, &led.Blue); err == nil {

@@ -28,32 +28,32 @@ import (
 
 type Protocol string
 
-const APA102	Protocol	= "apa102"
-const APA102X				= "apa102x"
+const APA102 Protocol = "apa102"
+const APA102X = "apa102x"
 
 type Options struct {
-	Channel		byte	`long:"spiled-channel" value-name:"N" description:"/dev/spidev0.N"`
-	Speed		int		`long:"spiled-speed" value-name:"HZ"`
-	Protocol	string	`long:"spiled-protocol" value-name:"apa102|apa102x" description:"Type of LED"`
-	Count		uint	`long:"spiled-count" value-name:"COUNT" description:"Number of LEDs"`
-	Debug		bool	`long:"spiled-debug" description:"Dump SPI output"`
-	Intensity	uint8	`long:"spiled-intensity" value-name:"0-255" default:"255"`
-	Refresh		float64 `long:"spiled-refresh" value-name:"HZ" default:"10"`
+	Channel   byte    `long:"spiled-channel" value-name:"N" description:"/dev/spidev0.N"`
+	Speed     int     `long:"spiled-speed" value-name:"HZ"`
+	Protocol  string  `long:"spiled-protocol" value-name:"apa102|apa102x" description:"Type of LED"`
+	Count     uint    `long:"spiled-count" value-name:"COUNT" description:"Number of LEDs"`
+	Debug     bool    `long:"spiled-debug" description:"Dump SPI output"`
+	Intensity uint8   `long:"spiled-intensity" value-name:"0-255" default:"255"`
+	Refresh   float64 `long:"spiled-refresh" value-name:"HZ" default:"10"`
 
-	TallyIdle		LED		`long:"spiled-tally-idle"    value-name:"RRGGBB" default:"000010"`
-	TallyPreview	LED		`long:"spiled-tally-preview" value-name:"RRGGBB" default:"00ff00"`
-	TallyProgram	LED		`long:"spiled-tally-program" value-name:"RRGGBB" default:"ff0000"`
-	TallyBoth		LED		`long:"spiled-tally-both"    value-name:"RRGGBB" default:"ff4000"`
+	TallyIdle    LED `long:"spiled-tally-idle"    value-name:"RRGGBB" default:"000010"`
+	TallyPreview LED `long:"spiled-tally-preview" value-name:"RRGGBB" default:"00ff00"`
+	TallyProgram LED `long:"spiled-tally-program" value-name:"RRGGBB" default:"ff0000"`
+	TallyBoth    LED `long:"spiled-tally-both"    value-name:"RRGGBB" default:"ff4000"`
 
-	StatusIdle		LED		`long:"spiled-status-idle"    value-name:"RRGGBB" default:"0000ff"`
-	StatusOK		LED		`long:"spiled-status-ok"      value-name:"RRGGBB" default:"00ff00"`
-	StatusWarn	    LED		`long:"spiled-status-warn"    value-name:"RRGGBB" default:"ffff00"`
-	StatusError		LED		`long:"spiled-status-error"   value-name:"RRGGBB" default:"ff0000"`
+	StatusIdle  LED `long:"spiled-status-idle"    value-name:"RRGGBB" default:"0000ff"`
+	StatusOK    LED `long:"spiled-status-ok"      value-name:"RRGGBB" default:"00ff00"`
+	StatusWarn  LED `long:"spiled-status-warn"    value-name:"RRGGBB" default:"ffff00"`
+	StatusError LED `long:"spiled-status-error"   value-name:"RRGGBB" default:"ff0000"`
 }
 
 func (options Options) Make() (*SPILED, error) {
 	var spiled = SPILED{
-		options:   options,
+		options: options,
 	}
 
 	if err := spiled.init(options); err != nil {
@@ -64,13 +64,13 @@ func (options Options) Make() (*SPILED, error) {
 }
 
 type SPILED struct {
-	options     Options
-	protocol	Protocol
-	count		uint
+	options  Options
+	protocol Protocol
+	count    uint
 
-	spiBus	embd.SPIBus
+	spiBus embd.SPIBus
 
-	leds		[]LED
+	leds []LED
 
 	tallyChan chan tally.State
 	waitGroup sync.WaitGroup
@@ -84,9 +84,9 @@ func (spiled *SPILED) init(options Options) error {
 	// SPI
 	var spiMode byte = embd.SPIMode0
 	var spiChannel byte = options.Channel // /dev/spidev0.X
-	var spiSpeed int = options.Speed // Hz
-	var spiBitsPerWord int = 8 // bits
-	var spiDelay int = 0 // us?
+	var spiSpeed int = options.Speed      // Hz
+	var spiBitsPerWord int = 8            // bits
+	var spiDelay int = 0                  // us?
 
 	spiled.protocol = Protocol(strings.ToLower(options.Protocol))
 	spiled.count = options.Count
@@ -118,7 +118,7 @@ func (spiled *SPILED) write(leds []LED, renderTime time.Time) error {
 	var packet bytes.Buffer
 
 	var stopByte = []byte{0xff}
-	var stopCount = 4 * (1 + len(leds) / 32) // one bit per byte, in frames of 32 bits
+	var stopCount = 4 * (1 + len(leds)/32) // one bit per byte, in frames of 32 bits
 
 	switch spiled.protocol {
 	case APA102X:

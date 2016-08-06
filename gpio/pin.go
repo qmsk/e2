@@ -1,26 +1,26 @@
 package gpio
 
 import (
-	"github.com/kidoman/embd"
 	"fmt"
+	"github.com/kidoman/embd"
 	"sync"
 	"time"
 )
 
 type pinState struct {
-	value	bool
-	blink	time.Duration
-	cycle	time.Duration
+	value bool
+	blink time.Duration
+	cycle time.Duration
 }
 
 // Output pin
 type Pin struct {
-	label    string
-	name	 string
-	embdPin	 embd.DigitalPin
+	label   string
+	name    string
+	embdPin embd.DigitalPin
 
-	c		chan pinState
-	closeWg	*sync.WaitGroup
+	c       chan pinState
+	closeWg *sync.WaitGroup
 }
 
 func (gp *Pin) String() string {
@@ -30,7 +30,7 @@ func (gp *Pin) String() string {
 func openPin(label string, name string) (*Pin, error) {
 	var gp = Pin{
 		label: label,
-		name: name,
+		name:  name,
 	}
 
 	if embdPin, err := embd.NewDigitalPin(name); err != nil {
@@ -110,21 +110,21 @@ func (gp *Pin) run() {
 }
 
 func (gp *Pin) Set(value bool) {
-	gp.c <- pinState{value:value}
+	gp.c <- pinState{value: value}
 }
 
 // Set to value, and return to !value
 func (gp *Pin) Blink(value bool, blink time.Duration) {
-	gp.c <- pinState{value:value, blink:blink}
+	gp.c <- pinState{value: value, blink: blink}
 }
 
 // Set to value, and cycle between !value and value
 func (gp *Pin) Cycle(value bool, cycle time.Duration) {
-	gp.c <- pinState{value:value, blink:cycle, cycle:cycle}
+	gp.c <- pinState{value: value, blink: cycle, cycle: cycle}
 }
 
 func (gp *Pin) BlinkCycle(value bool, blink time.Duration, cycle time.Duration) {
-	gp.c <- pinState{value:value, blink:blink, cycle:cycle}
+	gp.c <- pinState{value: value, blink: blink, cycle: cycle}
 }
 
 func (gp *Pin) Close(wg *sync.WaitGroup) {

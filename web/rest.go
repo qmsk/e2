@@ -35,12 +35,12 @@ type GetResource interface {
 }
 
 type API struct {
-	root	Resource
+	root Resource
 }
 
 func MakeAPI(root Resource) API {
 	return API{
-		root:	root,
+		root: root,
 	}
 }
 

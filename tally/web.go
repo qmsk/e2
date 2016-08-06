@@ -9,7 +9,7 @@ import (
 type restInput struct {
 	Input
 	ID
-	Status		string
+	Status string
 }
 
 type restStatus struct {
@@ -18,36 +18,36 @@ type restStatus struct {
 }
 
 type restTally struct {
-	ID			ID
-	Inputs		[]restInput
-	Outputs		[]restStatus
+	ID      ID
+	Inputs  []restInput
+	Outputs []restStatus
 	Status
-	Errors		[]string
+	Errors []string
 }
 
 type restError struct {
-	Source		string
-	Error		string
+	Source string
+	Error  string
 }
 
 type restState struct {
-	Inputs	[]restInput
-	Tally	[]restTally
-	Errors	[]restError
+	Inputs []restInput
+	Tally  []restTally
+	Errors []restError
 }
 
 type restSource struct {
-	Source	  string
+	Source    string
 	Discovery discovery.Packet
 	FirstSeen time.Time
 	LastSeen  string
 
 	Connected bool
-	Error	  string	`json:",omitempty"`
+	Error     string `json:",omitempty"`
 }
 
 type event struct {
-	Tally	*restState `json:"tally,omitempty"`
+	Tally *restState `json:"tally,omitempty"`
 }
 
 func (sources sources) Get() (interface{}, error) {
@@ -55,7 +55,7 @@ func (sources sources) Get() (interface{}, error) {
 
 	for sourceName, source := range sources {
 		var rs = restSource{
-			Source:	   sourceName,
+			Source:    sourceName,
 			Discovery: source.discoveryPacket,
 			FirstSeen: source.created,
 		}
@@ -80,23 +80,23 @@ func (sources sources) Get() (interface{}, error) {
 
 func (state State) toRest() (rs restState) {
 	for input, inputState := range state.Inputs {
-		rs.Inputs = append(rs.Inputs, restInput{Input:input, ID:inputState.ID, Status:inputState.Status})
+		rs.Inputs = append(rs.Inputs, restInput{Input: input, ID: inputState.ID, Status: inputState.Status})
 	}
 
 	for id, tallyState := range state.Tally {
 		var tally = restTally{
-			ID:	id,
+			ID:     id,
 			Status: tallyState.Status,
 		}
 
 		for input, _ := range tallyState.Inputs {
 			inputState := state.Inputs[input]
 
-			tally.Inputs = append(tally.Inputs, restInput{Input:input, ID:id, Status:inputState.Status})
+			tally.Inputs = append(tally.Inputs, restInput{Input: input, ID: id, Status: inputState.Status})
 		}
 
 		for output, status := range tallyState.Outputs {
-			tally.Outputs = append(tally.Outputs, restStatus{Output: output, Status: status })
+			tally.Outputs = append(tally.Outputs, restStatus{Output: output, Status: status})
 		}
 
 		for _, err := range tallyState.Errors {
@@ -107,7 +107,7 @@ func (state State) toRest() (rs restState) {
 	}
 
 	for source, err := range state.Errors {
-		rs.Errors = append(rs.Errors, restError{Source:source, Error:err.Error()})
+		rs.Errors = append(rs.Errors, restError{Source: source, Error: err.Error()})
 	}
 
 	return
@@ -140,7 +140,7 @@ func (tally *Tally) WebEvents() *web.Events {
 
 	tally.Register(stateChan)
 
-	go func(){
+	go func() {
 		for state := range stateChan {
 			restState := state.toRest()
 

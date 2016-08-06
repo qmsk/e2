@@ -25,7 +25,7 @@ type InputState struct {
 type Status struct {
 	Program bool
 	Preview bool
-	Active	bool
+	Active  bool
 }
 
 func (status Status) String() string {
@@ -48,11 +48,11 @@ type Link struct {
 }
 
 type TallyState struct {
-	Inputs	map[Input]bool
-	Outputs	map[Output]Status
+	Inputs  map[Input]bool
+	Outputs map[Output]Status
 
-	Status	Status
-	Errors  []error
+	Status Status
+	Errors []error
 }
 
 type State struct {
@@ -70,7 +70,7 @@ func makeState() State {
 		Inputs:  make(map[Input]InputState),
 		Outputs: make(map[Output]bool),
 		Tally:   make(map[ID]TallyState),
-		Errors:	 make(map[string]error),
+		Errors:  make(map[string]error),
 	}
 }
 
@@ -90,7 +90,7 @@ func (state *State) addInput(source string, name string, id ID, status string) I
 	input := Input{source, name}
 
 	state.Inputs[input] = InputState{
-		ID:		id,
+		ID:     id,
 		Status: status,
 	}
 
@@ -115,7 +115,7 @@ func (state *State) addLink(link Link) {
 
 // Update finaly Tally state from links
 func (state *State) update() {
-	for input, inputState:= range state.Inputs {
+	for input, inputState := range state.Inputs {
 		tallyState := state.Tally[inputState.ID]
 
 		if tallyState.Inputs == nil {

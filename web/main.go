@@ -1,8 +1,8 @@
 package web
 
 import (
-	"net/http"
 	"log"
+	"net/http"
 	"path"
 )
 
@@ -12,8 +12,8 @@ type Options struct {
 }
 
 type Route struct {
-	Pattern		string
-	Handler		http.Handler
+	Pattern string
+	Handler http.Handler
 }
 
 func RoutePrefix(prefix string, handler http.Handler) Route {
@@ -25,7 +25,7 @@ func RoutePrefix(prefix string, handler http.Handler) Route {
 
 // Return a route that services the tree relative to --http-static=
 func (options Options) RouteStatic(prefix string) Route {
-	var route = Route{Pattern:prefix}
+	var route = Route{Pattern: prefix}
 
 	if options.Static != "" {
 		log.Printf("Serve static %v from %v\n", prefix, options.Static)
@@ -65,8 +65,8 @@ func (options Options) Server(routes ...Route) {
 
 	if options.Listen != "" {
 		var server = http.Server{
-			Addr:		options.Listen,
-			Handler:	serveMux,
+			Addr:    options.Listen,
+			Handler: serveMux,
 		}
 
 		if err := server.ListenAndServe(); err != nil {

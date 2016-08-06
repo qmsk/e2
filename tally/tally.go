@@ -5,18 +5,18 @@ import (
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/discovery"
 	"log"
-	"time"
 	"regexp"
+	"time"
 )
 
 type Options struct {
 	clientOptions    client.Options
 	discoveryOptions discovery.Options
 
-	IgnoreDest		string	`long:"tally-ignore-dest" value-name:"REGEXP" description:"Ignore matching destinations (case-insensitive regexp)"`
-	ignoreDestRegexp	*regexp.Regexp
-	ContactName		string	`long:"tally-contact-name" value-name:"NAME" default:"tally" description:"Resolve Input ID from Contact 'tally=\\d' field"`
-	contactIDRegexp		*regexp.Regexp
+	IgnoreDest       string `long:"tally-ignore-dest" value-name:"REGEXP" description:"Ignore matching destinations (case-insensitive regexp)"`
+	ignoreDestRegexp *regexp.Regexp
+	ContactName      string `long:"tally-contact-name" value-name:"NAME" default:"tally" description:"Resolve Input ID from Contact 'tally=\\d' field"`
+	contactIDRegexp  *regexp.Regexp
 }
 
 func (options Options) Tally(clientOptions client.Options, discoveryOptions discovery.Options) (*Tally, error) {
@@ -25,7 +25,7 @@ func (options Options) Tally(clientOptions client.Options, discoveryOptions disc
 
 	if options.IgnoreDest == "" {
 
-	// case-insensitive match
+		// case-insensitive match
 	} else if regexp, err := regexp.Compile("(?i)" + options.IgnoreDest); err != nil {
 		return nil, fmt.Errorf("Invalid --tally-ignore-dest=%v: %v", options.IgnoreDest, err)
 	} else {
@@ -53,7 +53,7 @@ type sources map[string]Source
 
 // Concurrent tally support for multiple sources and destinations
 type Tally struct {
-	options         Options
+	options Options
 
 	closeChan chan struct{}
 

@@ -10,8 +10,8 @@ import (
 
 func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions client.Options) (Source, error) {
 	source := Source{
-		options:		 tally.options,
-		created:		 time.Now(),
+		options:         tally.options,
+		created:         time.Now(),
 		discoveryPacket: discoveryPacket,
 		clientOptions:   clientOptions,
 	}
@@ -39,12 +39,12 @@ func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions cli
 //
 // A source can either be in a running state with err == nil, or in a failed state with err != nil
 type Source struct {
-	options			Options
-	created			time.Time
-	updated			time.Time
+	options Options
+	created time.Time
+	updated time.Time
 
-	discoveryPacket	discovery.Packet
-	clientOptions	client.Options
+	discoveryPacket discovery.Packet
+	clientOptions   client.Options
 	xmlClient       *client.XMLClient
 
 	system client.System
@@ -154,7 +154,6 @@ func (source Source) updateState(state *State) error {
 				continue
 			}
 
-
 			output := state.addOutput(tallySource, aux.Name)
 
 			if aux.PvwLastSrcIndex == sourceID || aux.PgmLastSrcIndex == sourceID {
@@ -165,7 +164,7 @@ func (source Source) updateState(state *State) error {
 					Status: Status{
 						Preview: (aux.PvwLastSrcIndex == sourceID),
 						Program: (aux.PgmLastSrcIndex == sourceID),
-						Active: (aux.IsActive > 0),
+						Active:  (aux.IsActive > 0),
 					},
 				})
 			}

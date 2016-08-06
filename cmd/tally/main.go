@@ -20,9 +20,9 @@ var Options = struct {
 	DiscoveryOptions discovery.Options `group:"E2 Discovery"`
 	ClientOptions    client.Options    `group:"E2 XML"`
 	TallyOptions     tally.Options     `group:"Tally"`
-	WebOptions		 web.Options       `group:"Web API"`
+	WebOptions       web.Options       `group:"Web API"`
 
-	modules			map[string]module
+	modules map[string]module
 }{
 	modules: make(map[string]module),
 }

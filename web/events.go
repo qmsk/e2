@@ -8,7 +8,7 @@ import (
 
 const EVENTS_BUFFER = 100
 
-type Event interface {}
+type Event interface{}
 
 type clientSet map[chan Event]bool
 

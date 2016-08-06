@@ -67,18 +67,18 @@ type XMLClient struct {
 	conn       net.Conn
 	connReader *bufio.Reader
 
-	writeError error // if set, the conn is closed
-	readChan   chan xmlPacket
-	readError  error // set once readChan is closed, nil on clean EOF
-	listenChan chan System
-	closeChan  chan struct{}
-	closed     bool
+	writeError    error // if set, the conn is closed
+	readChan      chan xmlPacket
+	readError     error // set once readChan is closed, nil on clean EOF
+	listenChan    chan System
+	closeChan     chan struct{}
+	closed        bool
 	readKeepalive bool
 }
 
 func (options Options) XMLClient() (*XMLClient, error) {
 	xmlClient := &XMLClient{
-		timeout: options.Timeout,
+		timeout:       options.Timeout,
 		readKeepalive: options.ReadKeepalive,
 	}
 

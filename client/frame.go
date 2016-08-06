@@ -5,14 +5,14 @@ import (
 )
 
 type Frame struct {
-	ID          string `xml:"id,attr"`
-	FrameType	int
-	OpMode		int
-	Name		string
-	Contact		string
-	OSVersion	string
-	Version		string
-	IsConnected	  int
+	ID            string `xml:"id,attr"`
+	FrameType     int
+	OpMode        int
+	Name          string
+	Contact       string
+	OSVersion     string
+	Version       string
+	IsConnected   int
 	SyncedSetting int
 
 	// Enet
@@ -33,5 +33,3 @@ func (col *FrameCollection) UnmarshalXML(d *xml.Decoder, e xml.StartElement) err
 func (col FrameCollection) MarshalJSON() ([]byte, error) {
 	return marshalJSONMap(col)
 }
-
-
