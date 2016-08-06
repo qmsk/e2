@@ -78,7 +78,11 @@ angular.module('qmsk.e2', [
         query: {
             method: 'GET',
             isArray: false,
-        }
+        },
+        activate: {
+            method: 'POST',
+            url: '/api/presets',
+        },
     }, {stripTrailingSlashes: false});
 })
 
@@ -208,6 +212,8 @@ angular.module('qmsk.e2', [
         var groups = { };
 
         $.each(presets, function(id, preset) {
+
+            // group it
             var group = groups[preset.group];
 
             if (!group) {
@@ -221,6 +227,24 @@ angular.module('qmsk.e2', [
             return {id: id, presets: presets};
         });
     });
+
+    $scope.busy = false;
+    $scope.activatePreset = function(preset) {
+        if ($scope.busy) {
+            return;
+        } else {
+            $scope.busy = true;
+        }
+
+        Preset.activate({id: preset.id},
+            function success(r) {
+                $scope.busy = false;
+            },
+            function error(e) {
+                $scope.busy = false;
+            }
+        );
+    };
 })
 
 ;

@@ -133,7 +133,7 @@ table.table tbody tr {
     background-color: #133337;
     color: #ffffff;
     
-    border: 4px solid transparent;
+    border: 4px solid #133337;
     border-radius: 4px;
 }
 
@@ -143,6 +143,14 @@ table.table tbody tr {
 .aux .label,
 .preset .label {
     font-size: inherit;
+}
+
+.preset .dest {
+    color: #444;
+}
+
+.preset.active {
+    border: 4px solid #888;
 }
 
 .inactive {

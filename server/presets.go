@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/qmsk/e2/client"
 	"github.com/qmsk/e2/web"
+	"net/http"
 )
 
 type Presets struct {
@@ -34,6 +35,20 @@ func (presets *Presets) load() error {
 
 func (presets *Presets) Get() (interface{}, error) {
 	return presets.presetMap, nil
+}
+
+func (presets *Presets) Post(request *http.Request) (interface{}, error) {
+	var params struct { ID int `json:"id"` }
+
+	if err := web.DecodeRequest(request, &params); err != nil {
+		return nil, err
+	}
+
+	if preset, exists := presets.system.PresetMgr.Preset[params.ID]; !exists {
+		return nil, nil // 404
+	} else {
+		return Preset{Preset: preset}.activate(presets.jsonClient)
+	}
 }
 
 func (presets *Presets) Index(name string) (web.Resource, error) {
@@ -78,6 +93,14 @@ func (preset Preset) String() string {
 }
 
 func (preset Preset) Get() (interface{}, error) {
+	return preset, nil
+}
+
+func (preset Preset) activate(jsonClient *client.JSONClient) (interface{}, error) {
+	if err := jsonClient.ActivatePresetPreview(preset.ID); err != nil {
+		return nil, fmt.Errorf("ActivatePresetPreview %d: %v", preset.ID, err)
+	}
+
 	return preset, nil
 }
 
