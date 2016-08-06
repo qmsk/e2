@@ -57,13 +57,11 @@ For example, using `--tally-contact-name=tally-test` would follow the input with
 
 The tally state can be output on a HTTP REST/WebSocket API, on GPIO pins, or RGB LEDs on the SPI bus.
 
-### Web API and UI
+### Web API
 
-The Web output provides an JSON REST API, a JSON WebSocket API, and an AngularJS frontend.
+The Web output provides an JSON REST API, a JSON WebSocket API:
 
-    tally --http-listen=:8001 --http-static=./static
-
-The `--http-static` is optional, and is only needed for the UI.
+    tally --http-listen=:8001
 
 Example JSON `http://localhost:8001/api/tally` output:
 
@@ -121,6 +119,16 @@ Example JSON `http://localhost:8001/api/tally` output:
 
 The same JSON document is also published on `ws://localhost:8001/events` in the `{"tally": { ... }}` format whenever it is updated.
 A HTTP `Origin:` header must be set.
+
+## Web UI
+
+The Web output also provides an AngularJS frontend using the JSON API:
+
+    tally --http-listen=:8001 --http-static=./static
+
+The `--http-static` is optional, and is only needed for the UI. Use `bower` to prepare the JS deps:
+
+	cd static && bower install
 
 The Web UI uses this WebSocket stream to display a live-updating tally state:
 
