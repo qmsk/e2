@@ -50,27 +50,6 @@ type Source struct {
 	DestIndex int
 }
 
-type listSources struct {
-	Type int `json:"type"`
-}
-
-const listSourcesTypeInput = 0
-const listSourcesTypeBackground = 1
-
-// Default is to return all
-func (client *Client) ListSources() (sourceList []Source, err error) {
-	request := Request{
-		Method: "listSources",
-		Params: struct{}{},
-	}
-
-	if err := client.doResult(&request, &sourceList); err != nil {
-		return nil, err
-	} else {
-		return sourceList, nil
-	}
-}
-
 // XML
 type SourceCol map[int]Source
 
