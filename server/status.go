@@ -1,18 +1,14 @@
 package server
 
-import (
-	"github.com/qmsk/e2/client"
-)
-
 type Status struct {
-	client *client.Client
+	options Options
 
 	Server string `json:"server"`
 	Mode   string `json:"mode"`
 }
 
 func (status Status) Get() (interface{}, error) {
-	status.Server = status.client.String()
+	status.Server = status.options.ClientOptions.String()
 	status.Mode = "live"
 
 	return status, nil

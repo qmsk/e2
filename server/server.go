@@ -25,12 +25,12 @@ func (options Options) Server() (*Server, error) {
 		server.clientOptions = clientOptions
 	}
 
-	if client, err := server.clientOptions.Client(); err != nil {
+	if jsonClient, err := server.clientOptions.JSONClient(); err != nil {
 		log.Fatalf("Client %#v: %v\n", server.clientOptions, err)
 	} else {
-		log.Printf("Client %#v: %v\n", server.clientOptions, client)
+		log.Printf("Client %#v: %v\n", server.clientOptions, jsonClient)
 
-		server.client = client
+		server.jsonClient = jsonClient
 	}
 
 	if xmlClient, err := server.clientOptions.XMLClient(); err != nil {
@@ -48,7 +48,7 @@ func (options Options) Server() (*Server, error) {
 type Server struct {
 	options       Options
 	clientOptions client.Options
-	client        *client.Client
+	jsonClient    *client.JSONClient
 	xmlClient	  *client.XMLClient
 
 	state		  atomic.Value

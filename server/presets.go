@@ -7,31 +7,24 @@ import (
 )
 
 type Presets struct {
-	client *client.Client
+	system *client.System
+	jsonClient *client.JSONClient
 
 	presetMap map[string]Preset
 }
 
-func (presets *Presets) load(client *client.Client) error {
-	apiPresets, err := client.ListPresets()
-	if err != nil {
-		return err
-	}
-
+func (presets *Presets) load() error {
 	presetMap := make(map[string]Preset)
 
-	for _, apiPreset := range apiPresets {
+	for presetID, preset := range presets.system.PresetMgr.Preset {
 		// parse sno
 		preset := Preset{
-			ID:   apiPreset.ID,
-			Name: apiPreset.Name,
-
-			Locked: apiPreset.LockMode > 0,
+			Preset:	preset,
 		}
 
-		preset.Group, preset.Index = apiPreset.ParseOrder()
+		preset.Group, preset.Index = preset.ParseOrder()
 
-		presetMap[preset.String()] = preset
+		presetMap[fmt.Sprintf("%v", presetID)] = preset
 	}
 
 	presets.presetMap = presetMap
@@ -48,7 +41,7 @@ func (presets *Presets) Index(name string) (web.Resource, error) {
 		var presetStates PresetStates
 
 		for _, preset := range presets.presetMap {
-			if presetState, err := preset.loadState(presets.client); err != nil {
+			if presetState, err := preset.loadState(presets.jsonClient); err != nil {
 				return nil, err
 			} else {
 				presetStates = append(presetStates, presetState)
@@ -59,7 +52,7 @@ func (presets *Presets) Index(name string) (web.Resource, error) {
 
 	} else if preset, found := presets.presetMap[name]; !found {
 		return nil, nil
-	} else if presetState, err := preset.loadState(presets.client); err != nil {
+	} else if presetState, err := preset.loadState(presets.jsonClient); err != nil {
 		return presetState, err
 	} else {
 		return presetState, nil
@@ -73,14 +66,11 @@ func (presetStates PresetStates) Get() (interface{}, error) {
 }
 
 type Preset struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	client.Preset
 
 	// Decomposed Sequence order
 	Group int `json:"group"`
 	Index int `json:"index"`
-
-	Locked bool `json:"locked"`
 }
 
 func (preset Preset) String() string {
@@ -91,10 +81,10 @@ func (preset Preset) Get() (interface{}, error) {
 	return preset, nil
 }
 
-func (preset Preset) loadState(client *client.Client) (PresetState, error) {
+func (preset Preset) loadState(jsonClient *client.JSONClient) (PresetState, error) {
 	presetState := PresetState{Preset: preset}
 
-	return presetState, presetState.load(client)
+	return presetState, presetState.load(jsonClient)
 }
 
 type PresetState struct {
@@ -104,8 +94,8 @@ type PresetState struct {
 	Auxes   []string `json:"auxes"`
 }
 
-func (presetState *PresetState) load(client *client.Client) error {
-	if presetDestinations, err := client.ListDestinationsForPreset(presetState.ID); err != nil {
+func (presetState *PresetState) load(jsonClient *client.JSONClient) error {
+	if presetDestinations, err := jsonClient.ListDestinationsForPreset(presetState.ID); err != nil {
 		return err
 	} else {
 		for _, auxDest := range presetDestinations.AuxDest {

@@ -19,17 +19,18 @@ func (server *Server) Index(name string) (web.Resource, error) {
 
 	case "status":
 		status := Status{
-			client: server.client,
+			options: server.options,
 		}
 
 		return &status, nil
 
 	case "presets":
 		presets := Presets{
-			client: server.client,
+			system: server.GetState().System,
+			jsonClient: server.jsonClient,
 		}
 
-		return &presets, presets.load(server.client)
+		return &presets, presets.load()
 
 	default:
 		return nil, nil
