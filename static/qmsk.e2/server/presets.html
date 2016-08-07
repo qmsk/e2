@@ -44,28 +44,7 @@
                                                  ng-click="autoTake ? take(preset) : select(preset)"
              >
                 {{preset.Name}}
-        
-                <div ng-repeat="id in preset.auxes">
-                    <span class="dest">{{state.System.DestMgr.AuxDestCol[id].Name}}</span>
-                </div>
-                <div ng-repeat="id in preset.screens">
-                    <span class="dest">{{state.System.DestMgr.ScreenDestCol[id].Name}}</span>
-                </div>
             </button>
         </div>
     </div>
-<!--
-            <button type="button" class="preset"
-                    ng-repeat="preset in group.presets"
-                    ng-class="{'preview': data.presets[preset].preview, 'program': data.presets[preset].program, 'active': data.presets[preset].active}"
-                    ng-click="clickPreset(preset)">
-                {{data.presets[preset].title}}
-                <div ng-repeat="(dest, where) in data.presets[preset].destinations">
-                    <span class="destination"
-                    ng-class="{'preview': where == 'preview', 'program': where == 'program', 'inactive': where == undefined}">
-                        {{dest}}
-                    </span>
-                </div>
-            </button>
--->
 </div>

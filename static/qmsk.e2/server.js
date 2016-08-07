@@ -203,7 +203,7 @@ angular.module('qmsk.e2', [
     $scope.state = State;
 })
 
-.controller('PresetsCtrl', function($scope, State, Preset, $location) {
+.controller('PresetsCtrl', function($scope, State, $location) {
     $scope.state = State;
 
     // size
@@ -246,9 +246,10 @@ angular.module('qmsk.e2', [
         var groups = { };
 
         $.each(presets, function(id, preset) {
-            var groupID = preset.group; // from sno=X.Y
+            var groupID = preset.presetSno.Group;
+            var groupIndex = preset.presetSno.Index;
             
-            preset = $.extend({groupIndex: preset.index}, preset);
+            preset = $.extend({groupIndex: groupIndex}, preset);
 
             // group it
             var group = groups[groupID];
@@ -305,26 +306,22 @@ angular.module('qmsk.e2', [
         });
     }
 
-    $scope.presets = [];
     $scope.groups = [];
-        
-    Preset.all(function(presets){
-        $scope.presets = presets;
-    });
-    
-    $scope.$watchGroup(['groupBy', 'presets'], function() {
+
+    $scope.$watchGroup(['groupBy', 'State.System'], function() {
+        var presets = State.System.PresetMgr.Preset;
         var groups;
 
         if ($scope.groupBy == 'sno') {
-            groups = groupBySno($scope.presets);
+            groups = groupBySno(presets);
         } else if ($scope.groupBy == 'console') {
-            groups = groupByConsole($scope.presets);
+            groups = groupByConsole(presets);
         } else {
 
             groups = [{
                 id: 0,
                 name: "",
-                presets: $.map($scope.presets, function(preset){
+                presets: $.map(presets, function(preset){
                     return $.extend({groupIndex: preset.id}, preset);
                 }),
             }];
