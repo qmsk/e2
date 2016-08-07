@@ -36,11 +36,6 @@ func (sno *PresetSno) UnmarshalJSON(value []byte) error {
 	return sno.parse(string(value))
 }
 
-func (sno PresetSno) MarshalJSON(value string) ([]byte, error) {
-	// as float
-	return []byte(sno.String()), nil
-}
-
 type Preset struct {
 	ID       int       `json:"id" xml:"id,attr"`
 	Name     string    `json:"Name"`
