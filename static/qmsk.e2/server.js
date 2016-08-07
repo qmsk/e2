@@ -380,6 +380,14 @@ angular.module('qmsk.e2', [
             }
         );
     };
+    
+    // preview -> program
+    $scope.cut = function() {
+        Preset.activate({cut: true});
+    };
+    $scope.autotrans = function() {
+        Preset.activate({autotrans: 0});
+    };
 })
 
 ;

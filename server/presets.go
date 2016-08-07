@@ -41,24 +41,51 @@ func (presets *Presets) Get() (interface{}, error) {
 
 func (presets *Presets) Post(request *http.Request) (interface{}, error) {
 	var params struct {
-		ID   int  `json:"id"`
-		Live bool `json:"live"`
+		ID        int  `json:"id"`
+		Live      bool `json:"live,omitempty"`
+		Cut	      bool `json:"cut,omitempty"`
+		AutoTrans int  `json:"autotrans,omitempty"`
 	}
+	params.ID = -1
+	params.AutoTrans = -1
 
 	if err := web.DecodeRequest(request, &params); err != nil {
 		return nil, err
 	}
 
-	preset, exists := presets.system.PresetMgr.Preset[params.ID]
-	if !exists {
-		return nil, nil // 404
+	if params.ID >= 0 {
+		preset , exists := presets.presetMap[fmt.Sprintf("%d", params.ID)]
+		if !exists {
+			return nil, nil // 404
+		}
+
+		if params.Live {
+			if err := preset.take(presets.tcpClient); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := preset.activate(presets.tcpClient); err != nil {
+				return nil, err
+			}
+		}
 	}
 
-	if params.Live {
-		return Preset{Preset: preset}.take(presets.tcpClient)
-	} else {
-		return Preset{Preset: preset}.activate(presets.tcpClient)
+	// preview -> program
+	if params.Cut {
+		if err := presets.tcpClient.Cut(); err != nil {
+			return nil, err
+		}
+	} else if params.AutoTrans == 0 {
+		if err := presets.tcpClient.AutoTrans(); err != nil {
+			return nil, err
+		}
+	} else if params.AutoTrans >= 0 {
+		if err := presets.tcpClient.AutoTransFrames(params.AutoTrans); err != nil {
+			return nil, err
+		}
 	}
+
+	return params, nil
 }
 
 func (presets *Presets) Index(name string) (web.Resource, error) {
@@ -106,20 +133,20 @@ func (preset Preset) Get() (interface{}, error) {
 	return preset, nil
 }
 
-func (preset Preset) activate(clientAPI client.API) (interface{}, error) {
+func (preset Preset) activate(clientAPI client.API) error {
 	if err := clientAPI.PresetRecall(preset.Preset); err != nil {
-		return nil, fmt.Errorf("RecallPreset %d: %v", preset.ID, err)
+		return fmt.Errorf("RecallPreset %d: %v", preset.ID, err)
 	}
 
-	return preset, nil
+	return nil
 }
 
-func (preset Preset) take(clientAPI client.API) (interface{}, error) {
+func (preset Preset) take(clientAPI client.API) error {
 	if err := clientAPI.PresetAutoTrans(preset.Preset); err != nil {
-		return nil, fmt.Errorf("RecallPreset %d: %v", preset.ID, err)
+		return fmt.Errorf("RecallPreset %d: %v", preset.ID, err)
 	}
 
-	return preset, nil
+	return nil
 }
 
 func (preset Preset) loadState(jsonClient *client.JSONClient) (PresetState, error) {
