@@ -4,26 +4,48 @@ import (
 	"encoding/xml"
 	"fmt"
 	"sort"
-	"strings"
 )
 
-type Preset struct {
-	ID       int     `json:"id" xml:"id,attr"`
-	Name     string  `json:"Name"`
-	LockMode int     `json:"LockMode"`
-	Sno      float64 `json:"presetSno" xml:"presetSno"`
+type PresetSno struct {
+	Group, Index	int
 }
 
-func (preset Preset) ParseOrder() (group int, index int) {
-	// one awesome hack
-	sno := strings.Trim(fmt.Sprintf("%f", preset.Sno), "0")
+func (sno PresetSno) String() string {
+	return fmt.Sprintf("%d.%d", sno.Group, sno.Index)
+}
 
-	if _, err := fmt.Sscanf(sno, "%d.%d", &group, &index); err != nil {
-		// 0.0 is invalid..
-		return 0, 0
+func (sno *PresetSno) parse(value string) error {
+	if _, err := fmt.Sscanf(value, "%d.%d", &sno.Group, &sno.Index); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
+func (sno *PresetSno) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
+	var value string
+
+	if err := d.DecodeElement(&value, &e); err != nil {
+		return err
 	}
 
-	return
+	return sno.parse(value)
+}
+
+func (sno *PresetSno) UnmarshalJSON(value []byte) error {
+	return sno.parse(string(value))
+}
+
+func (sno PresetSno) MarshalJSON(value string) ([]byte, error) {
+	// as float
+	return []byte(sno.String()), nil
+}
+
+type Preset struct {
+	ID       int       `json:"id" xml:"id,attr"`
+	Name     string    `json:"Name"`
+	LockMode int       `json:"LockMode"`
+	Sno      PresetSno `json:"presetSno" xml:"presetSno"`
 }
 
 // XML
