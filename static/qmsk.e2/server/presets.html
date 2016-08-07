@@ -1,18 +1,22 @@
-<div id="presets" ng-class="{'display-small': displaySize == 'small', 'display-large': displaySize == 'large'}">
+<div id="presets" ng-class="{'display-small': displaySize == 'small', 'display-large': displaySize == 'large', 'autotake': autoTake }">
     <div id="tools">
         <div class="btn-group">
-            <label type="button" class="btn btn-default" ng-model="groupBy" uib-btn-radio="'all'">All</label>
-            <label type="button" class="btn btn-default" ng-model="groupBy" uib-btn-radio="'sno'">X.Y</label>
-            <label type="button" class="btn btn-default" ng-model="groupBy" uib-btn-radio="'console'">PG</label>
+            <label class="btn btn-default" ng-model="groupBy" uib-btn-radio="'all'" ng-click="clearGroup()">All</label>
+            <label class="btn btn-default" ng-model="groupBy" uib-btn-radio="'sno'" ng-click="clearGroup()">X.Y</label>
+            <label class="btn btn-default" ng-model="groupBy" uib-btn-radio="'console'" ng-click="clearGroup()">PG</label>
         </div>
 
         <div class="btn-group">
-            <label type="button" class="btn btn-default" ng-model="displaySize" uib-btn-radio="'small'">Small</label>
-            <label type="button" class="btn btn-default" ng-model="displaySize" uib-btn-radio="'normal'">Normal</label>
-            <label type="button" class="btn btn-default" ng-model="displaySize" uib-btn-radio="'large'">Large</label>
+            <label class="btn btn-default" ng-model="displaySize" uib-btn-radio="'small'">Small</label>
+            <label class="btn btn-default" ng-model="displaySize" uib-btn-radio="'normal'">Normal</label>
+            <label class="btn btn-default" ng-model="displaySize" uib-btn-radio="'large'">Large</label>
         </div>
 
-        <button class="tool" name="take" id="take" type="submit" ng-click="take()">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default" ng-class="autoTake ? 'btn-danger' : 'btn-default'" ng-model="autoTake" uib-btn-checkbox>Auto Take</button>
+        </div>
+
+        <button class="tool" name="take" id="take" type="submit" ng-click="take()" ng-show="!autoTake">
             Take
         </button>
     <!--
@@ -36,7 +40,7 @@
             <button type="button" class="preset" ng-repeat="preset in group.presets | orderBy:'groupIndex' track by preset.groupIndex"
                                                  id="preset-{{preset.id}}"
                                                  ng-class="{'active': preset.id == activePresetID, 'preview': preset.id == previewPreset.id, 'program': preset.id == programPreset.id, 'other': preset.id != previewPreset.id && preset.id != programPreset.id  }"
-                                                 ng-click="select(preset)"
+                                                 ng-click="autoTake ? take(preset) : select(preset)"
              >
                 {{preset.Name}}
         

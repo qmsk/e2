@@ -37,6 +37,17 @@
     border-style: dashed;
 }
 
+#presets.autotake .preset {
+    background-color: #ff4000;
+    border-color: #ff4000;
+
+    color: #ffffff;
+}
+
+#presets.autotake .preset.program {
+    border-color: #133337;
+}
+
 #presets.display-small .preset {
     width: 80px;
     height: 80px;

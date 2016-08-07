@@ -226,6 +226,11 @@ angular.module('qmsk.e2', [
             $location.search('group', groupID);
         }
     }
+    $scope.clearGroup = function() {
+        $scope.collapseGroups = {};
+        $scope.showGroup = null;
+        $location.search('group', null);
+    };
     $scope.toggleGroup = function(groupID) {
         $scope.collapseGroups[groupID] = !$scope.collapseGroups[groupID];
     };
@@ -234,11 +239,7 @@ angular.module('qmsk.e2', [
     $scope.groupBy = $location.search().groupBy || 'sno';
     
     $scope.$watch('groupBy', function(groupBy) {
-        $location.search('groupBy', groupBy);
-            
-        $scope.collapseGroups = {};
-        $scope.showGroup = null;
-        $location.search('group', null);
+        $location.search('groupBy', groupBy);          
     });
 
     function groupBySno(presets) {
@@ -353,6 +354,12 @@ angular.module('qmsk.e2', [
     };
     
     // take preset for program
+    $scope.autoTake = $location.search().autotake || false;
+
+    $scope.$watch('autoTake', function(autoTake) {
+        $location.search('autotake', autoTake ? true : null);
+    });
+
     $scope.programPreset = null;
     $scope.take = function(preset) {
         if (preset) {
@@ -364,7 +371,7 @@ angular.module('qmsk.e2', [
         }
 
         $scope.activePresetID = null;
-        Preset.activate({id: $scope.previewPreset.id, live: true},
+        Preset.activate({id: preset.id, live: true},
             function success(r) {
                 $scope.programPreset = preset;
             },
