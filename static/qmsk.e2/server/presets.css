@@ -109,6 +109,16 @@
     margin: 0.5em auto;
 }
 
+#tools .btn-default {
+    background-color: #aaa;
+    color: #133337;
+}
+
+#tools .btn-default.active {
+    background-color: #133337;
+    color: #ffffff;
+}
+
 #tools button.tool {
     width: 120px;
     height: 120px;
