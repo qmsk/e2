@@ -10,6 +10,7 @@ import (
 type Presets struct {
 	system *client.System
 	jsonClient *client.JSONClient
+	tcpClient *client.TCPClient
 
 	presetMap map[string]Preset
 }
@@ -21,9 +22,10 @@ func (presets *Presets) load() error {
 		// parse sno
 		preset := Preset{
 			Preset:	preset,
-		}
 
-		preset.Group, preset.Index = preset.ParseOrder()
+			Group: preset.Sno.Group,
+			Index: preset.Sno.Index,
+		}
 
 		presetMap[fmt.Sprintf("%v", presetID)] = preset
 	}
@@ -53,9 +55,9 @@ func (presets *Presets) Post(request *http.Request) (interface{}, error) {
 	}
 
 	if params.Live {
-		return Preset{Preset: preset}.take(presets.jsonClient)
+		return Preset{Preset: preset}.take(presets.tcpClient)
 	} else {
-		return Preset{Preset: preset}.activate(presets.jsonClient)
+		return Preset{Preset: preset}.activate(presets.tcpClient)
 	}
 }
 
@@ -104,17 +106,17 @@ func (preset Preset) Get() (interface{}, error) {
 	return preset, nil
 }
 
-func (preset Preset) activate(jsonClient *client.JSONClient) (interface{}, error) {
-	if err := jsonClient.ActivatePresetPreview(preset.ID); err != nil {
-		return nil, fmt.Errorf("ActivatePresetPreview %d: %v", preset.ID, err)
+func (preset Preset) activate(clientAPI client.API) (interface{}, error) {
+	if err := clientAPI.PresetRecall(preset.Preset); err != nil {
+		return nil, fmt.Errorf("RecallPreset %d: %v", preset.ID, err)
 	}
 
 	return preset, nil
 }
 
-func (preset Preset) take(jsonClient *client.JSONClient) (interface{}, error) {
-	if err := jsonClient.ActivatePresetProgram(preset.ID); err != nil {
-		return nil, fmt.Errorf("ActivatePresetProgram %d: %v", preset.ID, err)
+func (preset Preset) take(clientAPI client.API) (interface{}, error) {
+	if err := clientAPI.PresetAutoTrans(preset.Preset); err != nil {
+		return nil, fmt.Errorf("RecallPreset %d: %v", preset.ID, err)
 	}
 
 	return preset, nil

@@ -41,6 +41,13 @@ func (options Options) Server() (*Server, error) {
 		server.xmlClient = xmlClient
 	}
 
+	if tcpClient, err := server.clientOptions.TCPClient(); err != nil {
+		log.Fatalf("Client %v: TCPClient %v", server.clientOptions, err)
+	} else {
+		log.Printf("Client %v: TCPClient: %v", server.clientOptions, tcpClient)
+
+		server.tcpClient = tcpClient
+	}
 
 	return server, nil
 }
@@ -50,6 +57,7 @@ type Server struct {
 	clientOptions client.Options
 	jsonClient    *client.JSONClient
 	xmlClient	  *client.XMLClient
+	tcpClient	  *client.TCPClient
 
 	state		  atomic.Value
 	eventChan     chan web.Event

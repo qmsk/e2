@@ -28,6 +28,7 @@ func (server *Server) Index(name string) (web.Resource, error) {
 		presets := Presets{
 			system: server.GetState().System,
 			jsonClient: server.jsonClient,
+			tcpClient: server.tcpClient,
 		}
 
 		return &presets, presets.load()
