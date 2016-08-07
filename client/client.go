@@ -22,7 +22,8 @@ func (options Options) String() string {
 }
 
 type API interface {
-	AutoTrans(frames int) error
+	AutoTrans() error
+	AutoTransFrames(frames int) error
 	Cut() error
 	PresetSave(preset Preset) error
 	PresetRecall(preset Preset) error

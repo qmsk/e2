@@ -98,12 +98,16 @@ func (client *TCPClient) command(command string, params... interface{}) error {
 	return client.send(parts)
 }
 
-func (client *TCPClient) AutoTrans(frames int) error {
+func (client *TCPClient) AutoTrans() error {
+	return client.command("ATRN")
+}
+
+func (client *TCPClient) AutoTransFrames(frames int) error {
 	return client.command("ATRN", frames)
 }
 
 func (client *TCPClient) Cut() error {
-	return client.command("ATRN")
+	return client.command("ATRN", 0)
 }
 
 func (client *TCPClient) PresetSave(preset Preset) error {
