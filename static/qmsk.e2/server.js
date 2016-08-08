@@ -274,16 +274,11 @@ angular.module('qmsk.e2', [
     };
     function groupByConsole(presets) {
         var groups = { };
-        var presetsByID = { };
-
-        $.each(presets, function(presetID, preset){
-            presetsByID[preset.id] = preset;
-        });
 
         $.each(State.System.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl, function(buttonID, button) {
             var groupID = Math.floor(button.id / 12); // rows of 12 keys
             var group = groups[groupID];
-            var preset = presetsByID[button.ConsoleButtonTypeIndex];
+            var preset = presets[button.ConsoleButtonTypeIndex];
 
             if (button.ConsoleButtonType != 'preset' || !preset) {
                 return;
@@ -330,7 +325,7 @@ angular.module('qmsk.e2', [
             }];
         }
 
-        Console.log("Refresh presets: presets=" + presets.length + ", groupBy=" + $scope.groupBy + ", groups=" + groups.length);
+        Console.log("Refresh presets: presets=" + Object.keys(presets).length + ", groupBy=" + $scope.groupBy + ", groups=" + groups.length);
 
         $scope.groups = groups;
     });
