@@ -252,13 +252,6 @@ Use the included `cmd/tally/spiled-down.sh <count>` script to force the SPI LEDs
 
 Web interface for displaying E2 state and controlling presets.
 
-### System
-Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
-
-![#/system](/docs/web-system.png?raw=true)
-
-## Server
-
 Follow E2 status, providing a HTTP REST + WebSocket JSON API, and an AngularJS web UI:
 
     go get ./cmd/server
@@ -293,6 +286,46 @@ The server will connect to the first discovered E2 system.
 
 	Help Options:
 	  -h, --help                       Show this help message
+
+### Main view
+
+Shows an overview of Sources and their active Preview/Program destinations.
+
+![#/main](/docs/web-main.png?raw=true)
+
+### Presets
+
+Shows grouped Presets.
+
+![#/presets](/docs/web-presets.png?raw=true)
+
+Clicking a Preset recalls it to Preview.
+
+There are three different grouping options available. 
+*All* will show all presets in ID order.
+*X.Y* groups presets by their sequence number.
+*PG* groups presets by the console layout's preset pages.
+
+The display size buttons change the size of the preset buttons, between *Small*, *Normal* and *Large*.
+
+Clicking *Take*  transitions the last selected Preset directly to Program.
+Enabling *Auto Take* will recall each selected Preset directly to Program. The colors of the Preset buttons change to red to indicate this state.
+
+Clicking *Cut* or *Auto Trans* transitions the current System Preview state to Program.
+*WARNING:* This may not necessarily be the same as the last recalled preset, in case other concurrent users are also modifying preview
+or the set of active destinations!
+
+The last recalled preset is shown with a border.
+Externally recalled presets are colored in white.
+Recalling a preset will color the border green. The border is initially dashed until the E2 updates the result of the recall command.
+*Take* will change the selected Preset's border to red.
+*XXX*: *Cut* and *Auto Trans* do not change the selected Preset's display state.
+
+### System
+
+Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
+
+![#/system](/docs/web-system.png?raw=true)
 
 ### API
 
