@@ -203,7 +203,7 @@ angular.module('qmsk.e2', [
     $scope.state = State;
 })
 
-.controller('PresetsCtrl', function($scope, State, $location) {
+.controller('PresetsCtrl', function($scope, State, $location, $log) {
     $scope.state = State;
 
     // size
@@ -308,7 +308,7 @@ angular.module('qmsk.e2', [
 
     $scope.groups = [];
 
-    $scope.$watchGroup(['groupBy', 'State.System'], function() {
+    $scope.$watchGroup(['groupBy', 'state.System'], function() {
         var presets = State.System.PresetMgr.Preset;
         var groups;
 
@@ -326,6 +326,8 @@ angular.module('qmsk.e2', [
                 }),
             }];
         }
+
+        $log.info("Refresh presets: presets=" + presets.length + ", groupBy=" + $scope.groupBy + ", groups=" + groups.length);
 
         $scope.groups = groups;
     });
