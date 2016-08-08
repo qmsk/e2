@@ -24,6 +24,9 @@ var Options = struct {
 
 	modules map[string]module
 }{
+	ClientOptions: client.Options{
+		ReadOnly: true,
+	},
 	modules: make(map[string]module),
 }
 
