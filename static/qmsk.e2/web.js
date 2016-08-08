@@ -1,4 +1,5 @@
 angular.module('qmsk.e2.web', [
+        'qmsk.e2.console',
         'ngResource',
 ])
 
