@@ -1,4 +1,5 @@
 angular.module('qmsk.e2', [
+        'qmsk.e2.console',
         'qmsk.e2.source',
         'qmsk.e2.web',
         'ngResource',
@@ -205,7 +206,7 @@ angular.module('qmsk.e2', [
     $scope.state = State;
 })
 
-.controller('PresetsCtrl', function($scope, State, Preset, $location, $log) {
+.controller('PresetsCtrl', function($scope, State, Preset, $location, Console) {
     $scope.state = State;
 
     // size
@@ -329,7 +330,7 @@ angular.module('qmsk.e2', [
             }];
         }
 
-        $log.info("Refresh presets: presets=" + presets.length + ", groupBy=" + $scope.groupBy + ", groups=" + groups.length);
+        Console.log("Refresh presets: presets=" + presets.length + ", groupBy=" + $scope.groupBy + ", groups=" + groups.length);
 
         $scope.groups = groups;
     });
@@ -344,6 +345,9 @@ angular.module('qmsk.e2', [
     $scope.previewPreset = null
     $scope.select = function(preset) {
         $scope.activePresetID = null;
+        
+        Console.log("Recall preset " + preset.id + ": " + preset.name);
+
         Preset.activate({id: preset.id},
             function success(r) {
                 $scope.previewPreset = preset;
@@ -370,6 +374,8 @@ angular.module('qmsk.e2', [
         } else {
             return;
         }
+        
+        Console.log("Take preset " + preset.id + ": " + preset.name);
 
         $scope.activePresetID = null;
         Preset.activate({id: preset.id, live: true},
@@ -384,9 +390,13 @@ angular.module('qmsk.e2', [
     
     // preview -> program
     $scope.cut = function() {
+        Console.log("Cut")
+
         Preset.activate({cut: true});
     };
     $scope.autotrans = function() {
+        Console.log("AutoTrans")
+
         Preset.activate({autotrans: 0});
     };
 })

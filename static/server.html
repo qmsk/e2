@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="/static/qmsk.e2/server/presets.css">
 
         <script src="/static/qmsk.e2/source/source.js"></script>
+        <script src="/static/qmsk.e2/console.js"></script>
         <script src="/static/qmsk.e2/web.js"></script>
         <script src="/static/qmsk.e2/server.js"></script>
     </head>
@@ -64,10 +65,13 @@
                     <span class="glyphicon glyphicon-alert" title="API error"></span>
                 </p>
                 <p class="navbar-text navbar-right state-error" ng-show="events.error">
-                    <span class="glyphicon glyphicon-alert" title="WebSocket error"></span>
+                    <span class="glyphicon glyphicon-alert" title="WebSocket error: {{events.error}}"></span>
                 </p>
                 <p class="navbar-text navbar-right state-error" ng-show="!events.open ">
                     <span class="glyphicon glyphicon-alert" title="WebSocket closed"></span>
+                </p>
+                <p class="navbar-text navbar-right state-success" ng-show="events.open">
+                    <span class="glyphicon glyphicon-cloud-download" title="WebSocket open"></span>
                 </p>
 
                 <p class="navbar-text navbar-right" ng-if="status.mode == 'live'">
@@ -87,14 +91,8 @@
 
         <div id="view" ng-view></div>
             
-        <div id="status" ng-controller="StatusCtrl" scroll-glue>
-            <div ng-repeat="event in events.events">{{event.line}}</div>
-            <div class="state" ng-class="{'open': events.open, 'error': events.error}">
-                WebSocket 
-                <span ng-if="!events.open">Closed</span>
-                <span ng-if="events.open">Open</span>
-                <span ng-if="events.error">Error: {{events.error}}</span>
-            </div>
+        <div id="status" ng-controller="ConsoleCtrl" scroll-glue>
+            <div ng-repeat="log in console.logMessages track by log.id">{{log.message}}</div>
         </div>
     </body>
 
