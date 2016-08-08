@@ -291,13 +291,13 @@ The server will connect to the first discovered E2 system.
 
 Shows an overview of Sources and their active Preview/Program destinations.
 
-![#/main](/docs/web-main.png?raw=true)
+![Web UI Main view](/docs/web-main.png?raw=true)
 
 ### Presets
 
 Shows grouped Presets.
 
-![#/presets](/docs/web-presets.png?raw=true)
+![Web UI Presets view](/docs/web-presets.png?raw=true)
 
 Clicking a Preset recalls it to Preview.
 
@@ -325,7 +325,7 @@ Recalling a preset will color the border green. The border is initially dashed u
 
 Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
 
-![#/system](/docs/web-system.png?raw=true)
+![Web UI System view](/docs/web-system.png?raw=true)
 
 ### API
 
@@ -338,7 +338,8 @@ Returns server state:
 ```
 {
     "System": { ... }
-}```
+}
+```
 
 This uses the same JSON format as the WebSocket API.
 
@@ -380,7 +381,8 @@ Uses the same JSON format as `/api/`.
 ```
 {
     "System": { ... }
-}```
+}
+```
 
 See the [server.json example file](docs/server.json).
 
