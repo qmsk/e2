@@ -1,0 +1,385 @@
+{
+   "System" : {
+      "PresetMgr" : {
+         "Preset" : {
+            "3" : {
+               "presetSno" : {
+                  "Index" : 0,
+                  "Group" : 4
+               },
+               "id" : 3,
+               "LockMode" : 0,
+               "Name" : "Input1 @ Two"
+            },
+            "0" : {
+               "Name" : "Input1 @ All",
+               "LockMode" : 0,
+               "id" : 0,
+               "presetSno" : {
+                  "Index" : 0,
+                  "Group" : 1
+               }
+            },
+            "1" : {
+               "presetSno" : {
+                  "Group" : 2,
+                  "Index" : 0
+               },
+               "id" : 1,
+               "LockMode" : 0,
+               "Name" : "Input2  @ All"
+            },
+            "2" : {
+               "LockMode" : 0,
+               "Name" : "Input2 @ Two",
+               "presetSno" : {
+                  "Group" : 3,
+                  "Index" : 0
+               },
+               "id" : 2
+            }
+         },
+         "ConflictMode" : 0,
+         "TransTime" : 0,
+         "ConflictPref" : 0,
+         "LastRecall" : 1,
+         "GuiId" : "",
+         "ID" : 0,
+         "Conflict" : 0
+      },
+      "ConsoleLayoutMgr" : {
+         "ConsoleLayout" : {
+            "DestinationBusColl" : {},
+            "PresetBusColl" : {
+               "0" : {
+                  "ConsoleButtonType" : "preset",
+                  "ConsoleButtonTypeIndex" : 0,
+                  "id" : 0
+               },
+               "1" : {
+                  "id" : 1,
+                  "ConsoleButtonTypeIndex" : 1,
+                  "ConsoleButtonType" : "preset"
+               },
+               "12" : {
+                  "ConsoleButtonTypeIndex" : 3,
+                  "id" : 12,
+                  "ConsoleButtonType" : "preset"
+               },
+               "13" : {
+                  "ConsoleButtonType" : "preset",
+                  "ConsoleButtonTypeIndex" : 2,
+                  "id" : 13
+               }
+            },
+            "UserKeyBusColl" : {},
+            "InputSourceBusColl" : {}
+         }
+      },
+      "Name" : "System1",
+      "OSVersion" : "NA",
+      "Version" : "3.0.21361",
+      "SrcMgr" : {
+         "ID" : 0,
+         "SourceCol" : {
+            "3" : {
+               "HSize" : 1920,
+               "InputCfgVideoStatus" : null,
+               "VSize" : 1080,
+               "DestIndex" : 1,
+               "InputCfgIndex" : -1,
+               "SrcType" : "dest",
+               "StillIndex" : -1,
+               "Name" : "ScreenDest2_PGM-4",
+               "UserKeyIndex" : -1,
+               "id" : 3
+            },
+            "1" : {
+               "id" : 1,
+               "Name" : "Input1-2",
+               "UserKeyIndex" : -1,
+               "VSize" : 1080,
+               "DestIndex" : -1,
+               "InputCfgIndex" : 0,
+               "StillIndex" : -1,
+               "SrcType" : "input",
+               "HSize" : 1920,
+               "InputCfgVideoStatus" : null
+            },
+            "2" : {
+               "DestIndex" : -1,
+               "VSize" : 1080,
+               "InputCfgIndex" : 1,
+               "StillIndex" : -1,
+               "SrcType" : "input",
+               "HSize" : 1920,
+               "InputCfgVideoStatus" : null,
+               "id" : 2,
+               "UserKeyIndex" : -1,
+               "Name" : "Input2-3"
+            },
+            "0" : {
+               "VSize" : 1080,
+               "DestIndex" : 0,
+               "InputCfgIndex" : -1,
+               "SrcType" : "dest",
+               "StillIndex" : -1,
+               "HSize" : 1920,
+               "InputCfgVideoStatus" : null,
+               "id" : 0,
+               "Name" : "ScreenDest1_PGM-1",
+               "UserKeyIndex" : -1
+            }
+         },
+         "InputCfgCol" : {
+            "1" : {
+               "InputCfgVideoStatus" : "bad",
+               "Name" : "Input2",
+               "ConfigOwner" : "",
+               "ConfigContact" : "tally=2",
+               "id" : 1,
+               "InputCfgType" : 0
+            },
+            "0" : {
+               "ConfigOwner" : "",
+               "ConfigContact" : "tally=1",
+               "id" : 0,
+               "InputCfgType" : 0,
+               "InputCfgVideoStatus" : "bad",
+               "Name" : "Input1"
+            }
+         }
+      },
+      "FrameCollection" : {
+         "08::00::27::cb::66::47" : {
+            "OSVersion" : "NA",
+            "OpMode" : 0,
+            "ID" : "08::00::27::cb::66::47",
+            "Contact" : "",
+            "Name" : "E2",
+            "SyncedSetting" : 0,
+            "Version" : "3.0.21361",
+            "FrameType" : 0,
+            "IsConnected" : 1
+         }
+      },
+      "DestMgr" : {
+         "AuxDestCol" : {},
+         "ID" : 0,
+         "ScreenDestCol" : {
+            "0" : {
+               "Name" : "ScreenDest1",
+               "LayerCollection" : {
+                  "3" : {
+                     "PvwZOrder" : 2,
+                     "PgmMode" : 0,
+                     "IsActive" : 0,
+                     "id" : 3,
+                     "LastSrcIdx" : -1,
+                     "Name" : "Layer2-B",
+                     "PvwMode" : 0,
+                     "PgmZOrder" : 2,
+                     "LastUserKeyIdx" : -1
+                  },
+                  "0" : {
+                     "Name" : "Layer1-A",
+                     "PgmZOrder" : 0,
+                     "PvwMode" : 1,
+                     "LastUserKeyIdx" : -1,
+                     "PgmMode" : 0,
+                     "IsActive" : 0,
+                     "id" : 0,
+                     "LastSrcIdx" : 2,
+                     "PvwZOrder" : 0
+                  },
+                  "2" : {
+                     "PgmZOrder" : 2,
+                     "PvwMode" : 0,
+                     "LastUserKeyIdx" : -1,
+                     "Name" : "Layer2-A",
+                     "LastSrcIdx" : -1,
+                     "PgmMode" : 0,
+                     "IsActive" : 0,
+                     "id" : 2,
+                     "PvwZOrder" : 2
+                  },
+                  "1" : {
+                     "PvwZOrder" : 0,
+                     "Name" : "Layer1-B",
+                     "PvwMode" : 0,
+                     "PgmZOrder" : 0,
+                     "LastUserKeyIdx" : -1,
+                     "PgmMode" : 1,
+                     "IsActive" : 0,
+                     "id" : 1,
+                     "LastSrcIdx" : 1
+                  }
+               },
+               "ID" : 0,
+               "IsActive" : 0,
+               "HSize" : 1920,
+               "BGLyr" : {
+                  "1" : {
+                     "id" : 1,
+                     "BGShowMatte" : 1,
+                     "BGColor" : {
+                        "Green" : 0,
+                        "id" : 0,
+                        "Red" : 0,
+                        "Blue" : 0
+                     },
+                     "Name" : "",
+                     "LastBGSourceIndex" : -1
+                  },
+                  "0" : {
+                     "BGColor" : {
+                        "Blue" : 0,
+                        "Red" : 0,
+                        "Green" : 0,
+                        "id" : 0
+                     },
+                     "BGShowMatte" : 1,
+                     "id" : 0,
+                     "LastBGSourceIndex" : -1,
+                     "Name" : ""
+                  }
+               },
+               "Transition" : {
+                  "0" : {
+                     "TransPos" : 0,
+                     "ArmMode" : 0,
+                     "ID" : 0,
+                     "AutoTransInProg" : 0,
+                     "TransInProg" : 0
+                  },
+                  "1" : {
+                     "TransPos" : 0,
+                     "ID" : 1,
+                     "ArmMode" : 0,
+                     "TransInProg" : 0,
+                     "AutoTransInProg" : 0
+                  }
+               },
+               "VSize" : 1080
+            },
+            "1" : {
+               "HSize" : 1920,
+               "BGLyr" : {
+                  "1" : {
+                     "Name" : "",
+                     "LastBGSourceIndex" : -1,
+                     "id" : 1,
+                     "BGShowMatte" : 1,
+                     "BGColor" : {
+                        "Blue" : 0,
+                        "Red" : 0,
+                        "Green" : 0,
+                        "id" : 0
+                     }
+                  },
+                  "0" : {
+                     "BGColor" : {
+                        "Blue" : 0,
+                        "Red" : 0,
+                        "Green" : 0,
+                        "id" : 0
+                     },
+                     "BGShowMatte" : 1,
+                     "id" : 0,
+                     "LastBGSourceIndex" : -1,
+                     "Name" : ""
+                  }
+               },
+               "Transition" : {
+                  "1" : {
+                     "TransPos" : 0,
+                     "ID" : 1,
+                     "ArmMode" : 0,
+                     "TransInProg" : 0,
+                     "AutoTransInProg" : 0
+                  },
+                  "0" : {
+                     "TransInProg" : 0,
+                     "AutoTransInProg" : 0,
+                     "ID" : 0,
+                     "TransPos" : 0,
+                     "ArmMode" : 1
+                  }
+               },
+               "VSize" : 1080,
+               "Name" : "ScreenDest2",
+               "LayerCollection" : {
+                  "3" : {
+                     "PvwZOrder" : 2,
+                     "id" : 3,
+                     "IsActive" : 0,
+                     "PgmMode" : 0,
+                     "LastSrcIdx" : -1,
+                     "Name" : "Layer2-B",
+                     "LastUserKeyIdx" : -1,
+                     "PgmZOrder" : 2,
+                     "PvwMode" : 0
+                  },
+                  "5" : {
+                     "PvwZOrder" : 4,
+                     "LastSrcIdx" : -1,
+                     "PgmMode" : 0,
+                     "id" : 5,
+                     "IsActive" : 0,
+                     "PvwMode" : 0,
+                     "PgmZOrder" : 4,
+                     "LastUserKeyIdx" : -1,
+                     "Name" : "Layer3-B"
+                  },
+                  "4" : {
+                     "PgmZOrder" : 4,
+                     "PvwMode" : 0,
+                     "LastUserKeyIdx" : -1,
+                     "Name" : "Layer3-A",
+                     "LastSrcIdx" : -1,
+                     "PgmMode" : 0,
+                     "id" : 4,
+                     "IsActive" : 0,
+                     "PvwZOrder" : 4
+                  },
+                  "1" : {
+                     "LastSrcIdx" : -1,
+                     "PgmMode" : 0,
+                     "IsActive" : 0,
+                     "id" : 1,
+                     "PvwMode" : 0,
+                     "PgmZOrder" : 0,
+                     "LastUserKeyIdx" : -1,
+                     "Name" : "Layer1-B",
+                     "PvwZOrder" : 0
+                  },
+                  "2" : {
+                     "PvwZOrder" : 2,
+                     "Name" : "Layer2-A",
+                     "LastUserKeyIdx" : -1,
+                     "PvwMode" : 0,
+                     "PgmZOrder" : 2,
+                     "id" : 2,
+                     "IsActive" : 0,
+                     "PgmMode" : 0,
+                     "LastSrcIdx" : -1
+                  },
+                  "0" : {
+                     "PvwZOrder" : 0,
+                     "id" : 0,
+                     "IsActive" : 0,
+                     "PgmMode" : 0,
+                     "LastSrcIdx" : 1,
+                     "Name" : "Layer1-A",
+                     "LastUserKeyIdx" : -1,
+                     "PgmZOrder" : 0,
+                     "PvwMode" : 1
+                  }
+               },
+               "IsActive" : 1,
+               "ID" : 1
+            }
+         }
+      }
+   }
+}

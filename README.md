@@ -250,7 +250,7 @@ Use the included `cmd/tally/spiled-down.sh <count>` script to force the SPI LEDs
 
 ## Server (Web UI)
 
-Under development.
+Web interface for displaying E2 state and controlling presets.
 
 ### System
 Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
@@ -259,275 +259,97 @@ Raw System state, represented as a collapsible JSON object, live-updated from th
 
 ## Server
 
+Follow E2 status, providing a HTTP REST + WebSocket JSON API, and an AngularJS web UI:
+
     go get ./cmd/server
     
     cd static && bower install
+    
+	$GOPATH/bin/server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
 
-Follow E2 status, providing a REST + WebSocket API, and a web UI:
+The server will connect to the first discovered E2 system.
 
-    $GOPATH/bin/server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
+### Usage
+
+	  server [OPTIONS]
+
+	Web:
+		  --http-listen=[HOST]:PORT
+		  --http-static=PATH
+
+	E2 Discovery:
+		  --discovery-address=
+		  --discovery-interface=
+		  --discovery-interval=
+
+	E2 JSON-RPC:
+		  --e2-address=HOST
+		  --e2-jsonrpc-port=PORT
+		  --e2-xml-port=PORT
+		  --e2-telnet-port=PORT
+		  --e2-timeout=
+		  --e2-safe                    Safe mode, do not allow modifications
+		  --e2-debug                   Dump commands
+
+	Help Options:
+	  -h, --help                       Show this help message
 
 ### API
 
-TODO: examples
+HTTP REST JSON.
 
 #### *GET* `/api/`
 
-Combines both sources and screens, including cross-correlated program/preview state for both. This is `O(N)` RPCs on the number of screen destinations.
+Returns server state:
 
-```JSON
-  {
-    "sources": {
-      "4" : {
-         "dimensions" : {
-            "width" : 1920,
-            "height" : 1080
-         },
-         "type" : "input",
-         "id" : 4,
-         "name" : "PC 3",
-         "status" : "ok"
-         "preview_screens" : [
-            "0"
-         ],
-      },
-      "5" : {
-         "id" : 5,
-         "name" : "PC 4",
-         "status" : "ok",
-         "type" : "input",
-         "dimensions" : {
-            "height" : 1080,
-            "width" : 1920
-         }
-         "program_screens" : [
-            "0"
-         ],
-      },
-    },
-    "screens" : {
-      "0" : {
-         "id" : 0,
-         "preview_sources" : [
-            "4"
-         ],
-         "name" : "Main",
-         "program_sources" : [
-            "5"
-         ],
-         "dimensions" : {
-            "width" : 1920,
-            "height" : 1080
-         }
-      },
-    }
- }
 ```
+{
+    "System": { ... }
+}```
 
-#### *GET* `/api/sources`
+This uses the same JSON format as the WebSocket API.
 
-#### *GET* `/api/sources/:id`
-
-#### *GET* `/api/screens`
-
-#### *GET* `/api/screens/`
-
-Includes the detailed information for each screen. This is `O(N)` RPCs on the number of screen destinations.
-
-#### *GET* `/api/screens/:id`
-
-#### *GET* `/api/auxes`
-
-#### *GET* `/api/auxes/:id`
+See the [server.json example file](docs/server.json).
 
 #### *GET* `/api/presets`
 
+List of presets.
+
+#### *POST* `/api/presets` `{ ID: 0, Live: false, Cut: false, AutoTrans: -1 }`
+
+Activate presets on preview/program, and optionally cut/autotrans from preview to program.
+
+Parameter   | Type   | Default       | Meaning
+------------|--------|---------------|--------------
+`ID`        | `int`  | -1            | Recall preset
+`Live`      | `bool` | false         | Recall preset directly to program
+`Cut`       | `bool` | false         | Cut preview to program (on active destinations)
+`AutoTrans` | `int`  | -1            | Auto transition preview to program, using given number of frames, or 0 for default
+
 #### *GET* `/api/presets/`
 
-Includes the detailed information for each preset. This is `O(N)` RPCs on the number of presets.
+List of presets with detailed information about preset destinations.
+
+This is `O(N)` JSON-RPC calls on the number of presets.
 
 #### *GET* `/api/presets/:id`
 
-### Events
+Detailed information about given preset.
 
-Supports live streaming of updated E2 system state on events.
+This is a single JSON-RPC call.
 
-The same output can be followed using `client listen` and `client listen --json`.
+### WebSocket `/events`
 
-#### `ws://.../events`
+Live streaming of updated E2 system state on events. Sends the current system state on initial connect.
 
-```JSON
-{
-    "system": {
-       "OSVersion" : "0.0.0",
-       "PresetMgr" : {
-          "LastRecall" : -1,
-          "ID" : 0,
-          "Preset" : {}
-       },
-       "DestMgr" : {
-          "AuxDestCol" : {},
-          "ID" : 0,
-          "ScreenDestCol" : {
-             "0" : {
-                "Transition" : [
-                   {
-                      "AutoTransInProg" : 0,
-                      "ArmMode" : 0,
-                      "ID" : 0,
-                      "TransInProg" : 0,
-                      "TransPos" : 0
-                   },
-                   {
-                      "AutoTransInProg" : 0,
-                      "ID" : 1,
-                      "ArmMode" : 0,
-                      "TransInProg" : 0,
-                      "TransPos" : 0
-                   }
-                ],
-                "VSize" : 1080,
-                "HSize" : 1920,
-                "Name" : "ScreenDest1",
-                "IsActive" : 0,
-                "LayerCollection" : {
-                   "0" : {
-                      "LastSrcIdx" : 1,
-                      "PgmMode" : 1,
-                      "PgmZOrder" : 0,
-                      "IsActive" : 0,
-                      "PvwMode" : 0,
-                      "Name" : "Layer1-A",
-                      "id" : 0,
-                      "LastUserKeyIdx" : -1,
-                      "PvwZOrder" : 0
-                   },
-                   "3" : {
-                      "PvwZOrder" : 2,
-                      "LastUserKeyIdx" : -1,
-                      "PvwMode" : 0,
-                      "Name" : "Layer2-B",
-                      "IsActive" : 0,
-                      "id" : 3,
-                      "PgmMode" : 0,
-                      "PgmZOrder" : 2,
-                      "LastSrcIdx" : -1
-                   },
-                   "1" : {
-                      "PgmZOrder" : 0,
-                      "PgmMode" : 0,
-                      "LastSrcIdx" : 1,
-                      "LastUserKeyIdx" : -1,
-                      "PvwZOrder" : 0,
-                      "id" : 1,
-                      "PvwMode" : 1,
-                      "Name" : "Layer1-B",
-                      "IsActive" : 0
-                   },
-                   "2" : {
-                      "PvwZOrder" : 2,
-                      "LastUserKeyIdx" : -1,
-                      "IsActive" : 0,
-                      "Name" : "Layer2-A",
-                      "PvwMode" : 0,
-                      "id" : 2,
-                      "PgmMode" : 0,
-                      "PgmZOrder" : 2,
-                      "LastSrcIdx" : -1
-                   }
-                },
-                "BGLayer" : [
-                   {
-                      "Name" : "",
-                      "BGShowMatte" : 1,
-                      "BGColor" : {
-                         "Red" : 0,
-                         "Blue" : 0,
-                         "Green" : 0,
-                         "id" : 0
-                      },
-                      "id" : 0,
-                      "LastBGSourceIndex" : -1
-                   },
-                   {
-                      "LastBGSourceIndex" : -1,
-                      "Name" : "",
-                      "BGShowMatte" : 1,
-                      "BGColor" : {
-                         "id" : 0,
-                         "Blue" : 0,
-                         "Green" : 0,
-                         "Red" : 0
-                      },
-                      "id" : 1
-                   }
-                ],
-                "ID" : 0
-             }
-          }
-       },
-       "SrcMgr" : {
-          "ID" : 0,
-          "SourceCol" : {
-             "0" : {
-                "HSize" : 1920,
-                "StillIndex" : -1,
-                "id" : 0,
-                "SrcType" : 2,
-                "Name" : "ScreenDest1_PGM-1",
-                "DestIndex" : 0,
-                "UserKeyIndex" : -1,
-                "VSize" : 1080,
-                "InputCfgVideoStatus" : 0,
-                "InputCfgIndex" : -1
-             },
-             "1" : {
-                "DestIndex" : -1,
-                "VSize" : 1080,
-                "UserKeyIndex" : -1,
-                "InputCfgVideoStatus" : 0,
-                "InputCfgIndex" : 0,
-                "HSize" : 1920,
-                "id" : 1,
-                "StillIndex" : -1,
-                "SrcType" : 0,
-                "Name" : "Input1-2"
-             }
-          },
-          "InputCfgCol" : {
-             "0" : {
-                "id" : 0,
-                "InputCfgType" : 0,
-                "Name" : "Input1",
-                "ConfigOwner" : "",
-                "ConfigContact" : "",
-                "InputCfgVideoStatus" : 4
-             }
-          }
-       },
-       "Version" : "0.0.0",
-       "Name" : "System1"
-    }
-}
+Uses the same JSON format as `/api/`.
+
 ```
+{
+    "System": { ... }
+}```
 
-### Usage
-    server [OPTIONS]
-
-    Application Options:
-          --http-listen=[HOST]:PORT
-          --http-static=PATH
-
-    E2 Discovery:
-          --discovery-address=
-          --discovery-interface=
-          --discovery-interval=
-
-    E2 JSON-RPC:
-          --e2-address=HOST
-          --e2-jsonrpc-port=PORT
-          --e2-xml-port=PORT
-          --e2-timeout=
+See the [server.json example file](docs/server.json).
 
 ## Client
     
