@@ -291,13 +291,13 @@ The server will connect to the first discovered E2 system.
 
 Shows an overview of Sources and their active Preview/Program destinations.
 
-![Web UI Main view](/docs/web-main.png?raw=true)
+![Web UI Main view](/docs/server-main.png?raw=true)
 
 ### Presets
 
 Shows grouped Presets.
 
-![Web UI Presets view](/docs/web-presets.png?raw=true)
+![Web UI Presets view](/docs/server-presets.png?raw=true)
 
 Clicking a Preset recalls it to Preview.
 
@@ -325,7 +325,7 @@ Recalling a preset will color the border green. The border is initially dashed u
 
 Raw System state, represented as a collapsible JSON object, live-updated from the `/events` WebSocket:
 
-![Web UI System view](/docs/web-system.png?raw=true)
+![Web UI System view](/docs/server-system.png?raw=true)
 
 ### API
 
