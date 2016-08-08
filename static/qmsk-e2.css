@@ -20,6 +20,10 @@ body {
     background-color: #884444;
 }
 
+#header.closed {
+    background-color: #444444 !important;
+}
+
 #header.navbar {
     margin-bottom: 0;
     border-radius: 0;

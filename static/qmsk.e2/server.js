@@ -98,9 +98,11 @@ angular.module('qmsk.e2', [
     };
 })
 
-.controller('HeaderCtrl', function($scope, $location, Status, httpState) {
+.controller('HeaderCtrl', function($scope, $location, Status, httpState, Events) {
+    $scope.httpState = httpState;
+    $scope.events = Events;
+    
     $scope.status = Status;
-    $scope.state = httpState;
 
     $scope.isActive = function(prefix) {
         return $location.path().startsWith(prefix);

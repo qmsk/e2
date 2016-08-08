@@ -293,6 +293,10 @@ Use `--e2-readonly` for *READ* mode to limit the client to only commands that re
 Use `--e2-safe` for *SAFE* mode to limit the client to commands that modify the preview state only, and do not perform any Recall, Cut or AutoTrans commands to program.
 The default *LIVE* mode is to allow use of all commands, including those that modify Program state.
 
+The status bar at the top of the UI indicates the current mode, showing green for *LIVE* mode, yellow for *SAFE* mode and grey for *READ* mode.
+The status bar will change to read to indicate *ERROR* mode if the WebSocket connection or any REST API request fails.
+If the websocket connection is lost, the status bar will turn dark grey.
+
 ### Main view
 
 Shows an overview of Sources and their active Preview/Program destinations.
