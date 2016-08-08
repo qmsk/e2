@@ -275,17 +275,23 @@ The server will connect to the first discovered E2 system.
 		  --discovery-interface=
 		  --discovery-interval=
 
-	E2 JSON-RPC:
+	E2 Client:
 		  --e2-address=HOST
 		  --e2-jsonrpc-port=PORT
 		  --e2-xml-port=PORT
 		  --e2-telnet-port=PORT
 		  --e2-timeout=
-		  --e2-safe                    Safe mode, do not allow modifications
+		  --e2-safe                    Safe mode, only modify preview
+		  --e2-readonly                Read state, do not modify anything
 		  --e2-debug                   Dump commands
 
 	Help Options:
 	  -h, --help                       Show this help message
+
+The server can be run in *LIVE*, *SAFE* or *READ* mode.
+Use `--e2-readonly` for *READ* mode to limit the client to only commands that read the system state, and do not perform any modifications to preview or program state.
+Use `--e2-safe` for *SAFE* mode to limit the client to commands that modify the preview state only, and do not perform any Recall, Cut or AutoTrans commands to program.
+The default *LIVE* mode is to allow use of all commands, including those that modify Program state.
 
 ### Main view
 

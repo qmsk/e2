@@ -11,7 +11,7 @@ import (
 
 type Options struct {
 	DiscoveryOptions discovery.Options `group:"E2 Discovery"`
-	ClientOptions    client.Options    `group:"E2 JSON-RPC"`
+	ClientOptions    client.Options    `group:"E2 Client"`
 }
 
 func (options Options) Server() (*Server, error) {
