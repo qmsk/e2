@@ -155,17 +155,26 @@ func (client *JSONClient) request(request *Request, data interface{}) error {
 	return nil
 }
 
-func (client *JSONClient) requestSafe(request *Request, data interface{}) error {
+func (client *JSONClient) readRequest(request *Request, data interface{}) error {
 	return client.request(request, data)
 }
 
-func (client *JSONClient) requestUnsafe(request *Request, data interface{}) error {
+func (client *JSONClient) safeRequest(request *Request, data interface{}) error {
 	if client.options.Safe {
 		return nil
+	} else {
+		return client.request(request, data)
 	}
-
-	return client.request(request, data)
 }
+
+func (client *JSONClient) liveRequest(request *Request, data interface{}) error {
+	if client.options.ReadOnly || client.options.Safe {
+		return nil
+	} else {
+		return client.request(request, data)
+	}
+}
+
 
 // Presets
 const listPresetsExclude = -2
@@ -183,7 +192,7 @@ func (client *JSONClient) ListPresets() (presetList []Preset, err error) {
 		Params: struct{}{},
 	}
 
-	if err := client.requestSafe(&request, &presetList); err != nil {
+	if err := client.readRequest(&request, &presetList); err != nil {
 		return nil, err
 	} else {
 		return presetList, nil
@@ -199,7 +208,7 @@ func (client *JSONClient) ListPresetsX(screenID int, auxID int) (presetList []Pr
 		},
 	}
 
-	if err := client.requestSafe(&request, &presetList); err != nil {
+	if err := client.readRequest(&request, &presetList); err != nil {
 		return nil, err
 	} else {
 		return presetList, nil
@@ -237,7 +246,7 @@ func (client *JSONClient) ListDestinationsForPreset(presetID int) (result Preset
 		},
 	}
 
-	if err := client.requestSafe(&request, &result); err != nil {
+	if err := client.readRequest(&request, &result); err != nil {
 		return result, err
 	} else {
 		return result, nil
@@ -262,10 +271,12 @@ func (client *JSONClient) activatePreset(id int, recallType int) error {
 		},
 	}
 
-	if err := client.requestUnsafe(&request, nil); err != nil {
-		return err
+	if recallType > 0 {
+		// type == 1 -> program
+		return client.liveRequest(&request, nil)
 	} else {
-		return nil
+		// type == 0 -> preview
+		return client.safeRequest(&request, nil)
 	}
 }
 
@@ -298,7 +309,7 @@ func (client *JSONClient) ListDestinations() (result ListDestinations, err error
 		},
 	}
 
-	if err := client.requestSafe(&request, &result); err != nil {
+	if err := client.readRequest(&request, &result); err != nil {
 		return result, err
 	} else {
 		return result, nil
@@ -315,7 +326,7 @@ func (client *JSONClient) ListAuxDestinations() ([]AuxDest, error) {
 		},
 	}
 
-	if err := client.requestSafe(&request, &result); err != nil {
+	if err := client.readRequest(&request, &result); err != nil {
 		return nil, err
 	} else {
 		return result.AuxDestinations, nil
@@ -332,7 +343,7 @@ func (client *JSONClient) ListScreenDestinations() ([]ScreenDestination, error) 
 		},
 	}
 
-	if err := client.requestSafe(&request, &result); err != nil {
+	if err := client.readRequest(&request, &result); err != nil {
 		return nil, err
 	} else {
 		return result.ScreenDestinations, nil
@@ -362,7 +373,7 @@ func (client *JSONClient) ListContent(screenID int) (result ListContent, err err
 		},
 	}
 
-	if err := client.requestSafe(&request, &result); err != nil {
+	if err := client.readRequest(&request, &result); err != nil {
 		return result, err
 	} else {
 		return result, nil
@@ -384,7 +395,7 @@ func (client *JSONClient) ListSources() (sourceList []Source, err error) {
 		Params: struct{}{},
 	}
 
-	if err := client.requestSafe(&request, &sourceList); err != nil {
+	if err := client.readRequest(&request, &sourceList); err != nil {
 		return nil, err
 	} else {
 		return sourceList, nil

@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// TODO: safe mode
 func (options Options) TCPClient() (*TCPClient, error) {
 	if options.Address == "" {
 		return nil, fmt.Errorf("No Address given")
@@ -98,27 +99,45 @@ func (client *TCPClient) command(command string, params... interface{}) error {
 	return client.send(parts)
 }
 
+func (client *TCPClient) readCommand(command string, params... interface{}) error {
+	return client.command(command, params...)
+}
+func (client *TCPClient) safeCommand(command string, params... interface{}) error {
+	if client.options.ReadOnly {
+		return nil
+	} else {
+		return client.command(command, params...)
+	}
+}
+func (client *TCPClient) liveCommand(command string, params... interface{}) error {
+	if client.options.ReadOnly || client.options.Safe {
+		return nil
+	} else {
+		return client.command(command, params...)
+	}
+}
+
 func (client *TCPClient) AutoTrans() error {
-	return client.command("ATRN")
+	return client.liveCommand("ATRN")
 }
 
 func (client *TCPClient) AutoTransFrames(frames int) error {
-	return client.command("ATRN", frames)
+	return client.liveCommand("ATRN", frames)
 }
 
 func (client *TCPClient) Cut() error {
-	return client.command("ATRN", 0)
+	return client.liveCommand("ATRN", 0)
 }
 
 func (client *TCPClient) PresetSave(preset Preset) error {
-	return client.command("PRESET", "-s", preset.Sno)
+	return client.liveCommand("PRESET", "-s", preset.Sno)
 }
 
 func (client *TCPClient) PresetRecall(preset Preset) error {
-	return client.command("PRESET", "-r", preset.Sno)
+	return client.safeCommand("PRESET", "-r", preset.Sno)
 }
 
 func (client *TCPClient) PresetAutoTrans(preset Preset) error {
-	return client.command("PRESET", "-a", preset.Sno)
+	return client.liveCommand("PRESET", "-a", preset.Sno)
 }
 
