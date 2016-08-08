@@ -1,8 +1,0 @@
-#!/usr/bin/env python3
-
-import logging; log = logging.getLogger('qmsk-e2-web')
-import qmsk.cli
-import qmsk.e2.server
-
-if __name__ == '__main__':
-    qmsk.cli.main(qmsk.e2.server.main)

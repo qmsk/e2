@@ -424,15 +424,3 @@ Useful for testing the client library:
 	  screen-list        List Screen destinations
 	  screen-show        Show screen content
 	  source-list        List sources
-
-## Legacy
-
-Python implementation; supports loading settings from the HTTP config backup, and using the telnet API to load presets and transition.
-
-The web UI broken, TODO to remove the client/server implementation once re-implemented.
-
-    PYTHONPATH=../qmsk-dmx ./opt/bin/python3 ./qmsk-e2-web \
-        --e2-host 192.168.0.201 \
-        --e2-presets-xml etc/xml/ \
-        --e2-presets-db var/e2.db \
-        -v --debug-module qmsk.net.e2.presets
