@@ -13,6 +13,9 @@ body {
 #header.safe {
     background-color: #aaaa44;
 }
+#header.read {
+    background-color: #aaa;
+}
 #header.error {
     background-color: #884444;
 }

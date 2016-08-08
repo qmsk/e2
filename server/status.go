@@ -14,7 +14,9 @@ type Status struct {
 func (status Status) Get() (interface{}, error) {
 	status.Server = status.clientOptions.String()
 
-	if status.clientOptions.Safe {
+	if status.clientOptions.ReadOnly {
+		status.Mode = "read"
+	} else if status.clientOptions.Safe {
 		status.Mode = "safe"
 	} else {
 		status.Mode = "live"
