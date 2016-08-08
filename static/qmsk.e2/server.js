@@ -203,7 +203,7 @@ angular.module('qmsk.e2', [
     $scope.state = State;
 })
 
-.controller('PresetsCtrl', function($scope, State, $location, $log) {
+.controller('PresetsCtrl', function($scope, State, Preset, $location, $log) {
     $scope.state = State;
 
     // size
