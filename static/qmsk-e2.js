@@ -9,6 +9,14 @@ angular.module('qmsk.e2', [
     $scope.state = Events.state;
 })
 
+.controller('HeaderCtrl', function($scope, $location, httpState) {
+    $scope.httpState = httpState;
+    
+    $scope.isActive = function(prefix) {
+        return $location.path().startsWith(prefix);
+    };
+})
+
 .controller('StatusCtrl', function($scope, Console) {
     $scope.console = Console;
 })

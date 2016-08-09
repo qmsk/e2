@@ -35,7 +35,7 @@
     </head>
 
     <body ng-controller="StateCtrl">
-        <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'live': status.mode == 'live', 'safe': status.mode == 'safe', 'read': status.mode == 'read', 'error': httpState.error || events.error, 'closed': !events.open }">
+        <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'live': state.mode == 'live', 'safe': state.mode == 'safe', 'read': state.mode == 'read', 'error': httpState.error || events.error, 'closed': !events.open }">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="/">
@@ -74,14 +74,14 @@
                     <span class="glyphicon glyphicon-cloud-download" title="WebSocket open"></span>
                 </p>
 
-                <p class="navbar-text navbar-right" ng-if="status.mode == 'live'">
-                    LIVE @ {{status.server}}
+                <p class="navbar-text navbar-right" ng-if="state.mode == 'live'">
+                    LIVE @ {{state.server}}
                 </p>
-                <p class="navbar-text navbar-right" ng-if="status.mode == 'safe'">
-                    SAFE MODE @ {{status.server}}
+                <p class="navbar-text navbar-right" ng-if="state.mode == 'safe'">
+                    SAFE @ {{state.server}}
                 </p>
-                <p class="navbar-text navbar-right" ng-if="status.mode == 'read'">
-                    READ MODE @ {{status.server}}
+                <p class="navbar-text navbar-right" ng-if="state.mode == 'read'">
+                    READ @ {{state.server}}
                 </p>
                 <p class="navbar-text navbar-right" ng-show="httpState.busy">
                     <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>

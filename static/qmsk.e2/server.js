@@ -41,19 +41,6 @@ angular.module('qmsk.e2.server', [
         });
 })
 
-.factory('Status', function($http) {
-    var Status = {};
-
-    $http.get('/api/status').then(
-        function success(r) {
-            Status.server = r.data.server;
-            Status.mode = r.data.mode;
-        }
-    );
-
-    return Status;
-})
-
 .factory('Preset', function($resource) {
     return $resource('/api/presets/:id', { }, {
         get: {
@@ -94,16 +81,6 @@ angular.module('qmsk.e2.server', [
             detail: '=detail',
         },
         templateUrl: '/static/qmsk.e2/server/source.html',
-    };
-})
-
-.controller('HeaderCtrl', function($scope, $location, Status, httpState) {
-    $scope.httpState = httpState;
-    
-    $scope.status = Status;
-
-    $scope.isActive = function(prefix) {
-        return $location.path().startsWith(prefix);
     };
 })
 

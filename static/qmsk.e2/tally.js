@@ -62,14 +62,6 @@ angular.module('qmsk.e2.tally', [
     );
 })
 
-.controller('HeaderCtrl', function($scope, $location, httpState, Events) {
-    $scope.httpState = httpState;
-
-    $scope.isActive = function(prefix) {
-        return $location.path().startsWith(prefix);
-    };
-})
-
 .controller('TallyIndexCtrl', function($scope) {
 
 })
