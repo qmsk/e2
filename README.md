@@ -122,7 +122,7 @@ A HTTP `Origin:` header must be set.
 
 ## Web UI
 
-The Web output also provides an AngularJS frontend using the JSON API:
+The Web output also provides an AngularJS frontend using the JSON WebSocket API:
 
     tally --http-listen=:8001 --http-static=./static
 
@@ -141,6 +141,8 @@ Click on the tally number to open up a large single-tally view that can be zoome
 The Web UI also includes a list of discovered sources and their status, including possible connection errors:
 
 ![Tally Web UI](/docs/tally-sources.png?raw=true)
+
+If the WebSocket connection is lost, the header turns dark grey, and the view fades.
 
 ## GPIO
 
@@ -299,7 +301,7 @@ The default *LIVE* mode is to allow use of all commands, including those that mo
 
 The status bar at the top of the UI indicates the current mode, showing green for *LIVE* mode, yellow for *SAFE* mode and grey for *READ* mode.
 The status bar will change to read to indicate *ERROR* mode if the WebSocket connection or any REST API request fails.
-If the websocket connection is lost, the status bar will turn dark grey.
+If the WebSocket connection is lost, the status bar will turn dark grey and the view will fade.
 
 ### Main view
 
