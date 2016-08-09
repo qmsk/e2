@@ -62,26 +62,29 @@
                 </ul>
 
                 <p class="navbar-text navbar-right state-error" ng-show="httpState.error">
-                    <span class="glyphicon glyphicon-alert" title="API error"></span>
+                    <span class="glyphicon glyphicon-alert glyphicon-pulse"></span>
                 </p>
                 <p class="navbar-text navbar-right state-error" ng-show="events.error">
-                    <span class="glyphicon glyphicon-alert" title="WebSocket error: {{events.error}}"></span>
+                    <span class="glyphicon glyphicon-alert glyphicon-pulse" title="WebSocket error: {{events.error}}"></span>
                 </p>
-                <p class="navbar-text navbar-right state-error" ng-show="!events.open ">
-                    <span class="glyphicon glyphicon-alert" title="WebSocket closed"></span>
+                <p class="navbar-text navbar-right state-error" ng-show="!events.open && !events.error">
+                    <span class="glyphicon glyphicon-alert glyphicon-pulse" title="WebSocket closed"></span>
                 </p>
                 <p class="navbar-text navbar-right state-success" ng-show="events.open">
                     <span class="glyphicon glyphicon-cloud-download" title="WebSocket open"></span>
                 </p>
 
-                <p class="navbar-text navbar-right" ng-if="state.mode == 'live'">
+                <p class="navbar-text navbar-right" ng-if="events.open && state.mode == 'live'">
                     LIVE @ {{state.server}}
                 </p>
-                <p class="navbar-text navbar-right" ng-if="state.mode == 'safe'">
+                <p class="navbar-text navbar-right" ng-if="events.open && state.mode == 'safe'">
                     SAFE @ {{state.server}}
                 </p>
-                <p class="navbar-text navbar-right" ng-if="state.mode == 'read'">
+                <p class="navbar-text navbar-right" ng-if="events.open && state.mode == 'read'">
                     READ @ {{state.server}}
+                </p>
+                <p class="navbar-text navbar-right" ng-if="!events.open">
+                    DISCONNECTED
                 </p>
                 <p class="navbar-text navbar-right" ng-show="httpState.busy">
                     <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>

@@ -207,3 +207,19 @@ table.table tbody tr {
     transform: rotate(359deg);
   }
 }
+
+.glyphicon-pulse {
+    animation: pulse 1000ms infinite linear;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.0;
+    }
+    50% {
+        opacity: 1.0;
+    }
+    100% {
+        opacity: 0.0;
+    }
+}
