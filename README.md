@@ -134,21 +134,27 @@ The Web UI uses this WebSocket stream to display a live-updating tally state:
 
 ![Tally WebUI](/docs/tally-web.png?raw=true)
 
+If the WebSocket connection is lost, the header turns dark grey, and the view fades:
+
+![tally WebUI Disconnected](/docs/tally-disconnected.png?raw=true)
+
+### Tally view
+
 Click on the tally number to open up a large single-tally view that can be zoomed as needed:
 
 ![Tally WebUI Tally](/docs/tally-pixel.png?raw=true)
+
+### Fullscreen view
 
 Click on the large tally button to toggle fullscreen view:
 
 ![Tally WebUI Tally Fullscreen](/docs/tally-fullscreen.png?raw=true)
 
+### Tally Sources
+
 The Web UI also includes a list of discovered sources and their status, including possible connection errors:
 
 ![Tally WebUI Sources](/docs/tally-sources.png?raw=true)
-
-If the WebSocket connection is lost, the header turns dark grey, and the view fades:
-
-![tally WebUI Disconnected](/docs/tally-disconnected.png?raw=true)
 
 ## GPIO
 
