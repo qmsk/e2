@@ -45,7 +45,7 @@ angular.module('qmsk.e2.tally', [
 })
 
 .controller('HeaderCtrl', function($scope, $location, httpState) {
-    $scope.state = httpState;
+    $scope.httpState = httpState;
 
     $scope.isActive = function(prefix) {
         return $location.path().startsWith(prefix);
