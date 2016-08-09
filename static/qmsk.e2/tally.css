@@ -5,3 +5,16 @@
 .tally-source h1 {
     text-align: center;
 }
+
+.tally a {
+    color: inherit;
+    display: block;
+}
+
+#tally .tally {
+    font-size: 200%;
+}
+
+#tally .tally .id {
+    font-size: 500%;
+}

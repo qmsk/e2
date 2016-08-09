@@ -1,46 +1,23 @@
 <div class="container" id="tally">
-    <div class="row">
-        <div class="alert alert-danger" ng-repeat="error in tally.Errors">
-            <h2>{{error.Source}}</h2>
+    <div class="alert alert-danger" ng-repeat="error in state.tally.Errors">
+        <h2>{{error.Source}}</h2>
 
-            <pre>{{error.Error}}</pre>
-        </div>
+        <pre>{{error.Error}}</pre>
     </div>
 
-    <div class="row inputs">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Tally #</th>
-                    <th>Input</th>
-                    <th>Output</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="tally in tally.Tally | orderBy: 'ID'">
-                    <td>
-                        <div class="preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}">
-                            {{tally.ID}}
-                        </div>
-                    </td>
-                    <td>
-                        <div class="source" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
-                            <span class="pull-left label label-success" ng-if="input.Status == 'ok'"><span class="glyphicon glyphicon-ok" title="OK"></span></span>
-                            <span class="pull-left label label-danger" ng-if="input.Status == 'bad'"><span class="glyphicon glyphicon-warning-sign" title="Bad"></span></span>
+    <div class="tally preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}">
+        <p class="source" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
+            {{input.Name}}
+            <!-- {{input.Source}} -->
+        </p>
 
-                            <span>{{input.Name}}</span>
-                            <!-- {{input.Source}} -->
-                        </div>
-                    </td>
-                    <td>
-                        <div class="screen" ng-repeat="output in tally.Outputs | orderBy: 'Name'"
-                            ng-class="{'preview': output.Preview, 'program': output.Program, 'active': output.Active}"
-                        >
-                            {{output.Name}}
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <span class="id">{{tally.ID}}</span>
+
+        <p class="screen" ng-repeat="output in tally.Outputs | orderBy: 'Name'"
+            ng-class="{'preview': output.Preview, 'program': output.Program }"
+        >
+            {{output.Name}}
+            <!-- {{output.Source}} -->
+        </p>
     </div>
 </div>

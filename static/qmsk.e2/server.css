@@ -1,3 +1,10 @@
+/* System view */
+#system {
+    padding: 1em;
+    background-color: #ddd;
+}
+
+/* Preset view */
 #presets {
 
 }
@@ -74,27 +81,9 @@
     border: 4px solid #888;
 }
 
-#presets button span.dest {
-    font-style: italic;
-    font-size: smaller;
-    color: #444;
-}
-
 /* Doesn't fit */
 #presets.display-small span.dest {
     display: none;
-}
-
-#presets button span.program {
-    color: #f55;
-}
-
-#presets button span.preview {
-    color: #9f9;
-}
-
-#presets button span.inactive {
-    color: #444;
 }
 
 /* Tools */
