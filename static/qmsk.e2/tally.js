@@ -69,6 +69,7 @@ angular.module('qmsk.e2.tally', [
 .controller('TallyCtrl', function($scope, id) {
     $scope.tallyID = id;
     $scope.tally = null;
+    $scope.fullscreen = false;
 
     $scope.$watch('state.tally', function(tallyState) {
         $scope.tally = null;

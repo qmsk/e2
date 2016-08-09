@@ -1,11 +1,11 @@
-<div class="container" id="tally">
+<div class="container" id="tally" ng-class="{'fullscreen': fullscreen}">
     <div class="alert alert-danger" ng-repeat="error in state.tally.Errors">
         <h2>{{error.Source}}</h2>
 
         <pre>{{error.Error}}</pre>
     </div>
 
-    <div class="tally preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}">
+    <div class="tally preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}" ng-click="fullscreen = !fullscreen">
         <p class="input" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
             {{input.Name}}
             <!-- {{input.Source}} -->

@@ -134,7 +134,8 @@ The Web UI uses this WebSocket stream to display a live-updating tally state:
 
 ![Tally WebUI](/docs/tally-web.png?raw=true)
 
-Click on the tally number to open up a large single-tally view that can be zoomed as needed:
+Click on the tally number to open up a large single-tally view that can be zoomed as needed.
+Click on the large tally button to toggle fullscreen view.
 
 ![Tally WebUI Tally](/docs/tally-pixel.png?raw=true)
 
