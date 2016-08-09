@@ -4,6 +4,9 @@ import (
 	"github.com/qmsk/e2/web"
 )
 
+func (status Status) Get() (interface{}, error) {
+	return status, nil
+}
 func (server *Server) Get() (interface{}, error) {
 	return server.GetState(), nil
 }
@@ -18,20 +21,11 @@ func (server *Server) Index(name string) (web.Resource, error) {
 		return server, nil
 
 	case "status":
-		status := Status{
-			clientOptions: server.clientOptions,
-		}
-
-		return &status, nil
+		return server.GetStatus(), nil
 
 	case "presets":
-		presets := Presets{
-			system: server.GetState().System,
-			jsonClient: server.jsonClient,
-			tcpClient: server.tcpClient,
-		}
 
-		return &presets, presets.load()
+		return server.Presets()
 
 	default:
 		return nil, nil

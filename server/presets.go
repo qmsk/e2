@@ -7,21 +7,35 @@ import (
 	"net/http"
 )
 
+func (server *Server) Presets() (*Presets, error) {
+	var presets = Presets{
+		system:     server.GetState().System,
+		jsonClient: server.jsonClient,
+		tcpClient:  server.tcpClient,
+	}
+
+	if err := presets.init(); err != nil {
+		return nil, err
+	}
+
+	return &presets, nil
+}
+
 type Presets struct {
-	system *client.System
+	system     *client.System
 	jsonClient *client.JSONClient
-	tcpClient *client.TCPClient
+	tcpClient  *client.TCPClient
 
 	presetMap map[string]Preset
 }
 
-func (presets *Presets) load() error {
+func (presets *Presets) init() error {
 	presetMap := make(map[string]Preset)
 
 	for presetID, preset := range presets.system.PresetMgr.Preset {
 		// parse sno
 		preset := Preset{
-			Preset:	preset,
+			Preset: preset,
 
 			Group: preset.Sno.Group,
 			Index: preset.Sno.Index,
@@ -43,7 +57,7 @@ func (presets *Presets) Post(request *http.Request) (interface{}, error) {
 	var params struct {
 		ID        int  `json:"id"`
 		Live      bool `json:"live,omitempty"`
-		Cut	      bool `json:"cut,omitempty"`
+		Cut       bool `json:"cut,omitempty"`
 		AutoTrans int  `json:"autotrans,omitempty"`
 	}
 	params.ID = -1
@@ -54,7 +68,7 @@ func (presets *Presets) Post(request *http.Request) (interface{}, error) {
 	}
 
 	if params.ID >= 0 {
-		preset , exists := presets.presetMap[fmt.Sprintf("%d", params.ID)]
+		preset, exists := presets.presetMap[fmt.Sprintf("%d", params.ID)]
 		if !exists {
 			return nil, nil // 404
 		}

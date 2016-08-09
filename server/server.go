@@ -56,15 +56,37 @@ type Server struct {
 	options       Options
 	clientOptions client.Options
 	jsonClient    *client.JSONClient
-	xmlClient	  *client.XMLClient
-	tcpClient	  *client.TCPClient
+	xmlClient     *client.XMLClient
+	tcpClient     *client.TCPClient
 
-	state		  atomic.Value
-	eventChan     chan web.Event
+	state     atomic.Value
+	eventChan chan web.Event
+}
+
+type Status struct {
+	Server string `json:"server"`
+	Mode   string `json:"mode"`
 }
 
 type State struct {
-	System	*client.System
+	Status
+	System *client.System
+}
+
+func (server *Server) GetStatus() Status {
+	var status = Status{
+		Server: server.clientOptions.String(),
+	}
+
+	if server.clientOptions.ReadOnly {
+		status.Mode = "read"
+	} else if server.clientOptions.Safe {
+		status.Mode = "safe"
+	} else {
+		status.Mode = "live"
+	}
+
+	return status
 }
 
 func (server *Server) Run() error {
@@ -76,7 +98,10 @@ func (server *Server) Run() error {
 		if system, err := server.xmlClient.Read(); err != nil {
 			return fmt.Errorf("xmlClient.Read: %v", err)
 		} else {
-			var state = State{System: &system}
+			var state = State{
+				Status: server.GetStatus(),
+				System: &system,
+			}
 
 			server.state.Store(state)
 
