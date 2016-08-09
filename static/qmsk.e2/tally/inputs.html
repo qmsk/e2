@@ -9,7 +9,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="input in tally.Inputs | orderBy: ['Source','Name']">
+                <tr ng-repeat="input in state.tally.Inputs | orderBy: ['Source','Name']">
                     <td>
                         <div class="preset">
                             {{input.ID}}

@@ -8,7 +8,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="output in tally.Outputs | orderBy: ['Source','Name']">
+                <tr ng-repeat="output in state.tally.Outputs | orderBy: ['Source','Name']">
                     <td>
                         <div class="source">
                             {{output.Source}}
