@@ -1,6 +1,6 @@
 angular.module('qmsk.e2.web', [
         'qmsk.e2.console',
-        'ngResource',
+        'ngWebSocket',
 ])
 
 // track global http state

@@ -1,12 +1,9 @@
-angular.module('qmsk.e2', [
+angular.module('qmsk.e2.server', [
+        'qmsk.e2',
         'qmsk.e2.console',
-        'qmsk.e2.source',
-        'qmsk.e2.status',
         'qmsk.e2.web',
         'ngResource',
         'ngRoute',
-        'ngWebSocket',
-        'luegg.directives',
         'jsonFormatter',
         'ui.bootstrap',
 ])
@@ -57,18 +54,6 @@ angular.module('qmsk.e2', [
     return Status;
 })
 
-.factory('State', function($rootScope, Events) {
-    var State = {
-        System: Events.state.System,
-    };
-
-    $rootScope.$on('qmsk.e2.event', function($e, event){
-        State.System = Events.state.System;
-    });
-
-    return State;
-})
-
 .factory('Preset', function($resource) {
     return $resource('/api/presets/:id', { }, {
         get: {
@@ -100,28 +85,29 @@ angular.module('qmsk.e2', [
     };
 })
 
-.controller('HeaderCtrl', function($scope, $location, Status, httpState, Events) {
+.directive('e2Source', function() {
+    return {
+        restrict: 'AE',
+        scope: {
+            source: '=source',
+            input: '=input',
+            detail: '=detail',
+        },
+        templateUrl: '/static/qmsk.e2/server/source.html',
+    };
+})
+
+.controller('HeaderCtrl', function($scope, $location, Status, httpState) {
     $scope.httpState = httpState;
-    $scope.events = Events;
     
     $scope.status = Status;
 
     $scope.isActive = function(prefix) {
         return $location.path().startsWith(prefix);
     };
-
 })
 
-.controller('StatusCtrl', function($scope, Events) {
-    $scope.events = Events;
-})
-
-.controller('SystemCtrl', function($scope, State) {
-    $scope.state = State;
-})
-
-.controller('MainCtrl', function($scope, $location, State) {
-    $scope.state = State;
+.controller('MainCtrl', function($scope, $location) {
     $scope.sources = [];
 
     $scope.$watch('state.System', function(system) {
@@ -195,21 +181,19 @@ angular.module('qmsk.e2', [
     $scope.selectOrder($location.search().order || 'source');
 })
 
-.controller('SourcesCtrl', function($scope, State) {
-    $scope.state = State;
+.controller('SourcesCtrl', function($scope) {
+
 })
 
-.controller('ScreensCtrl', function($scope, State) {
-    $scope.state = State;
+.controller('ScreensCtrl', function($scope) {
+
 })
 
-.controller('AuxesCtrl', function($scope, State) {
-    $scope.state = State;
+.controller('AuxesCtrl', function($scope) {
+
 })
 
-.controller('PresetsCtrl', function($scope, State, Preset, $location, Console) {
-    $scope.state = State;
-
+.controller('PresetsCtrl', function($scope, Preset, $location, Console) {
     // size
     $scope.displaySize = $location.search().size || 'normal';
 
@@ -276,7 +260,7 @@ angular.module('qmsk.e2', [
     function groupByConsole(presets) {
         var groups = { };
 
-        $.each(State.System.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl, function(buttonID, button) {
+        $.each($scope.state.System.ConsoleLayoutMgr.ConsoleLayout.PresetBusColl, function(buttonID, button) {
             var groupID = Math.floor(button.id / 12); // rows of 12 keys
             var group = groups[groupID];
             var preset = presets[button.ConsoleButtonTypeIndex];
@@ -308,7 +292,7 @@ angular.module('qmsk.e2', [
     $scope.groups = [];
 
     $scope.$watchGroup(['groupBy', 'state.System'], function() {
-        var presets = State.System.PresetMgr.Preset;
+        var presets = $scope.state.System.PresetMgr.Preset;
         var groups;
 
         if ($scope.groupBy == 'sno') {
@@ -395,6 +379,10 @@ angular.module('qmsk.e2', [
 
         Preset.activate({autotrans: 0});
     };
+})
+
+.controller('SystemCtrl', function($scope) {
+
 })
 
 ;

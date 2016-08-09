@@ -28,14 +28,14 @@
         <link rel="stylesheet" href="/static/qmsk-e2.css">
         <link rel="stylesheet" href="/static/qmsk.e2/tally.css">
 
-        <script src="/static/qmsk.e2/tally.js"></script>
+        <script src="/static/qmsk-e2.js"></script>
         <script src="/static/qmsk.e2/console.js"></script>
+        <script src="/static/qmsk.e2/tally.js"></script>
         <script src="/static/qmsk.e2/web.js"></script>
-        <script src="/static/qmsk.e2/status.js"></script>
     </head>
 
     <body ng-controller="StateCtrl">
-        <div id="header" class="navbar" ng-controller="HeaderCtrl">
+        <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'error': httpState.error || events.error, 'closed': !events.open }">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="/">
@@ -70,17 +70,26 @@
                     </li>
                 </ul>
 
-                <p class="navbar-text navbar-right state-error" ng-show="httpState.error">
-                    <span class="glyphicon glyphicon-alert"></span>
-                </p>
 
                 <p class="navbar-text navbar-right" ng-show="httpState.busy">
                     <span class="glyphicon glyphicon-refresh glyphicon-spin"></span>
                 </p>
+                <p class="navbar-text navbar-right state-error" ng-show="httpState.error">
+                    <span class="glyphicon glyphicon-alert"></span>
+                </p>
+                <p class="navbar-text navbar-right state-error" ng-show="events.error">
+                    <span class="glyphicon glyphicon-alert" title="WebSocket error: {{events.error}}"></span>
+                </p>
+                <p class="navbar-text navbar-right state-error" ng-show="!events.open ">
+                    <span class="glyphicon glyphicon-alert" title="WebSocket closed"></span>
+                </p>
+                <p class="navbar-text navbar-right state-success" ng-show="events.open">
+                    <span class="glyphicon glyphicon-cloud-download" title="WebSocket open"></span>
+                </p>
             </div>
         </div>
 
-        <div id="view" ng-view></div>
+        <div id="view" ng-view ng-class="{'closed': !events.open}"></div>
         
         <ng-include src="'/static/qmsk.e2/status.html'"></ng-include>
     </body>

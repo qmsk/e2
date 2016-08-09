@@ -1,4 +1,4 @@
-<html lang="en" ng-app="qmsk.e2">
+<html lang="en" ng-app="qmsk.e2.server">
     <head>
         <title>github.com/qmsk/e2</title>
 
@@ -28,14 +28,13 @@
         <link rel="stylesheet" href="/static/qmsk-e2.css">
         <link rel="stylesheet" href="/static/qmsk.e2/server.css">
 
-        <script src="/static/qmsk.e2/source/source.js"></script>
+        <script src="/static/qmsk-e2.js"></script>
         <script src="/static/qmsk.e2/console.js"></script>
-        <script src="/static/qmsk.e2/web.js"></script>
         <script src="/static/qmsk.e2/server.js"></script>
-        <script src="/static/qmsk.e2/status.js"></script>
+        <script src="/static/qmsk.e2/web.js"></script>
     </head>
 
-    <body>
+    <body ng-controller="StateCtrl">
         <div id="header" class="navbar" ng-controller="HeaderCtrl" ng-class="{'live': status.mode == 'live', 'safe': status.mode == 'safe', 'read': status.mode == 'read', 'error': httpState.error || events.error, 'closed': !events.open }">
             <div class="container-fluid">
                 <div class="navbar-header">
@@ -90,7 +89,7 @@
             </div>
         </div>
 
-        <div id="view" ng-view></div>
+        <div id="view" ng-view ng-class="{'closed': !events.open}"></div>
 
         <ng-include src="'/static/qmsk.e2/status.html'"></ng-include>
     </body>

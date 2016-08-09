@@ -75,6 +75,13 @@ body {
     margin-bottom: 5em;
 }
 
+#view.closed {
+    opacity: 0.2;
+}
+
+/*
+ * Status
+ */
 #status {
     position: fixed;
     bottom: 0px;
@@ -109,7 +116,9 @@ body {
     color: #ff4444;
 }
 
-/* XXX: customized styles */
+/* 
+ * Customized styles 
+ */
 table.table {
     
 }

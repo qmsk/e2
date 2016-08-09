@@ -1,11 +1,8 @@
 angular.module('qmsk.e2.tally', [
-        'qmsk.e2.status',
+        'qmsk.e2',
         'qmsk.e2.web',
-        'ngResource',
         'ngRoute',
         'ngWebSocket',
-        'luegg.directives',
-        'jsonFormatter',
 ])
 
 .config(function($routeProvider) {
@@ -65,16 +62,12 @@ angular.module('qmsk.e2.tally', [
     );
 })
 
-.controller('HeaderCtrl', function($scope, $location, httpState) {
+.controller('HeaderCtrl', function($scope, $location, httpState, Events) {
     $scope.httpState = httpState;
 
     $scope.isActive = function(prefix) {
         return $location.path().startsWith(prefix);
     };
-})
-
-.controller('StateCtrl', function($scope, Events) {
-    $scope.state = Events.state;
 })
 
 .controller('TallyIndexCtrl', function($scope) {
