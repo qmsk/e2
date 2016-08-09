@@ -134,6 +134,10 @@ The Web UI uses this WebSocket stream to display a live-updating tally state:
 
 ![Tally Web UI](/docs/tally-web.png?raw=true)
 
+Click on the tally number to open up a large single-tally view that can be zoomed as needed:
+
+![Tally View](/docs/tally-pixel.png?raw=true)
+
 The Web UI also includes a list of discovered sources and their status, including possible connection errors:
 
 ![Tally Web UI](/docs/tally-sources.png?raw=true)
