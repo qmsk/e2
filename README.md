@@ -134,10 +134,13 @@ The Web UI uses this WebSocket stream to display a live-updating tally state:
 
 ![Tally WebUI](/docs/tally-web.png?raw=true)
 
-Click on the tally number to open up a large single-tally view that can be zoomed as needed.
-Click on the large tally button to toggle fullscreen view.
+Click on the tally number to open up a large single-tally view that can be zoomed as needed:
 
 ![Tally WebUI Tally](/docs/tally-pixel.png?raw=true)
+
+Click on the large tally button to toggle fullscreen view:
+
+![Tally WebUI Tally Fullscreen](/docs/tally-fullscreen.png?raw=true)
 
 The Web UI also includes a list of discovered sources and their status, including possible connection errors:
 
