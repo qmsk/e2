@@ -52,7 +52,6 @@ angular.module('qmsk.e2.web', [
         open:   false,
         error:  null,
 
-        events: [],
         state:  {},
     }
 
@@ -74,8 +73,6 @@ angular.module('qmsk.e2.web', [
     ws.onMessage(function(message){
         var event = JSON.parse(message.data);
     
-        Events.events.push(event);
-
         $.each(event, function(k, v) {
             Events.state[k] = v;
         });
