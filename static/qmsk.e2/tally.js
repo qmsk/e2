@@ -66,10 +66,10 @@ angular.module('qmsk.e2.tally', [
 
 })
 
-.controller('TallyCtrl', function($scope, id) {
+.controller('TallyCtrl', function($scope, id, $location) {
     $scope.tallyID = id;
     $scope.tally = null;
-    $scope.fullscreen = false;
+    $scope.fullscreen = $location.search().fullscreen;
 
     $scope.$watch('state.tally', function(tallyState) {
         $scope.tally = null;
@@ -79,6 +79,10 @@ angular.module('qmsk.e2.tally', [
                 $scope.tally = tally;
             }
         });
+    });
+
+    $scope.$watch('fullscreen', function(fullscreen) {
+        $location.search('fullscreen', fullscreen ? true : null);
     });
 })
 
