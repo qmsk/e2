@@ -132,17 +132,19 @@ The `--http-static` is optional, and is only needed for the UI. Use `bower` to p
 
 The Web UI uses this WebSocket stream to display a live-updating tally state:
 
-![Tally Web UI](/docs/tally-web.png?raw=true)
+![Tally WebUI](/docs/tally-web.png?raw=true)
 
 Click on the tally number to open up a large single-tally view that can be zoomed as needed:
 
-![Tally View](/docs/tally-pixel.png?raw=true)
+![Tally WebUI Tally](/docs/tally-pixel.png?raw=true)
 
 The Web UI also includes a list of discovered sources and their status, including possible connection errors:
 
-![Tally Web UI](/docs/tally-sources.png?raw=true)
+![Tally WebUI Sources](/docs/tally-sources.png?raw=true)
 
-If the WebSocket connection is lost, the header turns dark grey, and the view fades.
+If the WebSocket connection is lost, the header turns dark grey, and the view fades:
+
+![tally WebUI Disconnected](/docs/tally-disconnected.png?raw=true)
 
 ## GPIO
 
@@ -301,7 +303,9 @@ The default *LIVE* mode is to allow use of all commands, including those that mo
 
 The status bar at the top of the UI indicates the current mode, showing green for *LIVE* mode, yellow for *SAFE* mode and grey for *READ* mode.
 The status bar will change to read to indicate *ERROR* mode if the WebSocket connection or any REST API request fails.
-If the WebSocket connection is lost, the status bar will turn dark grey and the view will fade.
+If the WebSocket connection is lost, the status bar will turn dark grey and the view will fade:
+
+![Web UI Disconnected](/docs/server-disconnected.png?raw=true)
 
 ### Main view
 
