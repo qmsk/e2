@@ -18,3 +18,33 @@
 #tally .tally .id {
     font-size: 500%;
 }
+
+/* Extra text */
+.tally p {
+    font-style: italic;
+
+    border: none;
+}
+
+.tally p.input {
+    color: #eee;
+}
+
+.tally p.output {
+    color: #444;
+}
+
+.tally p.program,
+.tally p.preview.program {
+    color: #f55;
+
+    border: none;
+}
+
+.tally p.preview {
+    color: #9f9;
+}
+
+.tally p.inactive {
+    color: #444;
+}

@@ -1,0 +1,4 @@
+<div id="status" ng-controller="StatusCtrl" scroll-glue>
+    <div ng-repeat="log in console.logMessages track by log.id">{{log.message}}</div>
+</div>
+

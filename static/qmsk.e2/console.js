@@ -20,7 +20,4 @@ angular.module('qmsk.e2.console', [
     return Console;
 })
 
-.controller('ConsoleCtrl', function($scope, Console) {
-    $scope.console = Console;
-})
 

@@ -31,6 +31,7 @@
         <script src="/static/qmsk.e2/tally.js"></script>
         <script src="/static/qmsk.e2/console.js"></script>
         <script src="/static/qmsk.e2/web.js"></script>
+        <script src="/static/qmsk.e2/status.js"></script>
     </head>
 
     <body ng-controller="StateCtrl">
@@ -80,5 +81,7 @@
         </div>
 
         <div id="view" ng-view></div>
+        
+        <ng-include src="'/static/qmsk.e2/status.html'"></ng-include>
     </body>
 </html>

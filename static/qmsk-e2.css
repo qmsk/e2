@@ -132,8 +132,9 @@ table.table tbody tr {
 .screen,
 .aux,
 .preset,
-.tally
-{
+.tally,
+.input,
+.output {
     text-align: center; 
 
     margin: 1em;
@@ -146,36 +147,14 @@ table.table tbody tr {
     border-radius: 4px;
 }
 
-/* Extra text */
-.preset p {
-    font-style: italic;
-    font-size: smaller;
-    color: #444;
-
-    border: none;
-}
-
-.preset p.program,
-.preset p.preview.program {
-    color: #f55;
-    border: none;
-}
-
-.preset p.preview {
-    color: #9f9;
-}
-
-.preset p.inactive {
-    color: #444;
-}
-
 /* Fix glyphicon label vertical alignment with text */
 .screen .label,
 .source .label,
 .aux .label,
 .preset .label,
-.tally .label
-{
+.tally .label,
+.input .label,
+.output .label {
     font-size: inherit;
 }
 

@@ -1,6 +1,7 @@
 angular.module('qmsk.e2', [
         'qmsk.e2.console',
         'qmsk.e2.source',
+        'qmsk.e2.status',
         'qmsk.e2.web',
         'ngResource',
         'ngRoute',

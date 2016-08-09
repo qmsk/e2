@@ -32,6 +32,7 @@
         <script src="/static/qmsk.e2/console.js"></script>
         <script src="/static/qmsk.e2/web.js"></script>
         <script src="/static/qmsk.e2/server.js"></script>
+        <script src="/static/qmsk.e2/status.js"></script>
     </head>
 
     <body>
@@ -90,10 +91,7 @@
         </div>
 
         <div id="view" ng-view></div>
-            
-        <div id="status" ng-controller="ConsoleCtrl" scroll-glue>
-            <div ng-repeat="log in console.logMessages track by log.id">{{log.message}}</div>
-        </div>
-    </body>
 
+        <ng-include src="'/static/qmsk.e2/status.html'"></ng-include>
+    </body>
 </html>

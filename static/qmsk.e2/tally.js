@@ -1,4 +1,5 @@
 angular.module('qmsk.e2.tally', [
+        'qmsk.e2.status',
         'qmsk.e2.web',
         'ngResource',
         'ngRoute',

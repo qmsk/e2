@@ -75,14 +75,37 @@
     border: 4px solid #eee;
 }
 
-#presets button.empty {
+#presets .preset.empty {
     background-color: #aaa;
     
     border: 4px solid #888;
 }
 
+/* Extra text */
+.preset p {
+    font-style: italic;
+    font-size: smaller;
+    color: #444;
+
+    border: none;
+}
+
+.preset p.program,
+.preset p.preview.program {
+    color: #f55;
+    border: none;
+}
+
+.preset p.preview {
+    color: #9f9;
+}
+
+.preset p.inactive {
+    color: #444;
+}
+
 /* Doesn't fit */
-#presets.display-small span.dest {
+#presets.display-small p {
     display: none;
 }
 

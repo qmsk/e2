@@ -6,14 +6,14 @@
     </div>
 
     <div class="tally preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}">
-        <p class="source" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
+        <p class="input" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
             {{input.Name}}
             <!-- {{input.Source}} -->
         </p>
 
         <span class="id">{{tally.ID}}</span>
 
-        <p class="screen" ng-repeat="output in tally.Outputs | orderBy: 'Name'"
+        <p class="output" ng-repeat="output in tally.Outputs | orderBy: 'Name'"
             ng-class="{'preview': output.Preview, 'program': output.Program }"
         >
             {{output.Name}}
