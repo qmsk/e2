@@ -1,6 +1,6 @@
 {
   "name": "qmsk-e2",
-  "version": "0.0.0",
+  "version": "0.2.1",
   "authors": [
     "Tero Marttila <terom@fixme.fi>"
   ],
@@ -17,6 +17,6 @@
     "json-formatter": "~0.4.2"
   },
   "resolutions": {
-    "angular": "1.5.7"
+    "angular": "1.5.8"
   }
 }
