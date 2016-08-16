@@ -64,6 +64,7 @@ angular.module('qmsk.e2.web', [
     ws.onError(function(error) {
         Console.log("WebSocket Error: " + error)
         Events.error = error;
+        Events.open = false;
     });
     ws.onClose(function() {
         Console.log("WebSocket Closed")
