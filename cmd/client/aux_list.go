@@ -12,7 +12,7 @@ func init() {
 }
 
 func (cmd *AuxList) Execute(args []string) error {
-	if client, err := options.ClientOptions.Client(); err != nil {
+	if client, err := options.ClientOptions.JSONClient(); err != nil {
 		return err
 	} else if auxDestinations, err := client.ListAuxDestinations(); err != nil {
 		return err

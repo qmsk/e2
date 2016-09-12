@@ -12,7 +12,7 @@ func init() {
 }
 
 func (cmd *PresetList) Execute(args []string) error {
-	if client, err := options.ClientOptions.Client(); err != nil {
+	if client, err := options.ClientOptions.JSONClient(); err != nil {
 		return err
 	} else if presets, err := client.ListPresets(); err != nil {
 		return err

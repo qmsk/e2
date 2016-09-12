@@ -14,7 +14,7 @@ func init() {
 }
 
 func (cmd *ScreenShow) Execute(args []string) error {
-	c, err := options.ClientOptions.Client()
+	c, err := options.ClientOptions.JSONClient()
 	if err != nil {
 		return err
 	}
