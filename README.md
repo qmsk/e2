@@ -300,11 +300,13 @@ Web interface for displaying E2 state and controlling presets.
 
 Follow E2 status, providing a HTTP REST + WebSocket JSON API, and an AngularJS web UI:
 
-	$GOPATH/bin/server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
+	server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
 
 The server will connect to the first discovered E2 system.
 
-Using the server Web UI requires [#Building](building) the static assets for the web frontend.
+The Web UI will be accessible at the port configured using `--http-listen`. Using `--http-listen=:8284` will listen on all interfaces at TCP port 8282. Use an URL such as `http://localhost:8284` or `http://yourhostname:8284/`. Using `--http-listen=192.0.2.1:8284` will listen on the specific interface given.
+
+Using the server Web UI requires the static assets for the web frontend (see [Building](#building)).
 
 ### Usage
 
