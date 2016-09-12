@@ -14,22 +14,6 @@ This implementation supports the following device APIs:
 * TCP port 9999 JSON-RPC (read-only for now, includes preset destinations)
 * UDP port 40961 discovery
 
-## Tally
-
-Tally implementation for following which inputs are active on destinations.
-The tally process connects to any discovered E2 systems, and follows their system state using a read-only
-implementation of the XML protocol.
-Input sources can be tagged with a `tally=ID` in their *Contact* field.
-Each tally ID has *program*, *preview* and *active* status if any input with a matching tally ID is used as the
-program or preview source on any screen destination layer, or Aux output.
-
-Multiple E2 systems can be connected, and their input/output state is merged.
-Stacked systems are supported, the tally system will only connect to the stack master.
-The tally system should be restarted if the stack master changes.
-
-The tally system will indicate an error status if any E2 system is disconnected (stops responding within the `--e2-timeout=`).
-The tally system will reconnect to any E2 system once is starts responding to discovery packets again.
-
 ## Building
 
 The project consists of a set Go applications, and a Javascript web frontend.
@@ -58,6 +42,23 @@ Building the frontend code requires:
 
 * [https://www.npmjs.com/](NPM) 
 * [bower](https://bower.io/)
+
+# Tally
+
+Tally implementation for following which inputs are active on destinations.
+The tally process connects to any discovered E2 systems, and follows their system state using a read-only
+implementation of the XML protocol.
+Input sources can be tagged with a `tally=ID` in their *Contact* field.
+Each tally ID has *program*, *preview* and *active* status if any input with a matching tally ID is used as the
+program or preview source on any screen destination layer, or Aux output.
+
+Multiple E2 systems can be connected, and their input/output state is merged.
+Stacked systems are supported, the tally system will only connect to the stack master.
+The tally system should be restarted if the stack master changes.
+
+The tally system will indicate an error status if any E2 system is disconnected (stops responding within the `--e2-timeout=`).
+The tally system will reconnect to any E2 system once is starts responding to discovery packets again.
+
 
 ## Usage
 
@@ -288,7 +289,7 @@ The tally output LED will start pulsing if the input connector is disconnected o
 The tally program will exit and drive the SPI LEDs off on SIGINT. If the tally program crashes or is killed, the SPI bus will remain stuck in its previous state.
 Use the included `cmd/tally/spiled-down.sh <count>` script to force the SPI LEDs off.
 
-## Server (Web UI)
+# Server (Web UI)
 
 Web interface for displaying E2 state and controlling presets.
 
@@ -436,7 +437,7 @@ Uses the same JSON format as `/api/`.
 
 See the [server.json example file](docs/server.json).
 
-## Client
+# Client
     
     go install ./cmd/client
 
