@@ -1,6 +1,8 @@
 # qmsk-e2
 E2 Client, Tally system. Web UI with Presets.
 
+Pre-built release binaries can be found under the [Releases](https://github.com/qmsk/e2/releases).
+
 Please refer to the [Wiki](https://github.com/qmsk/e2/wiki) for more detailed user guides, such as RaspberryPI installs.
 
 You can also try submitting a [GitHub Issue](https://github.com/qmsk/e2/issues/new?labels=question) for support, which may or may not receive an answer.
@@ -21,11 +23,9 @@ This implementation supports the following device APIs:
 
 ## Building
 
-The project consists of a set Go applications, and a Javascript web frontend.
+The project consists of a set Go applications, and a Javascript web frontend. Once built, the binary Go applications + Javascript assets can be distributed and executed without needing to install the development tools and instructions listed here.
 
-Once built, the binary Go applications + Javascript assets can be distributed and executed without needing to install the development tools and instructions listed here.
-
-There are no prebuilt binaries available, yet.
+Release binaries are built using the Docker-based setup under [build](/build)
 
 ### Backend
 
@@ -156,7 +156,7 @@ The Web output also provides an AngularJS frontend using the JSON WebSocket API:
 
     tally --http-listen=:8001 --http-static=./static
 
-The `--http-static` is optional, and is only needed for the UI. Using the Tally Web UI requires [#Building](building) the static assets for the web frontend.
+The `--http-static` is optional, and is only needed for the UI. Using the Tally Web UI requires [Building](#building) the static assets for the web frontend.
 
 The Web UI uses this WebSocket stream to display a live-updating tally state:
 
