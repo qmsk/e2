@@ -43,12 +43,10 @@ tar -C $SRC --exclude-vcs -czvf ${DIST}_src.tar.gz .
 install -d $DIST
 
 install -d $DIST/bin
-install -m 0755 -t $DIST/bin $SRC/cmd/tally/*.sh
+install -m 0755 -t $DIST/bin $SRC/cmd/*/*.sh
 
-if [ -d $SRC/etc ]; then
-    install -d $DIST/etc/systemd/system
-    install -m 0644 -t $DIST/etc/systemd/system $SRC/etc/systemd/system/*.service
-fi
+install -d $DIST/etc/systemd/system
+install -m 0644 -t $DIST/etc/systemd/system $SRC/cmd/*/*.service
 
 rsync -rlpt $SRC/static $DIST/
 

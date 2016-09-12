@@ -218,7 +218,7 @@ Use the included `cmd/tally/gpio-export.sh ...` script to pre-export the GPIO pi
 The tally program will exit and drive the GPIO pins low on SIGINT. If the tally program crashes or is killed, the GPIO pins will remain stuck
 in their previous state. Use the `cmd/tally/gpio-unexport.sh ...` script to clear the GPIO output.
 
-Example systemd service to pre-export the GPIO pins, and drive them low if the tally program exits:
+Example systemd service to pre-export the GPIO pins, and drive them low if the tally program exits: [cmd/tally/qmsk-e2-tally.service](/cmd/tally/qmsk-e2-tally.service?raw=true)
 
 	[Unit]
 	Description=github.com/qmsk/e2 tally
