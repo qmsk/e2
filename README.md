@@ -1,7 +1,7 @@
 # qmsk-e2
 E2 Client, Tally system. Web UI with Presets.
 
-Please referr to the [Wiki](https://github.com/qmsk/e2/wiki) for more detailed user guides, such as RaspberryPI installs.
+Please refer to the [Wiki](https://github.com/qmsk/e2/wiki) for more detailed user guides, such as RaspberryPI installs.
 
 You can also try submitting a [GitHub Issue](https://github.com/qmsk/e2/issues/new?labels=question) for support, which may or may not receive an answer.
 
@@ -23,9 +23,9 @@ This implementation supports the following device APIs:
 
 The project consists of a set Go applications, and a Javascript web frontend.
 
-There are no prebuilt binaries available, yet.
+Once built, the binary Go applications + Javascript assets can be distributed and executed without needing to install the development tools and instructions listed here.
 
-Once built, the binary Go applications + Javascript assets can be distributed and executed without the development tools and instructions listed here.
+There are no prebuilt binaries available, yet.
 
 ### Backend
 
@@ -45,7 +45,7 @@ The Go binaries can also be cross-compiled for different platforms, such as buil
 
 Building the frontend code requires:
 
-* [https://www.npmjs.com/](NPM) 
+* [NPM](https://www.npmjs.com/)
 * [bower](https://bower.io/)
 
 # Tally
