@@ -4,7 +4,7 @@ set -uex
 
 # go src
 if [ -z "${GOPATH:-}" ]; then
-    mkdir go
+    [ -d go ] || mkdir go
 
     export GOPATH=$PWD/go
 fi
@@ -12,7 +12,12 @@ fi
 if [ -z "${SRC:-}" ]; then
     SRC=$GOPATH/src/github.com/qmsk/e2
 
-    go get -v -d github.com/qmsk/e2/cmd/...
+    [ -d $SRC ] || go get -v -d github.com/qmsk/e2/cmd/...
+else
+    mkdir -p $GOPATH/src/github.com/qmsk
+    ln -s $SRC $GOPATH/src/github.com/qmsk/e2
+    
+    go get -v -u -d github.com/qmsk/e2/cmd/...
 fi
 
 GIT_VERSION=$(git -C $SRC describe --tags)
@@ -20,7 +25,7 @@ GIT_VERSION=$(git -C $SRC describe --tags)
 # dist
 PACKAGE=qmsk-e2
 VERSION=${GIT_VERSION#v}
-DIST=dist/${PACKAGE}_${VERSION}
+CMD=(client server tally)
 
 # build static
 ( cd $SRC/static
@@ -30,23 +35,39 @@ DIST=dist/${PACKAGE}_${VERSION}
     bower install
 )
 
-# build dist
+# prepare base dist
+DIST=dist/${PACKAGE}_${VERSION}
+
+tar -C $SRC --exclude-vcs -czvf ${DIST}_src.tar.gz .
+
 install -d $DIST
 
 install -d $DIST/bin
 install -m 0755 -t $DIST/bin $SRC/cmd/tally/*.sh
 
-install -d $DIST/etc/systemd/system
-install -m 0644 -t $DIST/etc/systemd/system $SRC/dist/etc/systemd/system/*.service
+if [ -d $SRC/etc ]; then
+    install -d $DIST/etc/systemd/system
+    install -m 0644 -t $DIST/etc/systemd/system $SRC/etc/systemd/system/*.service
+fi
 
 rsync -rlpt $SRC/static $DIST/
 
-# build arch
-go get github.com/qmsk/e2/cmd/...
+build_arch () {
+    local arch=$1
 
-install -d $DIST/bin
-install -m 0755 -t $DIST/bin $GOPATH/bin/client
-install -m 0755 -t $DIST/bin $GOPATH/bin/server
-install -m 0755 -t $DIST/bin $GOPATH/bin/tally
+    # build dist
+    DIST_ARCH=${DIST}_$arch
 
-tar -czvf $DIST.tar.gz $DIST/
+    cp -a $DIST $DIST_ARCH
+    install -d $DIST_ARCH/bin
+
+    for cmd in "${CMD[@]}"; do
+        go build -o $DIST_ARCH/bin/$cmd -v github.com/qmsk/e2/cmd/$cmd
+    done
+
+    tar -czvf $DIST_ARCH.tar.gz $DIST_ARCH/
+}
+
+GOOS=linux GOARCH=amd64 build_arch linux-amd64
+GOOS=linux GOARCH=arm build_arch linux-arm
+
