@@ -1,5 +1,9 @@
 # qmsk-e2
-E2 Client, Tally system, (partial) Web UI
+E2 Client, Tally system. Web UI with Presets.
+
+Please referr to the [Wiki](https://github.com/qmsk/e2/wiki) for more detailed user guides, such as RaspberryPI installs.
+
+You can also try submitting a [GitHub Issue](https://github.com/qmsk/e2/issues/new?labels=question) for support, which may or may not receive an answer.
 
 ## Supported Devices
 
