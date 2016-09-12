@@ -30,12 +30,36 @@ The tally system should be restarted if the stack master changes.
 The tally system will indicate an error status if any E2 system is disconnected (stops responding within the `--e2-timeout=`).
 The tally system will reconnect to any E2 system once is starts responding to discovery packets again.
 
+## Building
+
+The project consists of a set Go applications, and a Javascript web frontend.
+
+There are no prebuilt binaries available, yet.
+
+Once built, the binary Go applications + Javascript assets can be distributed and executed without the development tools and instructions listed here.
+
+### Backend
+
+    go get github.com/qmsk/e2/cmd/...
+
+Building the backend code requires at least [Go version 1.4](https://golang.org/dl/). Earlier versions lack support for:
+
+* `atomic.Value` (added in Go 1.4)
+
+The Go binaries can also be cross-compiled for different platforms, such as building Linux ARM binaries on your laptop for use on a RaspberryPI:
+
+    GOOS=linux GOARCH=arm go build -o bin/linux_arm/server -v github.com/qmsk/e2/cmd/server
+
+### Frontend
+	
+    cd static && bower install
+
+Building the frontend code requires:
+
+* [https://www.npmjs.com/](NPM) 
+* [bower](https://bower.io/)
 
 ## Usage
-
-Build the golang binary:
-
-    go get ./cmd/tally
 
 Tag the relevant inputs in EMTS with `tally=ID` in their Contact details field:
 
@@ -126,9 +150,7 @@ The Web output also provides an AngularJS frontend using the JSON WebSocket API:
 
     tally --http-listen=:8001 --http-static=./static
 
-The `--http-static` is optional, and is only needed for the UI. Use `bower` to prepare the JS deps:
-
-	cd static && bower install
+The `--http-static` is optional, and is only needed for the UI. Using the Tally Web UI requires [#Building](building) the static assets for the web frontend.
 
 The Web UI uses this WebSocket stream to display a live-updating tally state:
 
@@ -272,13 +294,11 @@ Web interface for displaying E2 state and controlling presets.
 
 Follow E2 status, providing a HTTP REST + WebSocket JSON API, and an AngularJS web UI:
 
-    go get ./cmd/server
-    
-    cd static && bower install
-    
 	$GOPATH/bin/server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
 
 The server will connect to the first discovered E2 system.
+
+Using the server Web UI requires [#Building](building) the static assets for the web frontend.
 
 ### Usage
 
