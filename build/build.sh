@@ -20,6 +20,8 @@ else
     go get -v -u -d github.com/qmsk/e2/cmd/...
 fi
 
+[ -z "$GIT_TAG" ] || git -C $SRC checkout $GIT_TAG
+
 GIT_VERSION=$(git -C $SRC describe --tags)
 
 # dist
@@ -36,7 +38,9 @@ CMD=(client server tally)
 )
 
 # prepare base dist
-DIST=dist/${PACKAGE}_${VERSION}
+cd dist
+
+DIST=${PACKAGE}_${VERSION}
 
 tar -C $SRC --exclude-vcs -czvf ${DIST}_src.tar.gz .
 
