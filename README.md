@@ -15,7 +15,8 @@ This implementation has been tested with the following device software versions:
 This implementation supports the following device APIs:
 
 * TCP port 9876 XML (read-only, live streaming)
-* TCP port 9999 JSON-RPC (read-only for now, includes preset destinations)
+* TCP port 9999 JSON-RPC (read-mostly, includes preset recall)
+* TCP port 9878 "telnet" (write-only, preset recalls and program cut/autotrans)
 * UDP port 40961 discovery
 
 ## Building
