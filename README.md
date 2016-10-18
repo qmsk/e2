@@ -63,11 +63,11 @@ Supports the following input sources:
 
 Supports the following output drivers:
 
-* HTTP REST JSON API
-* Web UI
-* GPIO
-* SPI RGB LEDs
-* Universe UDP
+* [HTTP REST JSON API](https://github.com/qmsk/e2/wiki/Tally#web-api)
+* [Web UI](https://github.com/qmsk/e2/wiki/Tally#web-ui)
+* [GPIO](https://github.com/qmsk/e2/wiki/Tally#gpio)
+* [SPI RGB LED](https://github.com/qmsk/e2/wiki/Tally#spi-led)
+* [Universe UDP](https://github.com/qmsk/e2/wiki/Universe-Tally)
 
 ## Usage
 
@@ -77,7 +77,7 @@ Run the tally software using a network interface connected to the same network a
 
 Tag the relevant inputs in EMTS with `tally=ID` in their Contact details field:
 
-    ![EMTS Contact field](https://raw.githubusercontent.com/qmsk/e2/master/docs/tally-emts-contact.png)
+![EMTS Contact field](https://raw.githubusercontent.com/qmsk/e2/master/docs/tally-emts-contact.png)
 
 Referr to the [Wiki](https://github.com/qmsk/e2/wiki/Tally) for further documentation.
 
@@ -88,6 +88,8 @@ Web API + frontend for following the E2 state and controlling presets.
 	server --discovery-interface=eth0 --http-listen=:8284 --http-static=./static
 
 The server will connect to the first discovered E2 system.
+
+![Server Presets UI](https://raw.githubusercontent.com/qmsk/e2/master/docs/server-presets.png)
 
 Using the server Web UI requires the static assets for the web frontend (see [Building](#building)).
 
