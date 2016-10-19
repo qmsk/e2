@@ -1,10 +1,13 @@
 package universe
 
 import (
-  "bufio"
-  "bytes"
-  "github.com/qmsk/e2/tally"
-  "text/template"
+	"bufio"
+	"bytes"
+	"log"
+	"sync"
+	"text/template"
+
+	"github.com/qmsk/e2/tally"
 )
 
 const TallyTemplate = `
@@ -14,62 +17,136 @@ const TallyTemplate = `
 `
 
 type TallyOptions struct {
-  TemplatePath  string `long:"universe-tally-template" value-name:"PATH"`
+	TemplatePath string `long:"universe-tally-template" value-name:"PATH" description:"Custom template file"`
+
+	LineFormat LineFormat `long:"universe-line-format" value-name:"CR|LF|CRLF" default:"CRLF"`
+	UDP        []string   `long:"universe-udp" value-name:"HOST[:PORT]" description:"Send UDP updates"`
 }
 
-func (options TallyOptions) TallyConfig(sender TallySender) (*TallyConfig, error) {
-  var tallyConfig = TallyConfig{
-    sender: sender,
-  }
-
-  if options.TemplatePath == "" {
-    if template, err := template.New("universe-tally").Parse(TallyTemplate); err != nil {
-      panic(err)
-    } else {
-      tallyConfig.template = template
-    }
-  } else {
-    if template, err := template.ParseFiles(options.TemplatePath); err != nil {
-      return nil, err
-    } else {
-      tallyConfig.template = template
-    }
-  }
-
-  return &tallyConfig, nil
+func (options TallyOptions) Enabled() bool {
+	return len(options.UDP) > 0
 }
 
-type TallySender interface {
-  Send(msg []byte) error
+func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
+	var tallyDriver = TallyDriver{}
+
+	if options.TemplatePath == "" {
+		if template, err := template.New("universe-tally").Parse(TallyTemplate); err != nil {
+			panic(err)
+		} else {
+			tallyDriver.template = template
+		}
+	} else {
+		if template, err := template.ParseFiles(options.TemplatePath); err != nil {
+			return nil, err
+		} else {
+			tallyDriver.template = template
+		}
+	}
+
+	for _, udp := range options.UDP {
+		var url = TallyURL{
+			Scheme: "udp",
+			Host:   udp,
+		}
+
+		if tallySender, err := url.tallySender(options); err != nil {
+			return nil, err
+		} else {
+			tallyDriver.addSender(tallySender)
+		}
+	}
+
+	return &tallyDriver, nil
 }
 
 // Configurable tally status output
 //
 // Each line is sent as a separate message
-type TallyConfig struct {
-  sender    TallySender
-  template  *template.Template
+type TallyDriver struct {
+	template *template.Template
+
+	tallyChan chan tally.State
+	runWG     sync.WaitGroup
+
+	senders []tallySender
 }
 
-func (tallyConfig *TallyConfig) Execute(tallyState tally.State) error {
-  var buffer bytes.Buffer
+func (tallyDriver *TallyDriver) addSender(tallySender tallySender) {
+	tallyDriver.senders = append(tallyDriver.senders, tallySender)
+}
 
-  if err := tallyConfig.template.Execute(&buffer, tallyState); err != nil {
-    return err
-  }
+func (tallyDriver *TallyDriver) Send(msg string) {
+	for _, sender := range tallyDriver.senders {
+		if err := sender.Send(msg); err != nil {
+			log.Printf("universe:Tally: Send %v: %v", sender, err)
+		}
+	}
+}
 
-  // send
-  var scanner = bufio.NewScanner(&buffer)
+func (tallyDriver *TallyDriver) RegisterTally(t *tally.Tally) {
+	tallyDriver.tallyChan = make(chan tally.State)
 
-  for scanner.Scan() {
-    msg := scanner.Bytes()
+	tallyDriver.runWG.Add(1)
+	go tallyDriver.run()
 
-    if len(msg) == 0 {
-      continue
-    }
+	t.Register(tallyDriver.tallyChan)
+}
 
-    tallyConfig.sender.Send(msg)
-  }
+func (tallyDriver *TallyDriver) close() {
+	defer tallyDriver.runWG.Done()
 
-  return scanner.Err()
+	for _, sender := range tallyDriver.senders {
+		if err := sender.Close(); err != nil {
+			log.Printf("universe:TallyDriver: Close %v: %v", sender, err)
+		}
+	}
+}
+
+func (tallyDriver *TallyDriver) run() {
+	defer tallyDriver.close()
+
+	for tallyState := range tallyDriver.tallyChan {
+		if err := tallyDriver.updateTally(tallyState); err != nil {
+			log.Printf("universe:TallyDriver %v: updateTally: %v", tallyDriver, err)
+		}
+	}
+
+	log.Printf("universe:TallyDriver: Done")
+}
+
+func (tallyDriver *TallyDriver) updateTally(tallyState tally.State) error {
+	var buffer bytes.Buffer
+
+	log.Printf("universe:TallyDriver: updateTally...")
+
+	if err := tallyDriver.template.Execute(&buffer, tallyState); err != nil {
+		return err
+	}
+
+	// send
+	var scanner = bufio.NewScanner(&buffer)
+
+	for scanner.Scan() {
+		msg := scanner.Text()
+
+		if len(msg) == 0 {
+			continue
+		}
+
+		tallyDriver.Send(msg)
+	}
+
+	return scanner.Err()
+}
+
+// Close and Wait..
+func (tallyDriver *TallyDriver) Close() {
+	log.Printf("universe:TallyDriver %v: Close..", tallyDriver)
+
+	if tallyDriver.tallyChan != nil {
+		close(tallyDriver.tallyChan)
+	}
+
+	tallyDriver.runWG.Wait()
 }

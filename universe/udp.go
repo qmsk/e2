@@ -1,115 +1,52 @@
 package universe
 
 import (
-  "fmt"
-  "net"
-  "github.com/qmsk/e2/tally"
-  "log"
-  "sync"
+	"fmt"
+	"log"
+	"net"
 )
 
-type UDPOptions struct {
-    TallyOptions
+func makeUDP(options TallyOptions, url TallyURL) (*UDPTally, error) {
+	var addr = url.Addr()
+	var udpTally = UDPTally{
+		options: options,
+	}
 
-    Port    string    `long:"universe-udp-port" value-name:"PORT" default:"3050"`
-    Addr    string    `long:"universe-udp-addr" value-name:"IP"`
-}
+	log.Printf("universe:UDPTally: %v", addr)
 
-func (options UDPOptions) Enabled() bool {
-  return (options.Addr != "")
-}
+	if udpAddr, err := net.ResolveUDPAddr("udp", addr); err != nil {
+		return nil, fmt.Errorf("ResolveUDPAddr %v: %v", addr, err)
+	} else if udpConn, err := net.DialUDP("udp", nil, udpAddr); err != nil {
+		return nil, fmt.Errorf("DialUDP %v: %v", udpAddr, err)
+	} else {
+		udpTally.udpConn = udpConn
+	}
 
-func (options UDPOptions) UDPTally() (*UDPTally, error) {
-  var udpTally = UDPTally{
-    options: options,
-  }
-
-  addr := net.JoinHostPort(options.Addr, options.Port)
-
-  if udpAddr, err := net.ResolveUDPAddr("udp", addr); err != nil {
-    return nil, fmt.Errorf("ResolveUDPAddr %v: %v", addr, err)
-  } else if udpConn, err := net.DialUDP("udp", nil, udpAddr); err != nil {
-    return nil, fmt.Errorf("DialUDP %v: %v", udpAddr, err)
-  } else {
-    udpTally.udpConn = udpConn
-  }
-
-  if tallyConfig, err := options.TallyOptions.TallyConfig(&udpTally); err != nil {
-    return nil, err
-  } else {
-    udpTally.config = tallyConfig
-  }
-
-  return &udpTally, nil
+	return &udpTally, nil
 }
 
 type UDPTally struct {
-  options UDPOptions
-  config  *TallyConfig
+	options TallyOptions
 
-  udpConn *net.UDPConn
-
-  tallyChan chan tally.State
-
-  closeWG sync.WaitGroup
+	udpConn *net.UDPConn
 }
 
 func (udpTally *UDPTally) String() string {
-  return udpTally.udpConn.RemoteAddr().String()
+	return udpTally.udpConn.RemoteAddr().String()
 }
 
-func (udpTally *UDPTally) Send(msg []byte) error {
-  log.Printf("universe:UDPTally %v: send %v", udpTally, string(msg))
+func (udpTally *UDPTally) Send(msg string) error {
+	var buf = []byte(msg + string(udpTally.options.LineFormat))
 
-  if _, err := udpTally.udpConn.Write(msg); err != nil {
-    return err
-  }
+	log.Printf("universe:UDPTally %v: send %v", udpTally, buf)
 
-  return nil
-}
-
-func (udpTally *UDPTally) RegisterTally(t *tally.Tally) {
-	udpTally.tallyChan = make(chan tally.State)
-
-  udpTally.closeWG.Add(1)
-	go udpTally.run()
-
-	t.Register(udpTally.tallyChan)
-}
-
-func (udpTally *UDPTally) close() {
-  defer udpTally.closeWG.Done()
-
-  if err := udpTally.udpConn.Close(); err != nil {
-    log.Printf("universe:UDPTally %v: close: %v", udpTally, err)
-  }
-}
-
-func (udpTally *UDPTally) run() {
-  defer udpTally.close()
-
-  for tallyState := range udpTally.tallyChan {
-    if err := udpTally.updateTally(tallyState); err != nil {
-      log.Printf("universe:UDPTally %v: updateTally: %v", udpTally, err)
-    }
-  }
-
-  log.Printf("universe:UDPTally: Done")
-}
-
-func (udpTally *UDPTally) updateTally(tallyState tally.State) error {
-  log.Printf("universe:UDPTally %v: updateTally...", udpTally)
-
-  return udpTally.config.Execute(tallyState)
-}
-
-// Close and Wait..
-func (udpTally *UDPTally) Close() {
-	log.Printf("universe:UDPTally %v: Close..", udpTally)
-
-	if udpTally.tallyChan != nil {
-		close(udpTally.tallyChan)
+	if _, err := udpTally.udpConn.Write(buf); err != nil {
+		return err
 	}
 
-	udpTally.closeWG.Wait()
+	return nil
+}
+
+func (udpTally *UDPTally) Close() error {
+	return udpTally.udpConn.Close()
 }
