@@ -21,10 +21,11 @@ type TallyOptions struct {
 
 	LineFormat LineFormat `long:"universe-line-format" value-name:"CR|LF|CRLF" default:"CRLF"`
 	UDP        []string   `long:"universe-udp" value-name:"HOST[:PORT]" description:"Send UDP commands"`
+	TCP        []string   `long:"universe-tcp" value-name:"HOST[:PORT]" description:"Send TCP commands"`
 }
 
 func (options TallyOptions) Enabled() bool {
-	return len(options.UDP) > 0
+	return len(options.UDP) > 0 || len(options.TCP) > 0
 }
 
 func (options TallyOptions) addSender(tallyDriver *TallyDriver, proto string, addr string) error {
@@ -63,6 +64,9 @@ func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
 		if err := options.addSender(&tallyDriver, "udp", addr); err != nil {
 			return nil, err
 		}
+	}
+	for _, addr := range options.TCP {
+		if err := options.addSender(&tallyDriver, "tcp", addr); err != nil {
 			return nil, err
 		}
 	}
