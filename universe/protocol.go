@@ -33,6 +33,7 @@ func (lf *LineFormat) UnmarshalFlag(value string) error {
 }
 
 type tallySender interface {
+	String() string
 	Send(msg string) error
 	Close() error
 }

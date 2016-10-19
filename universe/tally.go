@@ -6,6 +6,7 @@ import (
 	"log"
 	"sync"
 	"text/template"
+	"time"
 
 	"github.com/qmsk/e2/tally"
 )
@@ -19,9 +20,12 @@ const TallyTemplate = `
 type TallyOptions struct {
 	TemplatePath string `long:"universe-tally-template" value-name:"PATH" description:"Custom template file"`
 
-	LineFormat LineFormat `long:"universe-line-format" value-name:"CR|LF|CRLF" default:"CRLF"`
-	UDP        []string   `long:"universe-udp" value-name:"HOST[:PORT]" description:"Send UDP commands"`
-	TCP        []string   `long:"universe-tcp" value-name:"HOST[:PORT]" description:"Send TCP commands"`
+	LineFormat LineFormat    `long:"universe-line-format" value-name:"CR|LF|CRLF" default:"CRLF"`
+	Timeout    time.Duration `long:"universe-timeout" value-name:"DURATION" default:"1s"`
+	SendBuffer int           `long:"universe-send-buffer" value-name:"MESSAGES" default:"100" description:"Smaller values lead to dropped messages, larger values lead to stale messages on connection errors"`
+
+	UDP []string `long:"universe-udp" value-name:"HOST[:PORT]" description:"Send UDP commands"`
+	TCP []string `long:"universe-tcp" value-name:"HOST[:PORT]" description:"Send TCP commands"`
 }
 
 func (options TallyOptions) Enabled() bool {
@@ -44,7 +48,9 @@ func (options TallyOptions) addSender(tallyDriver *TallyDriver, proto string, ad
 }
 
 func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
-	var tallyDriver = TallyDriver{}
+	var tallyDriver = TallyDriver{
+		senders: make(map[string]tallySender),
+	}
 
 	if options.TemplatePath == "" {
 		if template, err := template.New("universe-tally").Parse(TallyTemplate); err != nil {
@@ -83,17 +89,19 @@ type TallyDriver struct {
 	tallyChan chan tally.State
 	runWG     sync.WaitGroup
 
-	senders []tallySender
+	senders map[string]tallySender
 }
 
 func (tallyDriver *TallyDriver) addSender(tallySender tallySender) {
-	tallyDriver.senders = append(tallyDriver.senders, tallySender)
+	tallyDriver.senders[tallySender.String()] = tallySender
 }
 
-func (tallyDriver *TallyDriver) Send(msg string) {
-	for _, sender := range tallyDriver.senders {
+func (tallyDriver *TallyDriver) send(msg string) {
+	for senderName, sender := range tallyDriver.senders {
 		if err := sender.Send(msg); err != nil {
 			log.Printf("universe:Tally: Send %v: %v", sender, err)
+
+			delete(tallyDriver.senders, senderName)
 		}
 	}
 }
@@ -148,7 +156,7 @@ func (tallyDriver *TallyDriver) updateTally(tallyState tally.State) error {
 			continue
 		}
 
-		tallyDriver.Send(msg)
+		tallyDriver.send(msg)
 	}
 
 	return scanner.Err()
