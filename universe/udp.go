@@ -6,47 +6,47 @@ import (
 	"net"
 )
 
-func makeUDP(options TallyOptions, url TallyURL) (*UDPTally, error) {
+func udpSender(options TallyOptions, url TallyURL) (*UDPSender, error) {
 	var addr = url.Addr()
-	var udpTally = UDPTally{
+	var udpSender = UDPSender{
 		options: options,
 	}
 
-	log.Printf("universe:UDPTally: %v", addr)
+	log.Printf("universe:UDPSender: %v", addr)
 
 	if udpAddr, err := net.ResolveUDPAddr("udp", addr); err != nil {
 		return nil, fmt.Errorf("ResolveUDPAddr %v: %v", addr, err)
 	} else if udpConn, err := net.DialUDP("udp", nil, udpAddr); err != nil {
 		return nil, fmt.Errorf("DialUDP %v: %v", udpAddr, err)
 	} else {
-		udpTally.udpConn = udpConn
+		udpSender.udpConn = udpConn
 	}
 
-	return &udpTally, nil
+	return &udpSender, nil
 }
 
-type UDPTally struct {
+type UDPSender struct {
 	options TallyOptions
 
 	udpConn *net.UDPConn
 }
 
-func (udpTally *UDPTally) String() string {
-	return udpTally.udpConn.RemoteAddr().String()
+func (udpSender *UDPSender) String() string {
+	return udpSender.udpConn.RemoteAddr().String()
 }
 
-func (udpTally *UDPTally) Send(msg string) error {
-	var buf = []byte(msg + string(udpTally.options.LineFormat))
+func (udpSender *UDPSender) Send(msg string) error {
+	var buf = []byte(msg + string(udpSender.options.LineFormat))
 
-	log.Printf("universe:UDPTally %v: send %v", udpTally, buf)
+	log.Printf("universe:UDPSender %v: send %v", udpSender, buf)
 
-	if _, err := udpTally.udpConn.Write(buf); err != nil {
+	if _, err := udpSender.udpConn.Write(buf); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (udpTally *UDPTally) Close() error {
-	return udpTally.udpConn.Close()
+func (udpSender *UDPSender) Close() error {
+	return udpSender.udpConn.Close()
 }

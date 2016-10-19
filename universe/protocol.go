@@ -60,7 +60,7 @@ func (url TallyURL) Addr() string {
 func (url TallyURL) tallySender(options TallyOptions) (tallySender, error) {
 	switch url.Scheme {
 	case "udp":
-		return makeUDP(options, url)
+		return udpSender(options, url)
 	default:
 		return nil, fmt.Errorf("Invalid Tally sender scheme: %v", url.Scheme)
 	}

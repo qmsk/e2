@@ -20,11 +20,26 @@ type TallyOptions struct {
 	TemplatePath string `long:"universe-tally-template" value-name:"PATH" description:"Custom template file"`
 
 	LineFormat LineFormat `long:"universe-line-format" value-name:"CR|LF|CRLF" default:"CRLF"`
-	UDP        []string   `long:"universe-udp" value-name:"HOST[:PORT]" description:"Send UDP updates"`
+	UDP        []string   `long:"universe-udp" value-name:"HOST[:PORT]" description:"Send UDP commands"`
 }
 
 func (options TallyOptions) Enabled() bool {
 	return len(options.UDP) > 0
+}
+
+func (options TallyOptions) addSender(tallyDriver *TallyDriver, proto string, addr string) error {
+	var url = TallyURL{
+		Scheme: proto,
+		Host:   addr,
+	}
+
+	if tallySender, err := url.tallySender(options); err != nil {
+		return err
+	} else {
+		tallyDriver.addSender(tallySender)
+	}
+
+	return nil
 }
 
 func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
@@ -44,16 +59,11 @@ func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
 		}
 	}
 
-	for _, udp := range options.UDP {
-		var url = TallyURL{
-			Scheme: "udp",
-			Host:   udp,
-		}
-
-		if tallySender, err := url.tallySender(options); err != nil {
+	for _, addr := range options.UDP {
+		if err := options.addSender(&tallyDriver, "udp", addr); err != nil {
 			return nil, err
-		} else {
-			tallyDriver.addSender(tallySender)
+		}
+			return nil, err
 		}
 	}
 
