@@ -33,7 +33,7 @@ type UDPSender struct {
 }
 
 func (udpSender *UDPSender) String() string {
-	return udpSender.udpConn.RemoteAddr().String()
+	return "udp://" + udpSender.udpConn.RemoteAddr().String()
 
 }
 func (udpSender *UDPSender) send(msg string) error {

@@ -41,7 +41,7 @@ type TCPSender struct {
 }
 
 func (tcpSender *TCPSender) String() string {
-	return tcpSender.tcpAddr.String()
+	return "tcp://" + tcpSender.tcpAddr.String()
 }
 
 func (tcpSender *TCPSender) connect() error {
