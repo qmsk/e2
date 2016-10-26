@@ -2,11 +2,12 @@ package tally
 
 import (
 	"fmt"
-	"github.com/qmsk/e2/client"
-	"github.com/qmsk/e2/discovery"
 	"io"
 	"log"
 	"time"
+
+	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/discovery"
 )
 
 func newSource(tally *Tally, discoveryPacket discovery.Packet, clientOptions client.Options) (Source, error) {
@@ -125,6 +126,12 @@ func (source Source) updateState(state *State) error {
 
 			if screen.IsActive > 0 {
 				status.Active = true
+			}
+
+			if screen.Transition[0].InProgress() {
+				status.Transition = screen.Transition[0].Progress()
+
+				log.Printf("tally:Source %v: Screen %v: Transition in progress: %#v", source, screen.Name, status.Transition)
 			}
 
 			for _, layer := range screen.LayerCollection {

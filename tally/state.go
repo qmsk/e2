@@ -2,8 +2,10 @@ package tally
 
 import (
 	"fmt"
-	"github.com/qmsk/e2/discovery"
 	"time"
+
+	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/discovery"
 )
 
 // Tally ID
@@ -37,6 +39,9 @@ type Status struct {
 	Program bool
 	Preview bool
 	Active  bool
+
+	// Transitioning from Preview -> Program
+	Transition client.TransitionProgress
 }
 
 func (status Status) String() string {
@@ -173,6 +178,10 @@ func (state *State) update() {
 		}
 		if link.Status.Active {
 			tallyState.Status.Active = true
+		}
+		if link.Status.Transition.InProgress() {
+			// TODO: merge multiple transitions?
+			tallyState.Status.Transition = link.Status.Transition
 		}
 
 		state.Tally[link.Tally] = tallyState
