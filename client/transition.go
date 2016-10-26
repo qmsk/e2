@@ -20,18 +20,14 @@ type Transition struct {
 	TransInProg     int `xml:"TransInProg"`
 }
 
+// Workaroud missing TransInProg=0 update after Cut
 func (transition Transition) InProgress() bool {
-	return transition.AutoTransInProg > 0
+	return (transition.AutoTransInProg > 0) || (transition.TransInProg > 0 && transition.TransPos > 0)
 }
 
 // Return float 0.0 .. 1.0
 func (transition Transition) Progress() TransitionProgress {
-	if transition.InProgress() {
-		return TransitionProgress(float64(transition.TransPos) / float64(TransitionPosMax))
-	} else {
-		// XXX: assume transition is always > 0.0
-		return TransitionProgress(0.0)
-	}
+	return TransitionProgress(float64(transition.TransPos) / float64(TransitionPosMax))
 }
 
 type Transitions map[int]Transition
