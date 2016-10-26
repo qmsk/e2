@@ -2,12 +2,13 @@ package tally
 
 import (
 	"fmt"
-	"github.com/qmsk/e2/client"
-	"github.com/qmsk/e2/discovery"
 	"log"
 	"regexp"
 	"sync/atomic"
 	"time"
+
+	"github.com/qmsk/e2/client"
+	"github.com/qmsk/e2/discovery"
 )
 
 type Options struct {
@@ -18,6 +19,12 @@ type Options struct {
 	ignoreDestRegexp *regexp.Regexp
 	ContactName      string `long:"tally-contact-name" value-name:"NAME" default:"tally" description:"Resolve Input ID from Contact 'tally=\\d' field"`
 	contactIDRegexp  *regexp.Regexp
+
+	ColorDefault         Color `long:"tally-color-default"    value-name:"RRGGBB" default:"133337"`
+	ColorPreviewInactive Color `long:"tally-color-preview-inactive" value-name:"RRGGBB" default:"008800"`
+	ColorPreview         Color `long:"tally-color-preview" value-name:"RRGGBB" default:"00ff00"`
+	ColorProgram         Color `long:"tally-color-program" value-name:"RRGGBB" default:"ff0000"`
+	ColorTransition      Color `long:"tally-color-transition" value-name:"RRGGBB" default:"ff8800"`
 }
 
 func (options Options) Tally(clientOptions client.Options, discoveryOptions discovery.Options) (*Tally, error) {
@@ -188,7 +195,7 @@ func (tally *Tally) update() *State {
 		}
 	}
 
-	state.update()
+	state.update(&tally.options)
 
 	return state
 }

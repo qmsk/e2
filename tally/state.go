@@ -41,7 +41,7 @@ type Status struct {
 	Active  bool
 
 	// Transitioning from Preview -> Program
-	Transition client.TransitionProgress
+	Transition client.TransitionProgress `json:",omitempty"`
 }
 
 // Consider tally as being in the high state
@@ -74,6 +74,28 @@ type TallyState struct {
 	Errors  []error
 
 	Status Status
+	Color  Color
+}
+
+func (tallyState TallyState) color(options *Options) Color {
+
+	if tallyState.Status.Program {
+		if tallyState.Status.Transition.InProgress() {
+			return options.ColorTransition.Blend(options.ColorPreview, tallyState.Status.Transition.Factor())
+		} else {
+			return options.ColorProgram
+		}
+	} else if tallyState.Status.Preview {
+		if tallyState.Status.Transition.InProgress() {
+			return options.ColorTransition.Blend(options.ColorProgram, tallyState.Status.Transition.Factor())
+		} else if tallyState.Status.Active {
+			return options.ColorPreview
+		} else {
+			return options.ColorPreviewInactive
+		}
+	} else {
+		return options.ColorDefault
+	}
 }
 
 type State struct {
@@ -149,7 +171,7 @@ func (state *State) addLink(link Link) {
 }
 
 // Update finaly Tally state from links
-func (state *State) update() {
+func (state *State) update(options *Options) {
 	for _, sourceState := range state.Sources {
 		if sourceState.Error != nil {
 			state.Errors = append(state.Errors, sourceState.Error)
@@ -190,6 +212,12 @@ func (state *State) update() {
 		}
 
 		state.Tally[link.Tally] = tallyState
+	}
+
+	for id, tally := range state.Tally {
+		tally.Color = tally.color(options)
+
+		state.Tally[id] = tally
 	}
 }
 

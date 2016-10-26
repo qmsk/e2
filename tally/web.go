@@ -1,8 +1,9 @@
 package tally
 
 import (
-	"github.com/qmsk/e2/web"
 	"time"
+
+	"github.com/qmsk/e2/web"
 )
 
 type restInput struct {
@@ -25,6 +26,7 @@ type restTally struct {
 	Inputs  []restInput
 	Outputs []restStatus
 	Status
+	Color  Color
 	Errors []string
 }
 
@@ -83,6 +85,7 @@ func (state State) toRest() (rs restState) {
 		var tally = restTally{
 			ID:     id,
 			Status: tallyState.Status,
+			Color:  tallyState.Color,
 		}
 
 		for input, _ := range tallyState.Inputs {
