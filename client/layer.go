@@ -22,15 +22,6 @@ type BGLyr struct {
 	Color     BGColor `json:"BGColor" xml:"BGColor"`
 }
 
-type Transition struct {
-	ID int `xml:"id,attr"`
-
-	ArmMode         int `xml:"ArmMode"`
-	TransPos        int `xml:"TransPos"`
-	AutoTransInProg int `xml:"AutoTransInProg"`
-	TransInProg     int `xml:"TransInProg"`
-}
-
 type Layer struct {
 	ID int `json:"id" xml:"id,attr"`
 

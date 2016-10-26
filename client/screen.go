@@ -15,16 +15,6 @@ type ScreenDestination struct {
 	//DestOutMapCol
 }
 
-type ScreenTransitions map[int]Transition
-
-func (col *ScreenTransitions) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
-	return unmarshalXMLItem(col, d, e)
-}
-
-func (col ScreenTransitions) MarshalJSON() ([]byte, error) {
-	return marshalJSONMap(col)
-}
-
 type ScreenBGLayers map[int]BGLyr
 
 func (col *ScreenBGLayers) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
@@ -44,7 +34,7 @@ type ScreenDest struct {
 	VSize    int
 
 	BGLyr           ScreenBGLayers
-	Transition      ScreenTransitions
+	Transition      Transitions
 	LayerCollection LayerCollection
 }
 
