@@ -18,7 +18,8 @@ const TallyTemplate = `
 `
 
 type TallyOptions struct {
-	TemplatePath string `long:"universe-tally-template" value-name:"PATH" description:"Custom template file"`
+	TemplatePath  string `long:"universe-tally-template" value-name:"PATH" description:"Custom template file"`
+	TemplateLines bool   `long:"universe-tally-lines" description:"Split template lines"`
 
 	LineFormat LineFormat    `long:"universe-line-format" value-name:"CR|LF|CRLF|NONE" default:"CRLF"`
 	Timeout    time.Duration `long:"universe-timeout" value-name:"DURATION" default:"1s"`
@@ -49,6 +50,7 @@ func (options TallyOptions) addSender(tallyDriver *TallyDriver, proto string, ad
 
 func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
 	var tallyDriver = TallyDriver{
+		options: options,
 		senders: make(map[string]tallySender),
 	}
 
@@ -84,6 +86,7 @@ func (options TallyOptions) TallyDriver() (*TallyDriver, error) {
 //
 // Each line is sent as a separate message
 type TallyDriver struct {
+	options  TallyOptions
 	template *template.Template
 
 	tallyChan chan tally.State
@@ -96,7 +99,7 @@ func (tallyDriver *TallyDriver) addSender(tallySender tallySender) {
 	tallyDriver.senders[tallySender.String()] = tallySender
 }
 
-func (tallyDriver *TallyDriver) send(msg string) {
+func (tallyDriver *TallyDriver) send(msg []byte) {
 	for senderName, sender := range tallyDriver.senders {
 		if err := sender.Send(msg); err != nil {
 			log.Printf("universe:Tally: Send %v: %v", sender, err)
@@ -146,8 +149,9 @@ func (tallyDriver *TallyDriver) updateTally(tallyState tally.State) error {
 		return err
 	}
 
-	// send
+	// lines
 	var scanner = bufio.NewScanner(&buffer)
+	var sendBuffer bytes.Buffer
 
 	for scanner.Scan() {
 		msg := scanner.Text()
@@ -156,7 +160,19 @@ func (tallyDriver *TallyDriver) updateTally(tallyState tally.State) error {
 			continue
 		}
 
-		tallyDriver.send(msg)
+		if tallyDriver.options.TemplateLines {
+			// send each line as a separate message
+			tallyDriver.send([]byte(msg + string(tallyDriver.options.LineFormat)))
+		} else {
+			// accumulate each output line
+			sendBuffer.WriteString(msg)
+			sendBuffer.WriteString(string(tallyDriver.options.LineFormat))
+		}
+	}
+
+	if !tallyDriver.options.TemplateLines {
+		// send the complete set of output lines as a single message
+		tallyDriver.send(sendBuffer.Bytes())
 	}
 
 	return scanner.Err()

@@ -12,7 +12,7 @@ func tcpSender(options TallyOptions, url TallyURL) (*TCPSender, error) {
 	var addr = url.Addr()
 	var tcpSender = TCPSender{
 		options:  options,
-		sendChan: make(chan string, options.SendBuffer),
+		sendChan: make(chan []byte, options.SendBuffer),
 	}
 
 	if tcpAddr, err := net.ResolveTCPAddr("tcp", addr); err != nil {
@@ -21,7 +21,7 @@ func tcpSender(options TallyOptions, url TallyURL) (*TCPSender, error) {
 		tcpSender.tcpAddr = tcpAddr
 	}
 
-	log.Printf("universe:TCPSender: %v", tcpSender)
+	log.Printf("universe:TCPSender: %v", &tcpSender)
 
 	tcpSender.runWG.Add(1)
 	go tcpSender.run()
@@ -36,7 +36,7 @@ type TCPSender struct {
 	tcpConn *net.TCPConn
 	err     error
 
-	sendChan chan string
+	sendChan chan []byte
 	runWG    sync.WaitGroup
 }
 
@@ -54,16 +54,14 @@ func (tcpSender *TCPSender) connect() error {
 	return nil
 }
 
-func (tcpSender *TCPSender) send(msg string) error {
-	log.Printf("universe:TCPSender %v: send msg=%#v line-format=%#v", udpSender, msg, tcpSender.options.LineFormat)
-
-	var buf = []byte(msg + string(tcpSender.options.LineFormat))
+func (tcpSender *TCPSender) send(msg []byte) error {
+	log.Printf("universe:TCPSender %v: send msg=%#v", udpSender, string(msg))
 
 	if err := tcpSender.tcpConn.SetWriteDeadline(time.Now().Add(tcpSender.options.Timeout)); err != nil {
 		return err
 	}
 
-	if _, err := tcpSender.tcpConn.Write(buf); err != nil {
+	if _, err := tcpSender.tcpConn.Write(msg); err != nil {
 		return err
 	}
 
@@ -101,7 +99,7 @@ func (tcpSender *TCPSender) run() {
 	}
 }
 
-func (tcpSender *TCPSender) Send(msg string) error {
+func (tcpSender *TCPSender) Send(msg []byte) error {
 	select {
 	case tcpSender.sendChan <- msg:
 		return nil
