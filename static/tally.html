@@ -4,7 +4,7 @@
 
         <meta charset="utf-8">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
-        
+
         <!-- jQuery -->
         <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
 
@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
 
         <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-        
+
         <!-- Angular -->
         <script src="/static/bower_components/angular/angular.js"></script>
         <script src="/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -23,7 +23,7 @@
         <script src="/static/bower_components/json-formatter/dist/json-formatter.min.js"></script>
 
         <link rel="stylesheet" href="/static/bower_components/json-formatter/dist/json-formatter.min.css"></link>
-        
+
         <!-- qmsk.e2 -->
         <link rel="stylesheet" href="/static/qmsk-e2.css">
         <link rel="stylesheet" href="/static/qmsk.e2/tally.css">
@@ -68,6 +68,11 @@
                             <span class="badge">{{tally.Outputs.length}}</span>
                         </a>
                     </li>
+                    <li ng-class="{'active': isActive('/debug')}">
+                        <a href="#/debug">
+                            Debug
+                        </a>
+                    </li>
                 </ul>
 
 
@@ -83,7 +88,7 @@
                 <p class="navbar-text navbar-right state-success" ng-show="events.open">
                     <span class="glyphicon glyphicon-cloud-download" title="WebSocket open"></span>
                 </p>
-                
+
                 <p class="navbar-text navbar-right" ng-if="!events.open">
                     DISCONNECTED
                 </p>
@@ -95,7 +100,7 @@
         </div>
 
         <div id="view" ng-view ng-class="{'closed': !events.open}"></div>
-        
+
         <ng-include src="'/static/qmsk.e2/status.html'"></ng-include>
     </body>
 </html>

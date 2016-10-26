@@ -3,6 +3,7 @@ angular.module('qmsk.e2.tally', [
         'qmsk.e2.web',
         'ngRoute',
         'ngWebSocket',
+        'jsonFormatter',
 ])
 
 .config(function($routeProvider) {
@@ -49,6 +50,11 @@ angular.module('qmsk.e2.tally', [
             reloadOnSearch: false,
         })
 
+        .when('/debug', {
+            templateUrl: '/static/qmsk.e2/tally/debug.html',
+            controller: 'DebugCtrl',
+        })
+
         .otherwise({
             redirectTo: '/tally',
         });
@@ -93,6 +99,9 @@ angular.module('qmsk.e2.tally', [
 
 })
 .controller('OutputsCtrl', function($scope) {
+
+})
+.controller('DebugCtrl', function($scope) {
 
 })
 
