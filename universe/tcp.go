@@ -29,6 +29,9 @@ func tcpSender(options TallyOptions, url TallyURL) (*TCPSender, error) {
 	return &tcpSender, nil
 }
 
+// The TCP connection is uni-directional. It is only used to send commands,
+// and we do not expect to ever receive any commands.
+// TODO: consider net:TCPConn.CloseRead?
 type TCPSender struct {
 	options TallyOptions
 
