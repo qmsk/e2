@@ -5,7 +5,11 @@
         <pre>{{error.Error}}</pre>
     </div>
 
-    <div class="tally preset" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}" ng-click="fullscreen = !fullscreen">
+    <div class="tally preset"
+      ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}"
+      ng-style="{'border-color': tally.Color}"
+      ng-click="fullscreen = !fullscreen"
+    >
         <p class="input" ng-repeat="input in tally.Inputs | orderBy: 'Name'">
             {{input.Name}}
             <!-- {{input.Source}} -->

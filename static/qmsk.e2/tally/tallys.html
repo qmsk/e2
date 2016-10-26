@@ -19,7 +19,9 @@
             <tbody>
                 <tr ng-repeat="tally in state.tally.Tally | orderBy: 'ID'">
                     <td>
-                        <div class="tally" ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active}">
+                        <div class="tally"
+                          ng-class="{'preview': tally.Preview, 'program': tally.Program, 'active': tally.Active, 'transition': tally.Transition > 0.0}"
+                        >
                             <a href="#/tally/{{tally.ID}}">{{tally.ID}}</a>
                         </div>
                     </td>
@@ -34,7 +36,7 @@
                     </td>
                     <td>
                         <div class="output" ng-repeat="output in tally.Outputs | orderBy: 'Name'"
-                            ng-class="{'preview': output.Preview, 'program': output.Program, 'active': output.Active}"
+                            ng-class="{'preview': output.Preview, 'program': output.Program, 'active': output.Active, 'transition': output.Transition > 0.0}"
                         >
                             {{output.Name}}
                         </div>
