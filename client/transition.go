@@ -9,6 +9,11 @@ func (value TransitionProgress) InProgress() bool {
 	return value > 0.0
 }
 
+// Return float64 factor 0.0 .. 1.0
+func (value TransitionProgress) Factor() float64 {
+	return float64(value)
+}
+
 const TransitionPosMax = 4096
 
 type Transition struct {
