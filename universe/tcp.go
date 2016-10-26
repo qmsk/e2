@@ -55,9 +55,9 @@ func (tcpSender *TCPSender) connect() error {
 }
 
 func (tcpSender *TCPSender) send(msg string) error {
-	var buf = []byte(msg + string(tcpSender.options.LineFormat))
+	log.Printf("universe:TCPSender %v: send msg=%#v line-format=%#v", udpSender, msg, tcpSender.options.LineFormat)
 
-	log.Printf("universe:TCPSender %v: send %v", tcpSender, buf)
+	var buf = []byte(msg + string(tcpSender.options.LineFormat))
 
 	if err := tcpSender.tcpConn.SetWriteDeadline(time.Now().Add(tcpSender.options.Timeout)); err != nil {
 		return err

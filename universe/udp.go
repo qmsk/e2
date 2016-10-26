@@ -37,9 +37,9 @@ func (udpSender *UDPSender) String() string {
 
 }
 func (udpSender *UDPSender) send(msg string) error {
-	var buf = []byte(msg + string(udpSender.options.LineFormat))
+	log.Printf("universe:UDPSender %v: send msg=%#v line-format=%#v", udpSender, msg, udpSender.options.LineFormat)
 
-	log.Printf("universe:UDPSender %v: send %v", udpSender, buf)
+	var buf = []byte(msg + string(udpSender.options.LineFormat))
 
 	if err := udpSender.udpConn.SetWriteDeadline(time.Now().Add(udpSender.options.Timeout)); err != nil {
 		return err
