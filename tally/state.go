@@ -44,6 +44,11 @@ type Status struct {
 	Transition client.TransitionProgress
 }
 
+// Consider tally as being in the high state
+func (status Status) High() bool {
+	return status.Program || status.Transition.InProgress()
+}
+
 func (status Status) String() string {
 	if status.Program && status.Preview {
 		return "program+preview"

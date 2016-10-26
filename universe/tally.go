@@ -13,7 +13,7 @@ import (
 
 const TallyTemplate = `
 {{ range $id, $state := .Tally }}
-<tally{{$id}}-{{ if $state.Status.Program }}high{{ else }}low{{ end }}>
+<tally{{$id}}-{{ if $state.Status.High }}high{{ else }}low{{ end }}>
 {{ end }}
 `
 

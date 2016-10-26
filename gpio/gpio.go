@@ -14,12 +14,13 @@ package gpio
 
 import (
 	"fmt"
-	"github.com/kidoman/embd"
-	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
-	"github.com/qmsk/e2/tally"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/kidoman/embd"
+	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
+	"github.com/qmsk/e2/tally"
 )
 
 type Options struct {
@@ -132,7 +133,7 @@ func (gpio *GPIO) updateTally(state tally.State) {
 		} else {
 			statusGreen = true
 
-			if status.Status.Program {
+			if status.Status.High() {
 				log.Printf("GPIO:\ttally pin %v high: %v", pin, status)
 
 				pinState = true
