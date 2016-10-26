@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/qmsk/e2/tally"
 )
 
 // 24-bit colors + 8-bit intensity
@@ -33,6 +35,10 @@ func (led *LED) UnmarshalFlag(value string) error {
 	}
 
 	return nil
+}
+
+func (led *LED) SetColor(color tally.Color) {
+	led.Red, led.Green, led.Blue = color.RGB255()
 }
 
 func (led *LED) Strobe(period time.Duration) {

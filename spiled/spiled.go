@@ -17,13 +17,14 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
-	"github.com/kidoman/embd"
-	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
-	"github.com/qmsk/e2/tally"
 	"log"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/kidoman/embd"
+	_ "github.com/kidoman/embd/host/rpi" // This loads the RPi driver
+	"github.com/qmsk/e2/tally"
 )
 
 type Protocol string
@@ -39,11 +40,6 @@ type Options struct {
 	Debug     bool    `long:"spiled-debug" description:"Dump SPI output"`
 	Intensity uint8   `long:"spiled-intensity" value-name:"0-255" default:"255"`
 	Refresh   float64 `long:"spiled-refresh" value-name:"HZ" default:"10"`
-
-	TallyIdle    LED `long:"spiled-tally-idle"    value-name:"RRGGBB" default:"000010"`
-	TallyPreview LED `long:"spiled-tally-preview" value-name:"RRGGBB" default:"00ff00"`
-	TallyProgram LED `long:"spiled-tally-program" value-name:"RRGGBB" default:"ff0000"`
-	TallyBoth    LED `long:"spiled-tally-both"    value-name:"RRGGBB" default:"ff4000"`
 
 	StatusIdle  LED `long:"spiled-status-idle"    value-name:"RRGGBB" default:"0000ff"`
 	StatusOK    LED `long:"spiled-status-ok"      value-name:"RRGGBB" default:"00ff00"`
@@ -192,17 +188,8 @@ func (spiled *SPILED) updateTally(tallyState tally.State) {
 		} else {
 			found++
 
-			if tally.Status.Program && tally.Status.Preview && tally.Status.Active {
-				led = spiled.options.TallyBoth
-			} else if tally.Status.Preview && tally.Status.Active {
-				led = spiled.options.TallyPreview
-			} else if tally.Status.Program {
-				led = spiled.options.TallyProgram
-			} else {
-				led = spiled.options.TallyIdle
-			}
-
 			led.Intensity = spiled.options.Intensity
+			led.SetColor(tally.Color)
 
 			if tally.Errors != nil {
 				led.Strobe(1 * time.Second)
