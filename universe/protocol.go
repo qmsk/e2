@@ -15,6 +15,7 @@ const (
 	LineFormatCRLF LineFormat = "\r\n"
 	LineFormatCR   LineFormat = "\r"
 	LineFormatLF   LineFormat = "\n"
+	LineFormatNone LineFormat = ""
 )
 
 func (lf *LineFormat) UnmarshalFlag(value string) error {
@@ -25,6 +26,8 @@ func (lf *LineFormat) UnmarshalFlag(value string) error {
 		*lf = LineFormatCR
 	case "lf":
 		*lf = LineFormatLF
+	case "none":
+		*lf = LineFormatNone
 	default:
 		return fmt.Errorf("Invalid LineFormat: %v", value)
 	}

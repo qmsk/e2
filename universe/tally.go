@@ -20,7 +20,7 @@ const TallyTemplate = `
 type TallyOptions struct {
 	TemplatePath string `long:"universe-tally-template" value-name:"PATH" description:"Custom template file"`
 
-	LineFormat LineFormat    `long:"universe-line-format" value-name:"CR|LF|CRLF" default:"CRLF"`
+	LineFormat LineFormat    `long:"universe-line-format" value-name:"CR|LF|CRLF|NONE" default:"CRLF"`
 	Timeout    time.Duration `long:"universe-timeout" value-name:"DURATION" default:"1s"`
 	SendBuffer int           `long:"universe-send-buffer" value-name:"MESSAGES" default:"100" description:"Smaller values lead to dropped messages, larger values lead to stale messages on connection errors"`
 
