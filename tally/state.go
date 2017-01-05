@@ -128,7 +128,7 @@ func (state *State) setSourceError(source Source, err error) {
 		Discovery: source.discoveryPacket,
 		FirstSeen: source.created,
 		LastSeen:  source.updated,
-		Connected: (source.xmlClient != nil),
+		Connected: (!source.closed && source.err == nil),
 		Error:     err,
 	}
 

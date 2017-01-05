@@ -131,8 +131,6 @@ func (gpio *GPIO) updateTally(state tally.State) {
 		if status, exists := state.Tally[id]; !exists {
 			// missing tally state for pin
 		} else {
-			statusGreen = true
-
 			if status.Status.High() {
 				log.Printf("GPIO:\ttally pin %v high: %v", pin, status)
 
@@ -141,6 +139,12 @@ func (gpio *GPIO) updateTally(state tally.State) {
 		}
 
 		pin.Set(pinState)
+	}
+
+	for _, source := range state.Sources {
+		if source.Connected {
+			statusGreen = true
+		}
 	}
 
 	if len(state.Errors) > 0 {
