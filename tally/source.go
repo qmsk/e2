@@ -59,6 +59,7 @@ func (source Source) String() string {
 }
 
 func (source Source) run(updateChan chan Source) {
+	defer source.xmlClient.Close()
 	for {
 		if system, err := source.xmlClient.Read(); err == nil {
 			source.system = system
