@@ -91,7 +91,7 @@ func (source Source) updateState(state *State) error {
 
 	system := source.system
 
-	for sourceID, systemSource := range system.SrcMgr.SourceCol.List() {
+	for sourceID, systemSource := range system.SrcMgr.SourceCol {
 		// lookup Input from inputCfg with tally=
 		if systemSource.InputCfgIndex < 0 {
 			continue
