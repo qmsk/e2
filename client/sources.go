@@ -85,11 +85,36 @@ func (col SourceCol) List() (items []Source) {
 	return items
 }
 
+// BG sources
+type BGSource struct {
+	ID int `json:"id" xml:"id,attr"`
+	Name    string
+
+	BGSrcType SourceType
+
+	// -1 unless Type == SourceTypeInput
+	InputCfgIndex    int
+	
+	// -1 unless Type == SourceTypeStill
+	StillIndex int
+}
+
+type BGSourceCol map[int]BGSource
+
+func (col *BGSourceCol) UnmarshalXML(d *xml.Decoder, e xml.StartElement) error {
+	return unmarshalXMLCol(col, d, e)
+}
+
+func (col BGSourceCol) MarshalJSON() ([]byte, error) {
+	return marshalJSONMap(col)
+}
+
+
 type SrcMgr struct {
 	ID int `xml:"id,attr"`
 
 	SourceCol SourceCol `xml:"SourceCol"`
-	//BGSourceCol
+	BGSourceCol BGSourceCol
 	InputCfgCol InputCfgCol `xml:"InputCfgCol"`
 	//SavedInputCfgCol
 }

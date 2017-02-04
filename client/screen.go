@@ -32,6 +32,7 @@ type ScreenDest struct {
 	Name     string
 	HSize    int
 	VSize    int
+	CurrBGLyr int
 
 	BGLyr           ScreenBGLayers
 	Transition      Transitions
