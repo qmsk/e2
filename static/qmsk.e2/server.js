@@ -134,6 +134,28 @@ angular.module('qmsk.e2.server', [
                 }
             });
 
+            $.each(system.DestMgr.AuxDestCol, function(auxID, aux) {
+              var output = {
+                  type: "aux",
+                  id: auxID,
+                  name: aux.Name,
+                  active: aux.IsActive > 0,
+              };
+
+              if (aux.PgmLastSrcIndex == sourceID) {
+                output.program = true;
+                item.program.push(output);
+              }
+              if (aux.PvwLastSrcIndex == sourceID) {
+                output.preview = true;
+                item.preview.push(output);
+              }
+
+              if (output.active && output.preview) {
+                  item.active = true;
+              }
+            });
+
             return item;
         });
     });
@@ -187,7 +209,7 @@ angular.module('qmsk.e2.server', [
 
         if (groupID != $scope.showGroup) {
             $scope.showGroup = groupID;
-        
+
             $location.search('group', groupID);
         }
     }
@@ -202,9 +224,9 @@ angular.module('qmsk.e2.server', [
 
     // grouping
     $scope.groupBy = $location.search().groupBy || 'sno';
-    
+
     $scope.$watch('groupBy', function(groupBy) {
-        $location.search('groupBy', groupBy);          
+        $location.search('groupBy', groupBy);
     });
 
     function groupBySno(presets) {
@@ -213,7 +235,7 @@ angular.module('qmsk.e2.server', [
         $.each(presets, function(id, preset) {
             var groupID = preset.presetSno.Group;
             var groupIndex = preset.presetSno.Index;
-            
+
             preset = $.extend({groupIndex: groupIndex}, preset);
 
             // group it
@@ -245,7 +267,7 @@ angular.module('qmsk.e2.server', [
             if (button.ConsoleButtonType != 'preset' || !preset) {
                 return;
             }
-            
+
             // copy with groupIndex, since the same preset can be included multiple times
             preset = $.extend({ groupIndex: button.id }, preset);
 
@@ -302,7 +324,7 @@ angular.module('qmsk.e2.server', [
     $scope.previewPreset = null
     $scope.select = function(preset) {
         $scope.activePresetID = null;
-        
+
         Console.log("Recall preset " + preset.id + ": " + preset.name);
 
         Preset.activate({id: preset.id},
@@ -314,7 +336,7 @@ angular.module('qmsk.e2.server', [
             }
         );
     };
-    
+
     // take preset for program
     $scope.autoTake = $location.search().autotake || false;
 
@@ -331,7 +353,7 @@ angular.module('qmsk.e2.server', [
         } else {
             return;
         }
-        
+
         Console.log("Take preset " + preset.id + ": " + preset.name);
 
         $scope.activePresetID = null;
@@ -344,7 +366,7 @@ angular.module('qmsk.e2.server', [
             }
         );
     };
-    
+
     // preview -> program
     $scope.cut = function() {
         Console.log("Cut")
