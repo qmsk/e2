@@ -181,6 +181,61 @@ func (source Source) updateState(state *State) error {
 		}
 	}
 
+	for bgSourceID, bgSource := range system.SrcMgr.BGSourceCol {
+		// lookup Input from inputCfg with tally=
+		if bgSource.InputCfgIndex < 0 {
+			continue
+		}
+		inputCfg := system.SrcMgr.InputCfgCol[bgSource.InputCfgIndex]
+		inputName := inputCfg.Name
+
+		// resolve ID
+		var tallyID ID
+
+		if match := source.options.contactIDRegexp.FindStringSubmatch(inputCfg.ConfigContact); match == nil {
+			continue
+		} else if _, err := fmt.Sscanf(match[1], "%d", &tallyID); err != nil {
+			return fmt.Errorf("Invalid Input Contact=%v: %v\n", inputCfg.ConfigContact, err)
+		}
+
+		input := state.addInput(tallySource, inputName, tallyID, inputCfg.InputCfgVideoStatus.String())
+
+		// lookup active Links
+		for _, screen := range system.DestMgr.ScreenDestCol {
+			// ignore?
+			if source.options.ignoreDestRegexp != nil && source.options.ignoreDestRegexp.MatchString(screen.Name) {
+				continue
+			}
+
+			var status Status
+
+			if screen.IsActive > 0 {
+				status.Active = true
+			}
+
+			for bgIndex, bgLayer := range screen.BGLyr {
+				if bgLayer.LastBGSourceIndex == bgSourceID {
+					if bgIndex == screen.CurrBGLyr {
+						status.Program = true
+					} else {
+						status.Preview = true
+					}
+				}
+			}
+
+			output := state.addOutput(tallySource, screen.Name)
+
+			if status.Preview || status.Program {
+				state.addLink(Link{
+					Tally:  tallyID,
+					Input:  input,
+					Output: output,
+					Status: status,
+				})
+			}
+		}
+	}
+
 	return nil
 }
 
