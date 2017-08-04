@@ -1,0 +1,6 @@
+Dockerfile
+static/bower_components
+bin
+dist
+dump
+go
