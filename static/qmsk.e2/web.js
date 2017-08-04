@@ -47,8 +47,10 @@ angular.module('qmsk.e2.web', [
 })
 
 .factory('Events', function($location, $websocket, $rootScope, Console) {
+    var ssl = document.location.protocol == 'https:';
+
     var Events = {
-        url:    'ws://' + window.location.host + '/events',
+        url:    (ssl ? 'wss' : 'ws') + '://' + window.location.host + '/events',
         open:   false,
         error:  null,
 
@@ -73,11 +75,11 @@ angular.module('qmsk.e2.web', [
 
     ws.onMessage(function(message){
         var event = JSON.parse(message.data);
-    
+
         $.each(event, function(k, v) {
             Events.state[k] = v;
         });
-        
+
         Console.log("WebSocket Update")
 
         $rootScope.$broadcast('qmsk.e2.event', event);

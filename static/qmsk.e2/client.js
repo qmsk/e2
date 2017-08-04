@@ -3,12 +3,13 @@ var e2client = angular.module('e2client', [
 	'ui.bootstrap'
 ]);
 
+var ssl = document.location.protocol == 'https:';
 var server = document.location.hostname;
 var apiPort = parseInt(document.location.port);
 var wsPort = apiPort + 1;
 
-var backendUrl = 'http://' + server + ':' + apiPort + '/api/v1/';
-var websocketUrl = 'ws://' + server + ':' + wsPort + '';
+var backendUrl = (ssl ? 'https://' : 'http://') + server + ':' + apiPort + '/api/v1/';
+var websocketUrl = (ssl ? 'wss://' : 'ws://') + server + ':' + wsPort + '';
 
 e2client.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 	$scope.base = {};
@@ -22,7 +23,7 @@ e2client.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 		console.log(msg, data);
 		$scope.status.unshift({msg: msg, data: data});
 	};
-	
+
 	// Websocket
 	var ws = $websocket.$new({
 		url: websocketUrl,
@@ -46,7 +47,7 @@ e2client.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 	ws.$on('$close', function () {
 		$scope.log('websocket closed');
 	});
-	
+
 	// Presets
 	$scope.loadPresets = function() {
 		$scope.log("presets load");
@@ -75,7 +76,7 @@ e2client.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 			});
 		return false;
 	};
-	
+
 	// Commands
 	$scope.autotrans = function() {
 		return $scope.setInPgm({autotrans: true});
@@ -87,7 +88,7 @@ e2client.controller('PresetsCtrl', function ($scope, $http, $websocket) {
 
 	$scope.setInPgm = function(data) {
 		data.seq = $scope.seq;
-		
+
 		$scope.log("transition click", data);
 
 		$http.post(backendUrl + 'preset/', data)
