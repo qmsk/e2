@@ -14,6 +14,15 @@ func (options Options) DiscoverOptions(discoveryPacket discovery.Packet) (Option
 	return options, nil
 }
 
+func (options Options) DiscoverFilter(discoveryPacket discovery.Packet) bool {
+	// do not connect to slave VPs
+	if discoveryPacket.MasterMac != discoveryPacket.MacAddress {
+		return false
+	}
+
+	return true
+}
+
 // If there is no URL given, use Discovery to find any E2 systems.
 // Returns a new Options for the first E2 found.
 func (options Options) DiscoverClient(discoveryOptions discovery.Options) (Options, error) {
@@ -27,7 +36,10 @@ func (options Options) DiscoverClient(discoveryOptions discovery.Options) (Optio
 		log.Printf("Discovering systems on %v...\n", discovery)
 
 		for packet := range discovery.Run() {
-			if options, err := options.DiscoverOptions(packet); err != nil {
+
+			if !options.DiscoverFilter(packet) {
+				log.Printf("Discovery filtered: %v\n", packet)
+			} else if options, err := options.DiscoverOptions(packet); err != nil {
 				log.Printf("Discovery invalid: %v\n", err)
 			} else {
 				log.Printf("Discovered system: %v\n", options.Address)
