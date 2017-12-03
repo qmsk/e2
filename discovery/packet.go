@@ -22,6 +22,19 @@ type Packet struct {
 	Type       string
 }
 
+func unpackInt(field string, value string, ptr *int) error {
+	if value == "N/A" {
+		*ptr = 0
+		return nil
+	}
+
+	if _, err := fmt.Sscanf(value, "%d", ptr); err != nil {
+		return fmt.Errorf("Invalid %v=%#v: %v", field, value, err)
+	}
+
+	return nil
+}
+
 func (packet *Packet) unpackHostname(hostname string) error {
 	parts := strings.Split(hostname, ":")
 
@@ -29,24 +42,24 @@ func (packet *Packet) unpackHostname(hostname string) error {
 		packet.Hostname = parts[0]
 	}
 	if len(parts) > 1 {
-		if _, err := fmt.Sscanf(parts[1], "%d", &packet.XMLPort); err != nil {
-			return fmt.Errorf("Invalid XMLPort=%#v: %v", parts[1], err)
+		if err := unpackInt("XMLPort", parts[1], &packet.XMLPort); err != nil {
+			return err
 		}
 	}
 	if len(parts) > 2 {
 		packet.Name = parts[2]
 	}
 	if len(parts) > 3 {
-		if _, err := fmt.Sscanf(parts[3], "%d", &packet.UnitID); err != nil {
-			return fmt.Errorf("Invalid UnitID=%#v: %v", parts[3], err)
+		if err := unpackInt("UnitID", parts[3], &packet.UnitID); err != nil {
+			return err
 		}
 	}
 	if len(parts) > 4 {
-		if _, err := fmt.Sscanf(parts[4], "%d", &packet.VPCount); err != nil {
-			return fmt.Errorf("Invalid VPCount=%#v: %v", parts[4], err)
+		if err := unpackInt("VPCount", parts[4], &packet.VPCount); err != nil {
+			return err
 		}
 	}
-	if len(parts) > 5 {
+	if len(parts) > 5 && parts[5] != "N/A" {
 		packet.MasterMac = strings.Replace(parts[5], "$", ":", -1)
 	}
 	if len(parts) > 6 {
