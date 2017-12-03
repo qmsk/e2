@@ -12,10 +12,10 @@ script: go test -v ./...
 before_deploy:
   - docker build -t qmsk-e2_build build/
   - |
-    docker run
-    -v $PWD/build:/home/build
-    -v $PWD:/home/build/src
-    -e SRC=/home/build/src
+    docker run \
+    -v $PWD/build:/home/build \
+    -v $PWD:/home/build/src \
+    -e SRC=/home/build/src \
       qmsk-e2_build
 deploy:
   skip_cleanup: true
