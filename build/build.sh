@@ -1,7 +1,6 @@
 #!/bin/bash
 
 PACKAGE=qmsk-e2
-DIST=${DIST:-.}
 CMD=(client server tally)
 
 set -uex
@@ -19,7 +18,7 @@ echo "building package=$PACKAGE version=$VERSION at $DIST"
 # prepare base/src dist
 dist=${PACKAGE}_${VERSION}
 
-tar --exclude-vcs -czvf $DIST/${dist}_src.tar.gz .
+tar --exclude-vcs --exclude=*.tar.gz -czvf $DIST/${dist}_src.tar.gz .
 
 install -d $DIST/$dist
 

@@ -13,5 +13,4 @@ bin/
 opt/
 var/
 dump/
-build/*.tar.gz
-build/*/
+dist/

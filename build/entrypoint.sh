@@ -15,9 +15,9 @@ if [ -z "${SRC:-}" ]; then
     [ -d $SRC ] || go get -v -d github.com/qmsk/e2/...
 else
     mkdir -p $GOPATH/src/github.com/qmsk
-    ln -s $SRC $GOPATH/src/github.com/qmsk/e2
+    cp -ar $SRC $GOPATH/src/github.com/qmsk/e2
 
-    go get -v -u -d github.com/qmsk/e2/...
+    go get -v -d github.com/qmsk/e2/...
 fi
 
 [ -z "${GIT_TAG:-}" ] || git -C $SRC checkout $GIT_TAG
