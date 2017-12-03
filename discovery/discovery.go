@@ -9,7 +9,8 @@ import (
 
 const DISCOVERY_ADDR = "255.255.255.255"
 const DISCOVERY_PORT = "40961"
-const DISCOVERY_SEND = "\x3f\x00"
+
+var discoveryProbe = []byte{0x3f, 0x00}
 
 type Options struct {
 	Address   string `long:"discovery-address" default:""`
@@ -69,10 +70,8 @@ func (discovery *Discovery) String() string {
 	return fmt.Sprintf("%v", discovery.udpAddr)
 }
 
-func (discovery *Discovery) send() error {
-	pkt := ([]byte)(DISCOVERY_SEND)
-
-	if _, err := discovery.udpConn.WriteToUDP(pkt, discovery.udpAddr); err != nil {
+func (discovery *Discovery) send(data []byte) error {
+	if _, err := discovery.udpConn.WriteToUDP(data, discovery.udpAddr); err != nil {
 		return err
 	}
 
@@ -116,12 +115,12 @@ func (discovery *Discovery) run(outChan chan Packet) {
 	intervalChan := time.Tick(discovery.options.Interval)
 
 	// initial discover
-	discovery.send()
+	discovery.send(discoveryProbe)
 
 	for {
 		select {
 		case <-intervalChan:
-			if err := discovery.send(); err != nil {
+			if err := discovery.send(discoveryProbe); err != nil {
 				log.Printf("Discovery.Send: %v\n", err)
 
 				discovery.recvError = err
