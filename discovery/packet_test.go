@@ -74,3 +74,23 @@ func TestDecodePacketInvalidSep(t *testing.T) {
 func TestDecodePacketInvalidHostname(t *testing.T) {
 	testDecodePacketError(t, []byte("hostname=foo:bar"), `Invalid hostname="foo:bar": Invalid XMLPort="bar": expected integer`)
 }
+
+func TestDecodePacket_EC200(t *testing.T) {
+	testDecodePacket(t, decodeTestPacket(`
+		686f 7374
+		6e61 6d65 3d45 432d 3230 303a 4e2f 413a
+		5379 7374 656d 313a 303a 4e2f 413a 4e2f
+		413a 352e 302e 3335 3437 3900 6970 2d61
+		6464 7265 7373 3d31 3932 2e31 3638 2e30
+		2e31 3830 006d 6163 2d61 6464 7265 7373
+		3d30 303a 3062 3a61 623a 3938 3a62 613a
+		6366 0074 7970 653d 4543 2d32 3030 00
+	`), Packet{
+		Hostname:   "EC-200",
+		Name:       "System1",
+		Version:    "5.0.35479",
+		IPAddress:  "192.168.0.180",
+		MacAddress: "00:0b:ab:98:ba:cf",
+		Type:       "EC-200",
+	})
+}
