@@ -8,9 +8,10 @@ MANIFEST
 
 static/bower_components/
 qmsk_e2.egg-info/
-dist/
 
 bin/
 opt/
 var/
 dump/
+build/*.tar.gz
+build/*/

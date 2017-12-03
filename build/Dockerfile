@@ -10,9 +10,10 @@ RUN npm install -g bower
 RUN adduser --system --home /home/build --uid 1000 --gid 100 build
 
 USER build
-ADD build.sh /home/build/
+ADD entrypoint.sh build.sh /home/build/
 
 VOLUME /home/build
 WORKDIR /home/build
 
+ENTRYPOINT ["/home/build/entrypoint.sh"]
 CMD ["/home/build/build.sh"]
