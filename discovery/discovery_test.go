@@ -5,6 +5,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"net"
+	"sync"
 	"testing"
 	"time"
 )
@@ -14,6 +15,7 @@ type discoveryTest struct {
 
 	udpConn *net.UDPConn
 	stopped bool
+	wg      sync.WaitGroup
 
 	discovery *Discovery
 }
@@ -33,6 +35,8 @@ func (test *discoveryTest) handle() []byte {
 }
 
 func (test *discoveryTest) run(t *testing.T) {
+	defer test.wg.Done()
+
 	for {
 		var buf = make([]byte, 1500)
 
@@ -41,6 +45,7 @@ func (test *discoveryTest) run(t *testing.T) {
 				return
 			} else {
 				t.Fatalf("udpConn.ReadFromUDP: %v", err)
+				break
 			}
 		} else if !bytes.Equal(buf[:recvSize], discoveryProbe) {
 			t.Errorf("recv unknown discovery probe: %#v", buf[:recvSize])
@@ -55,6 +60,7 @@ func (test *discoveryTest) run(t *testing.T) {
 func (test *discoveryTest) stop() {
 	test.stopped = true
 	test.udpConn.Close()
+	test.wg.Wait()
 }
 
 func withDiscoveryTest(t *testing.T, f func(*discoveryTest)) {
@@ -81,6 +87,7 @@ func withDiscoveryTest(t *testing.T, f func(*discoveryTest)) {
 
 	t.Logf("Run on %v...", test.udpConn.LocalAddr())
 
+	test.wg.Add(1)
 	go test.run(t)
 	defer test.stop()
 
