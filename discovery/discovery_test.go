@@ -121,3 +121,27 @@ func TestDiscovery(t *testing.T) {
 		test.AssertNumberOfCalls(t, "discover", 2)
 	})
 }
+
+func TestDiscoveryInvalid(t *testing.T) {
+	withDiscoveryTest(t, func(test *discoveryTest) {
+		test.mockResponse([]byte("foo\x00bar")).Once()
+		test.mockResponse(testPacketBytes).Once()
+
+		var count = 0
+
+		for packet := range test.discovery.Run() {
+			testPacket.IP = net.IP{127, 0, 0, 1}
+
+			assert.Equal(t, testPacket, packet)
+
+			count++
+
+			if count >= 1 {
+				test.discovery.Stop()
+			}
+		}
+
+		assert.NoError(t, test.discovery.Error())
+		test.AssertNumberOfCalls(t, "discover", 2)
+	})
+}

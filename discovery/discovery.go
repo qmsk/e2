@@ -79,25 +79,14 @@ func (discovery *Discovery) send(data []byte) error {
 	return nil
 }
 
-func (discovery *Discovery) recv(packet *Packet) error {
-	buf := make([]byte, 1500)
-
-	if n, recvAddr, err := discovery.udpConn.ReadFromUDP(buf); err != nil {
-		return err
-	} else if err := packet.unpack(recvAddr, buf[:n]); err != nil {
-		return err
-	} else {
-		return nil
-	}
-}
-
 func (discovery *Discovery) receiver() {
 	defer close(discovery.recvChan)
 
 	for {
+		var buf = make([]byte, 1500)
 		var packet Packet
 
-		if err := discovery.recv(&packet); err != nil {
+		if n, recvAddr, err := discovery.udpConn.ReadFromUDP(buf); err != nil {
 			if !discovery.stop {
 				log.Printf("Discovery.receiver: %v\n", err)
 
@@ -105,9 +94,11 @@ func (discovery *Discovery) receiver() {
 			}
 
 			return
+		} else if err := packet.unpack(recvAddr, buf[:n]); err != nil {
+			log.Printf("Discovery.receiver: received invalid packet from %v: %v", recvAddr, err)
+		} else {
+			discovery.recvChan <- packet
 		}
-
-		discovery.recvChan <- packet
 	}
 }
 
