@@ -24,6 +24,7 @@ type Packet struct {
 
 func unpackInt(field string, value string, ptr *int) error {
 	if value == "N/A" {
+		*ptr = 0
 		return nil
 	}
 
