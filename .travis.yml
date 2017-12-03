@@ -1,0 +1,6 @@
+language: go
+go:
+- '1.6'
+- '1.9'
+install: go get -v ./...
+script: go test -v ./...

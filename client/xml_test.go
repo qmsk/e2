@@ -24,7 +24,11 @@ func testXMLClient(test testXML) *XMLClient {
 	}
 
 	// setup mock server
-	tcpListener, err := net.ListenTCP("tcp", nil)
+	listenAddr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+	if err != nil {
+		panic(err)
+	}
+	tcpListener, err := net.ListenTCP("tcp", listenAddr)
 	if err != nil {
 		panic(err)
 	}
@@ -81,9 +85,11 @@ func testXMLClient(test testXML) *XMLClient {
 	}(tcpListener)
 
 	// connect client to test server
-	listenAddr := tcpListener.Addr().(*net.TCPAddr)
+	localAddr := tcpListener.Addr().(*net.TCPAddr)
 
-	tcpConn, err := net.DialTCP("tcp", nil, listenAddr)
+	log.Printf("Dial %v", localAddr)
+
+	tcpConn, err := net.DialTCP("tcp", nil, localAddr)
 	if err != nil {
 		panic(err)
 	}
