@@ -30,7 +30,7 @@ func (packet *Packet) unpackHostname(hostname string) error {
 	}
 	if len(parts) > 1 {
 		if _, err := fmt.Sscanf(parts[1], "%d", &packet.XMLPort); err != nil {
-			return err
+			return fmt.Errorf("Invalid XMLPort=%#v: %v", parts[1], err)
 		}
 	}
 	if len(parts) > 2 {
@@ -38,12 +38,12 @@ func (packet *Packet) unpackHostname(hostname string) error {
 	}
 	if len(parts) > 3 {
 		if _, err := fmt.Sscanf(parts[3], "%d", &packet.UnitID); err != nil {
-			return err
+			return fmt.Errorf("Invalid UnitID=%#v: %v", parts[3], err)
 		}
 	}
 	if len(parts) > 4 {
 		if _, err := fmt.Sscanf(parts[4], "%d", &packet.VPCount); err != nil {
-			return err
+			return fmt.Errorf("Invalid VPCount=%#v: %v", parts[4], err)
 		}
 	}
 	if len(parts) > 5 {
@@ -75,7 +75,7 @@ func (packet *Packet) unpack(addr *net.UDPAddr, data []byte) error {
 		switch parts[0] {
 		case "hostname":
 			if err := packet.unpackHostname(value); err != nil {
-				return err
+				return fmt.Errorf("Invalid hostname=%#v: %v", value, err)
 			}
 
 		case "ip-address":
