@@ -48,3 +48,6 @@ build_arch () {
 
 GOOS=linux GOARCH=amd64 build_arch linux-amd64
 GOOS=linux GOARCH=arm build_arch linux-arm
+
+ls -1p $DIST/
+sha256sum $DIST/${dist}_*.tar.gz > $DIST/SHA256SUM

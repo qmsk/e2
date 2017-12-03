@@ -28,4 +28,6 @@ deploy:
   api_key:
     secure:
   file_glob: true
-  file: build/*.tar.gz
+  file:
+    - dist/SHA256SUM
+    - dist/*.tar.gz
