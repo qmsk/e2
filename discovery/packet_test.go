@@ -42,20 +42,20 @@ var testPacket = Packet{
 	Type:       "E2",
 }
 
-func testDecodePacket(t *testing.T, expected Packet, data []byte) {
+func testDecodePacket(t *testing.T, data []byte, expected Packet) {
 	var udpAddr = &net.UDPAddr{IP: net.IP{127, 0, 0, 1}, Port: 1337}
 	var actual Packet
 
 	expected.IP = udpAddr.IP
 
 	if err := actual.unpack(udpAddr, data); err != nil {
-		assert.Errorf(t, err, "packet.unpack(...)")
+		assert.NoErrorf(t, err, "packet.unpack(...)")
+	} else {
+		assert.Equalf(t, expected, actual, "packet.unpack(...)")
 	}
-
-	assert.Equalf(t, expected, actual, "packet.unpack(...)")
 }
 
-func testDecodePacketError(t *testing.T, expected string, data []byte) {
+func testDecodePacketError(t *testing.T, data []byte, expected string) {
 	var udpAddr = &net.UDPAddr{IP: net.IP{127, 0, 0, 1}, Port: 1337}
 	var actual Packet
 
@@ -65,12 +65,12 @@ func testDecodePacketError(t *testing.T, expected string, data []byte) {
 }
 
 func TestDecodePacket(t *testing.T) {
-	testDecodePacket(t, testPacket, testPacketBytes)
+	testDecodePacket(t, testPacketBytes, testPacket)
 }
 
 func TestDecodePacketInvalidSep(t *testing.T) {
-	testDecodePacketError(t, `Invalid field: []byte{0x66, 0x6f, 0x6f}`, []byte("foo\x00bar"))
+	testDecodePacketError(t, []byte("foo\x00bar"), `Invalid field: []byte{0x66, 0x6f, 0x6f}`)
 }
 func TestDecodePacketInvalidHostname(t *testing.T) {
-	testDecodePacketError(t, `Invalid hostname="foo:bar": Invalid XMLPort="bar": expected integer`, []byte("hostname=foo:bar"))
+	testDecodePacketError(t, []byte("hostname=foo:bar"), `Invalid hostname="foo:bar": Invalid XMLPort="bar": expected integer`)
 }
