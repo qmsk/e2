@@ -64,6 +64,7 @@ type Discovery struct {
 
 	recvChan  chan Packet
 	recvError error
+	stop      bool
 }
 
 func (discovery *Discovery) String() string {
@@ -97,9 +98,11 @@ func (discovery *Discovery) receiver() {
 		var packet Packet
 
 		if err := discovery.recv(&packet); err != nil {
-			log.Printf("Discovery.receiver: %v\n", err)
+			if !discovery.stop {
+				log.Printf("Discovery.receiver: %v\n", err)
 
-			discovery.recvError = err
+				discovery.recvError = err
+			}
 
 			return
 		}
@@ -156,5 +159,6 @@ func (discovery *Discovery) Error() error {
 }
 
 func (discovery *Discovery) Stop() {
+	discovery.stop = true
 	discovery.udpConn.Close()
 }

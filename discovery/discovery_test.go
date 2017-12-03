@@ -18,8 +18,8 @@ type discoveryTest struct {
 	discovery *Discovery
 }
 
-func (test *discoveryTest) mockResponse(b []byte) {
-	test.On("discover").Return(b)
+func (test *discoveryTest) mockResponse(b []byte) *mock.Call {
+	return test.On("discover").Return(b)
 }
 
 func (test *discoveryTest) handle() []byte {
@@ -83,17 +83,18 @@ func withDiscoveryTest(t *testing.T, f func(*discoveryTest)) {
 
 	go test.run(t)
 	defer test.stop()
+
+	time.AfterFunc(50*time.Millisecond, func() {
+		t.Fatalf("Timeout")
+		test.discovery.Stop()
+	})
+
 	f(&test)
 }
 
 func TestDiscovery(t *testing.T) {
 	withDiscoveryTest(t, func(test *discoveryTest) {
 		test.mockResponse(testPacketBytes)
-
-		time.AfterFunc(50*time.Millisecond, func() {
-			t.Fatalf("Timeout")
-			test.discovery.Stop()
-		})
 
 		var count = 0
 
@@ -109,6 +110,7 @@ func TestDiscovery(t *testing.T) {
 			}
 		}
 
+		assert.NoError(t, test.discovery.Error())
 		test.AssertNumberOfCalls(t, "discover", 2)
 	})
 }
