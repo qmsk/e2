@@ -43,7 +43,7 @@ build_arch () {
         go build -o $DIST/$dist_arch/bin/$cmd -v github.com/qmsk/e2/cmd/$cmd
     done
 
-    tar -czvf $DIST/$dist_arch.tar.gz $DIST/$dist_arch/
+    tar -C $DIST -czvf $DIST/$dist_arch.tar.gz $dist_arch/
 }
 
 GOOS=linux GOARCH=amd64 build_arch linux-amd64
