@@ -24,7 +24,7 @@ fi
 
 GIT_VERSION=$(git -C $SRC describe --tags)
 
-export DIST=$PWD
-export VERSION=${GIT_VERSION#v}
+export DIST=${DIST:-$PWD}
+export VERSION=${VERSION:-${GIT_VERSION#v}}
 
 cd $SRC && exec "$@"

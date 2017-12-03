@@ -16,10 +16,10 @@ echo "building package=$PACKAGE version=$VERSION at $DIST"
     bower install
 )
 
-# prepare base dist
+# prepare base/src dist
 dist=${PACKAGE}_${VERSION}
 
-tar --exclude-vcs --exclude-vcs-ignores -czvf $DIST/${dist}_src.tar.gz .
+tar --exclude-vcs -czvf $DIST/${dist}_src.tar.gz .
 
 install -d $DIST/$dist
 
