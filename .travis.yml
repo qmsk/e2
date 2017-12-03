@@ -26,7 +26,7 @@ deploy:
     go: '1.6'
   provider: releases
   api_key:
-    secure:
+    secure: "ChMW+s/WvS+qdYhGdZoom5QqtFMjAXu1oHW/KyGcbUX1GBmf+mXk2Av22wr7lLWtZKzh6gpgfiPHxGNvQuctnZncGchSDqIbS2FyW+33vha4drWs8Z6RgWPcYYvYcDEO5rj+UDGgc+ARVCQtpLUMmOSfOhkLq574Cu2O0MFw/yfD5046pVsynTt3kgdWQnTxP78juw0LePafNswjTMXuoIGt5B46mrKCsVdxDh3ufP5dfuthe987QgXr6WkMFf6Chv/K/65Al89hsULgmqtDRtqmeMebLxOEXMYg7w54N3NDWe9baAlNQm57w5zSsvEnji3gWfub/5i6PMMDaixSCdUv5luYYGFDv4JuarfVuws5sYy5+2cGSxLE75u67akRRjU5ILgKEokA1yk9Soarzv1cQxefsOxH/KaW/gormu/pVX2hsdCLjA3cv8QFBIiqt6mcXLcD5LCBM+SrVslAOUBspmy7lsEC0HiHrHnVDhdszE1FPQLRL5GyGr3cxcBBXRLoh5jrt+dPRYgtdPVkDjJp0sEIC9ICYYuJorBNpgv6coTzqFXW7j1ItjniCxrJTwp8K4p3nI/t0QCFZO7SqR3BD9m//jvBu+QjBtNPs9re+ZUetI2HJsoYjLYlyLzYt+J9Hs94g469MFzDrd+qAEB6caEZLkRfNzMnqS0mVP4="
   file_glob: true
   file:
     - dist/SHA256SUM
