@@ -9,7 +9,8 @@ import (
 
 const DISCOVERY_ADDR = "255.255.255.255"
 const DISCOVERY_PORT = "40961"
-const DISCOVERY_SEND = "\x3f\x00"
+
+var discoveryProbe = []byte{0x3f, 0x00}
 
 type Options struct {
 	Address   string `long:"discovery-address" default:""`
@@ -63,49 +64,41 @@ type Discovery struct {
 
 	recvChan  chan Packet
 	recvError error
+	stop      bool
 }
 
 func (discovery *Discovery) String() string {
 	return fmt.Sprintf("%v", discovery.udpAddr)
 }
 
-func (discovery *Discovery) send() error {
-	pkt := ([]byte)(DISCOVERY_SEND)
-
-	if _, err := discovery.udpConn.WriteToUDP(pkt, discovery.udpAddr); err != nil {
+func (discovery *Discovery) send(data []byte) error {
+	if _, err := discovery.udpConn.WriteToUDP(data, discovery.udpAddr); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (discovery *Discovery) recv(packet *Packet) error {
-	buf := make([]byte, 1500)
-
-	if n, recvAddr, err := discovery.udpConn.ReadFromUDP(buf); err != nil {
-		return err
-	} else if err := packet.unpack(recvAddr, buf[:n]); err != nil {
-		return err
-	} else {
-		return nil
-	}
-}
-
 func (discovery *Discovery) receiver() {
 	defer close(discovery.recvChan)
 
 	for {
+		var buf = make([]byte, 1500)
 		var packet Packet
 
-		if err := discovery.recv(&packet); err != nil {
-			log.Printf("Discovery.receiver: %v\n", err)
+		if n, recvAddr, err := discovery.udpConn.ReadFromUDP(buf); err != nil {
+			if !discovery.stop {
+				log.Printf("Discovery.receiver: %v\n", err)
 
-			discovery.recvError = err
+				discovery.recvError = err
+			}
 
 			return
+		} else if err := packet.unpack(recvAddr, buf[:n]); err != nil {
+			log.Printf("Discovery.receiver: received invalid packet from %v: %v", recvAddr, err)
+		} else {
+			discovery.recvChan <- packet
 		}
-
-		discovery.recvChan <- packet
 	}
 }
 
@@ -116,12 +109,12 @@ func (discovery *Discovery) run(outChan chan Packet) {
 	intervalChan := time.Tick(discovery.options.Interval)
 
 	// initial discover
-	discovery.send()
+	discovery.send(discoveryProbe)
 
 	for {
 		select {
 		case <-intervalChan:
-			if err := discovery.send(); err != nil {
+			if err := discovery.send(discoveryProbe); err != nil {
 				log.Printf("Discovery.Send: %v\n", err)
 
 				discovery.recvError = err
@@ -157,5 +150,6 @@ func (discovery *Discovery) Error() error {
 }
 
 func (discovery *Discovery) Stop() {
+	discovery.stop = true
 	discovery.udpConn.Close()
 }
