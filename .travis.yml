@@ -21,6 +21,7 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
+    go: '1.6'
   provider: releases
   api_key:
     secure:
