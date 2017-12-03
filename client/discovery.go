@@ -8,8 +8,17 @@ import (
 
 // Returns client Options for the given discovery packet
 func (options Options) DiscoverOptions(discoveryPacket discovery.Packet) (Options, error) {
-	options.Address = discoveryPacket.IP.String()
-	options.XMLPort = fmt.Sprintf("%d", discoveryPacket.XMLPort)
+	if len(discoveryPacket.IP) == 0 {
+		return options, fmt.Errorf("Invalid discovery IP=%#v", discoveryPacket.IP)
+	} else {
+		options.Address = discoveryPacket.IP.String()
+	}
+
+	if discoveryPacket.XMLPort == 0 {
+		return options, fmt.Errorf("Invalid discovery XMLPort=%#v", discoveryPacket.XMLPort)
+	} else {
+		options.XMLPort = fmt.Sprintf("%d", discoveryPacket.XMLPort)
+	}
 
 	return options, nil
 }

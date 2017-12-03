@@ -117,11 +117,11 @@ func (tally *Tally) Run() error {
 			if !valid {
 				return fmt.Errorf("discovery: %v", tally.discovery.Error())
 			} else if clientOptions, err := tally.options.clientOptions.DiscoverOptions(discoveryPacket); err != nil {
-				log.Printf("Tally: invalid discovery client options: %v\n", err)
+				log.Printf("Tally: invalid discovery client options for %v: %v\n", discoveryPacket.IP, err)
 			} else if source, exists := tally.sources[clientOptions.String()]; exists && source.err == nil {
 				// already running
 			} else if source, err := newSource(tally, discoveryPacket, clientOptions); err != nil {
-				log.Printf("Tally: unable to connect to discovered system: %v\n", err)
+				log.Printf("Tally: unable to connect to discovered system at %v: %v\n", clientOptions, err)
 			} else {
 				log.Printf("Tally: connected to source: %v\n", source)
 
