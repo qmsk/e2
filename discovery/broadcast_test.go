@@ -1,139 +1,123 @@
 package discovery
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"net"
-	"strings"
 	"testing"
 )
 
-func TestBroadcastIP(t *testing.T) {
-	var testBroadcastIP = []struct {
-		cidr  string
-		bcast string
-		err   string
-	}{
-		{
-			cidr:  "192.168.1.10/24",
-			bcast: "192.168.1.255",
-		},
-		{
-			cidr: "fe80::5544:33ff:fe22:1100/64",
-		},
+type broadcastIPtest struct {
+	cidr  string
+	bcast string
+	err   string
+}
+
+func testBroadcastIP(t *testing.T, test broadcastIPtest) {
+	_, ipnet, err := net.ParseCIDR(test.cidr)
+	if err != nil {
+		panic(err)
 	}
 
-	for _, test := range testBroadcastIP {
-		_, ipnet, err := net.ParseCIDR(test.cidr)
-		if err != nil {
-			panic(err)
-		}
+	bcast, err := broadcastIP(ipnet)
 
-		bcast, err := broadcastIP(ipnet)
-
-		if err != nil {
-			if test.err == "" {
-				t.Errorf("broadcastIP %v: error: %v", ipnet, err)
-			} else if !strings.HasPrefix(err.Error(), test.err) {
-				t.Errorf("broadcastIP %v: error mismatch: %v", ipnet, err)
-			}
-		} else if test.bcast == "" && bcast == nil {
-			t.Logf("broadcastIP %v: ok: nil", ipnet)
-		} else if bcast.String() == test.bcast {
-			t.Logf("broadcastIP %v: ok: %v", ipnet, bcast)
-		} else {
-			t.Errorf("broadcastIP %v: mismatch: %v", ipnet, bcast)
-		}
+	if test.err != "" {
+		assert.EqualError(t, err, test.err)
+	} else if err != nil {
+		assert.Errorf(t, err, "broadcastIP(%#v)", ipnet)
+	} else if test.bcast == "" {
+		assert.Nilf(t, bcast, "broadcastIP(%#v)", ipnet)
+	} else {
+		assert.Equalf(t, test.bcast, bcast.String(), "broadcastIP(%#v)", ipnet)
 	}
 }
 
-// XXX: this test assume the system will have some interfaces configured with broadcast addresses...
-// XXX: would probably be better to test using fake Interface structs...
-/*
-   if addrs, err := iface.Addrs(); err != nil || len(addrs) == 0 {
-       panic(err)
-   } else {
-       t.Logf("Interface %v: %#v", iface.Name, iface)
+func TestBroadcastIPv4(t *testing.T) {
+	testBroadcastIP(t, broadcastIPtest{
+		cidr:  "192.168.1.10/24",
+		bcast: "192.168.1.255",
+	})
+}
 
-       for _, addr := range addrs {
-           t.Logf("\t%#v", addr)
-       }
-   }
-*/
+func TestBroadcastIPv6(t *testing.T) {
+	testBroadcastIP(t, broadcastIPtest{
+		cidr: "fe80::5544:33ff:fe22:1100/64",
+	})
+}
+
+type interfaceBroadcastTest struct {
+	iface *net.Interface
+	addrs []net.Addr
+	bcast string
+	err   string
+}
+
+func testGetInterfaceBroadcast(t *testing.T, test interfaceBroadcastTest) {
+	bcast, err := getInterfaceBroadcast(test.iface, test.addrs)
+
+	if test.err != "" {
+		assert.EqualError(t, err, test.err)
+	} else if err != nil {
+		assert.Errorf(t, err, "getInterfaceBroadcast(%#v, %#v)", test.iface, test.addrs)
+	} else if test.bcast == "" {
+		assert.Nilf(t, bcast, "getInterfaceBroadcast(%#v, %#v)", test.iface, test.addrs)
+	} else {
+		assert.Equalf(t, test.bcast, bcast.String(), "getInterfaceBroadcast(%#v, %#v)", test.iface, test.addrs)
+	}
+}
+
 func TestGetInterfaceBroadcast(t *testing.T) {
-	var testInterfaceBroadcast = []struct {
-		iface *net.Interface
-		addrs []net.Addr
-		bcast string
-		err   string
-	}{
-		{
-			iface: &net.Interface{
-				Index:        1,
-				MTU:          1500,
-				Name:         "test-down",
-				HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
-				Flags:        (net.FlagMulticast | net.FlagBroadcast),
-			},
-			err: "Interface is down: test-down",
+	testGetInterfaceBroadcast(t, interfaceBroadcastTest{
+		iface: &net.Interface{
+			Index:        1,
+			MTU:          1500,
+			Name:         "test-down",
+			HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
+			Flags:        (net.FlagMulticast | net.FlagBroadcast),
 		},
-		{
-			iface: &net.Interface{
-				Index:        1,
-				MTU:          1500,
-				Name:         "test-empty",
-				HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
-				Flags:        (net.FlagMulticast | net.FlagBroadcast | net.FlagUp), // 0x13
-			},
-			addrs: []net.Addr{},
-			err:   "No broadcast address for interface: test-empty",
-		},
-		{
-			iface: &net.Interface{
-				Index:        1,
-				MTU:          1500,
-				Name:         "test-basic",
-				HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
-				Flags:        (net.FlagMulticast | net.FlagBroadcast | net.FlagUp), // 0x13
-			},
-			addrs: []net.Addr{
-				// 192.168.1.10/24
-				&net.IPNet{IP: net.IP{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xff, 0xff, 0xc0, 0xa8, 0x1, 0xa}, Mask: net.IPMask{0xff, 0xff, 0xff, 0x0}},
-				// fe80::5544:33ff:fe22:1100/64
-				&net.IPNet{IP: net.IP{0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55, 0x44, 0x33, 0xff, 0xfe, 0x22, 0x11, 0x00}, Mask: net.IPMask{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
-			},
-			bcast: "192.168.1.255",
-		},
-		{
-			iface: &net.Interface{
-				Index:        1,
-				MTU:          1500,
-				Name:         "test-v6only",
-				HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
-				Flags:        (net.FlagMulticast | net.FlagBroadcast | net.FlagUp), // 0x13
-			},
-			addrs: []net.Addr{
-				// fe80::5544:33ff:fe22:1100/64
-				&net.IPNet{IP: net.IP{0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55, 0x44, 0x33, 0xff, 0xfe, 0x22, 0x11, 0x00}, Mask: net.IPMask{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
-			},
-			err: "No broadcast address for interface: test-v6only",
-		},
-	}
+		err: "Interface is down: test-down",
+	})
 
-	for _, test := range testInterfaceBroadcast {
-		if bcast, err := getInterfaceBroadcast(test.iface, test.addrs); err != nil {
-			if test.err == "" {
-				t.Errorf("ERR getInterfaceBroadcast %v: error: %v", test.iface.Name, err)
-			} else if !strings.HasPrefix(err.Error(), test.err) {
-				t.Errorf("ERR getInterfaceBroadcast %v: error: %v", test.iface.Name, err)
-			} else {
-				t.Logf("OK  getInterfaceBroadcast %v: error: %v", test.iface.Name, err)
-			}
-		} else if bcast == nil && test.bcast == "" {
-			t.Logf("OK  getInterfaceBroadcast %v: %v", test.iface.Name, bcast)
-		} else if fmt.Sprintf("%v", bcast) != test.bcast {
-			t.Errorf("ERR getInterfaceBroadcast %v: %v", test.iface.Name, bcast)
-		} else {
-			t.Logf("OK  getInterfaceBroadcast %v: %v", test.iface.Name, bcast)
-		}
-	}
+	testGetInterfaceBroadcast(t, interfaceBroadcastTest{
+		iface: &net.Interface{
+			Index:        1,
+			MTU:          1500,
+			Name:         "test-empty",
+			HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
+			Flags:        (net.FlagMulticast | net.FlagBroadcast | net.FlagUp), // 0x13
+		},
+		addrs: []net.Addr{},
+		err:   "No broadcast address for interface: test-empty",
+	})
+
+	testGetInterfaceBroadcast(t, interfaceBroadcastTest{
+		iface: &net.Interface{
+			Index:        1,
+			MTU:          1500,
+			Name:         "test-basic",
+			HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
+			Flags:        (net.FlagMulticast | net.FlagBroadcast | net.FlagUp), // 0x13
+		},
+		addrs: []net.Addr{
+			// 192.168.1.10/24
+			&net.IPNet{IP: net.IP{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0xff, 0xff, 0xc0, 0xa8, 0x1, 0xa}, Mask: net.IPMask{0xff, 0xff, 0xff, 0x0}},
+			// fe80::5544:33ff:fe22:1100/64
+			&net.IPNet{IP: net.IP{0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55, 0x44, 0x33, 0xff, 0xfe, 0x22, 0x11, 0x00}, Mask: net.IPMask{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
+		},
+		bcast: "192.168.1.255",
+	})
+
+	testGetInterfaceBroadcast(t, interfaceBroadcastTest{
+		iface: &net.Interface{
+			Index:        1,
+			MTU:          1500,
+			Name:         "test-v6only",
+			HardwareAddr: net.HardwareAddr{0x5, 0x44, 0x33, 0x22, 0x11, 0x00},
+			Flags:        (net.FlagMulticast | net.FlagBroadcast | net.FlagUp), // 0x13
+		},
+		addrs: []net.Addr{
+			// fe80::5544:33ff:fe22:1100/64
+			&net.IPNet{IP: net.IP{0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x55, 0x44, 0x33, 0xff, 0xfe, 0x22, 0x11, 0x00}, Mask: net.IPMask{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}},
+		},
+		err: "No broadcast address for interface: test-v6only",
+	})
 }
