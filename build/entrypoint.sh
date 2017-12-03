@@ -27,4 +27,4 @@ GIT_VERSION=$(git -C $SRC describe --tags)
 export DIST=${DIST:-$PWD}
 export VERSION=${VERSION:-${GIT_VERSION#v}}
 
-cd $SRC && exec "$@"
+cd $GOPATH/src/github.com/qmsk/e2 && exec "$@"

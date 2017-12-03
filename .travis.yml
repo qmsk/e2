@@ -11,8 +11,9 @@ script: go test -v ./...
 
 before_deploy:
   - docker build -t qmsk-e2_build build/
+  - install -d -m 0777 dist
   - |
-    docker run \
+    docker run --rm \
     -v $PWD/dist:/dist \
     -v $PWD:/src \
     -e SRC=/src \
