@@ -15,6 +15,11 @@ func (options Options) DiscoverOptions(discoveryPacket discovery.Packet) (Option
 }
 
 func (options Options) DiscoverFilter(discoveryPacket discovery.Packet) bool {
+	// do not connect to non-VPs
+	if discoveryPacket.XMLPort == 0 {
+		return false
+	}
+
 	// do not connect to slave VPs
 	if discoveryPacket.MasterMac != discoveryPacket.MacAddress {
 		return false
