@@ -2,17 +2,21 @@ Docker dist builds.
 
 First build the build image, which includes all the build dependencies:
 
-    docker build -t qmsk-e2-build build/ 
+    docker build -t qmsk-e2-build build/
 
-Then build the dist package, from github master:
+Prepare a directory for the output files, that the build user within the Docker container is able to write to:
 
-    docker run -v $PWD/dist:/home/build/dist qmsk-e2-build
+    mkdir dist && chmod 0777 dist
+
+Then build the dist packages, from github master:
+
+    docker run --rm -v $PWD/dist:/dist -e DIST=/dist qmsk-e2-build
 
 Alternatively, build from local sources:
 
-    docker run -v $PWD/dist:/home/build/dist -v $PWD:/home/build/src -e SRC=/home/build/src qmsk-e2-build
+    docker run --rm -v $PWD/dist:/dist -e DIST=/dist -v $PWD:/src -e SRC=/src qmsk-e2-build
 
-This will produce something along the following under `ls -1p dist/`:
+This will produce the following files:
 
 ```
 qmsk-e2_0.2.2/
