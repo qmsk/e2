@@ -58,7 +58,7 @@ func (tcpSender *TCPSender) connect() error {
 }
 
 func (tcpSender *TCPSender) send(msg []byte) error {
-	log.Printf("universe:TCPSender %v: send msg=%#v", udpSender, string(msg))
+	log.Printf("universe:TCPSender %v: send msg=%#v", tcpSender, string(msg))
 
 	if err := tcpSender.tcpConn.SetWriteDeadline(time.Now().Add(tcpSender.options.Timeout)); err != nil {
 		return err
