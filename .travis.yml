@@ -38,6 +38,7 @@ deploy:
       - dist/SHA256SUM
       - dist/*.tar.gz
   - provider: script
+    skip_cleanup: true
     script: ./build/docker-push.sh
     on:
       tags: true
