@@ -20,15 +20,14 @@
   version = "v1.4.0"
 
 [[projects]]
-  branch = "digitalpin-exported"
+  branch = "master"
   name = "github.com/kidoman/embd"
   packages = [
     ".",
     "host/generic",
     "host/rpi"
   ]
-  revision = "780d9e92acefc982f3c9b4edb0e46202137f597c"
-  source = "github.com/SpComb/embd"
+  revision = "d3d8c0c5c68dc6caccebb7d720f36e64bafd0a62"
 
 [[projects]]
   name = "github.com/kr/pretty"
@@ -89,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "af2ba16a84f788d2178c82f47941a79e255b4b64699e7ae63d7a1dcee801a925"
+  inputs-digest = "84859f212a212f9906cf4eedc6d9eb5c0e629037ee93d9626736249a57b5cccb"
   solver-name = "gps-cdcl"
   solver-version = 1
