@@ -1,9 +1,9 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN apt-get update && apt-get install -y \
-    git curl \
+    git curl rsync \
     golang-go \
-    nodejs nodejs-legacy npm
+    nodejs npm
 
 RUN curl -L -o /tmp/dep-linux-amd64 https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 && install -m 0755 /tmp/dep-linux-amd64 /usr/local/bin/dep
 RUN npm install -g bower
