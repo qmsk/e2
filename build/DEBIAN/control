@@ -1,0 +1,6 @@
+Package: qmsk-e2
+Version: @VERSION@
+Architecture: @ARCH@
+Depends:
+Maintainer: Tero Marttila <terom@fixme.fi>
+Description: E2 Client, Tally output

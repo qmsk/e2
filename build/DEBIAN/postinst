@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+case $1 in
+  configure)
+    getent group qmsk-e2 >/dev/null || addgroup --system qmsk-e2
+    getent passwd qmsk-e2 >/dev/null || adduser --system --ingroup qmsk-e2 qmsk-e2
+
+    # grant gpio permissions on rpi
+    getent group gpio >/dev/null && adduser qmsk-e2 gpio
+
+    systemctl daemon-reload
+    systemctl try-restart qmsk-e2-tally
+  ;;
+esac

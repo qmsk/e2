@@ -4,6 +4,8 @@
 #   http://raspberrypi.stackexchange.com/questions/23162/gpio-value-file-appears-with-wrong-permissions-momentarily
 # export beforehand and wait for udev before running
 
+[ "$#" -gt 0 ] || exit 0
+
 for gpio in "$@"; do
     [ -e /sys/class/gpio/gpio$gpio ] || echo $gpio > /sys/class/gpio/export
 done
