@@ -1,7 +1,7 @@
 # qmsk-e2
 E2 Client, Tally system. Web UI with Presets.
 
-Pre-built release binaries can be found under the [Releases](https://github.com/qmsk/e2/releases).
+Pre-built release packages can be found under the [Releases](https://github.com/qmsk/e2/releases).
 
 Please refer to the [Wiki](https://github.com/qmsk/e2/wiki) for more detailed documentation, including development and feature guides.
 
@@ -39,12 +39,11 @@ The Go binaries can also be cross-compiled for different platforms, such as buil
 
 ### Frontend
 
-    cd static && bower install
+    cd static && npm install
 
 Building the frontend code requires:
 
 * [NPM](https://www.npmjs.com/)
-* [bower](https://bower.io/)
 
 # Tally
 
