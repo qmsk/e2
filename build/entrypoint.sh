@@ -7,8 +7,8 @@ if [ -z "${SRC:-}" ]; then
 
     [ -d $SRC ] || go get -v -d github.com/qmsk/e2/...
 else
-    mkdir -p $GOPATH/src/github.com/qmsk
-    cp -ar $SRC $GOPATH/src/github.com/qmsk/e2
+    mkdir -p $GOPATH/src/github.com/qmsk/e2
+    rsync -rlpt $SRC/ $GOPATH/src/github.com/qmsk/e2/
 fi
 
 if [ -n "${GIT_TAG:-}" ]; then
