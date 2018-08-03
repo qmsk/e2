@@ -1,6 +1,10 @@
 sudo: required
 services:
   - docker
+env:
+  global:
+    - secure: "CFNDqqgI75LY+jklpPlGkkwabls/4jUf9USwChgaVUwDVPWf9I1rD2Pajtyrk3jzwkWqSKD3sMjgsw7Yhq3zF37cwTwKkwkkgSi15EaKnnDMxHTsRp83R6vH7DC9Fyt/vnC685NhKJIF8VJYs1PF6fQSQWv/qmWmn7JS0REIpB/uqkHY5jYlAUV++4yo30qlOHubrr85P/Cg8v2YNelnZE/kiBsLucNWhj8E44d1pbTUw4mWt5DVLNM3xRlttLzK2QbpOCCJqACsnh9sopcVgPKrfVux1RDUJ/+lX1VsnGMfB2F/1ZSDeZlEkhdakmHhofb+0XxWND1jvheRXP4PeXNOJhKeJcZX33VuVDw55xPZNcEH3EKacgXbFHGlQyYlk2wyBGuNzXHe2kFQr6sqIPUD3ND+1YQgJxJEMbRfeOPKJ6MMUFZg0k/yb0zdOJkdPRpU4X1l/voo1OOsstvBr//pbv+OFL/d4NLKYKXqNWirPHvt4SxKFky/V3ZJgCdkBJrJf2rEKU9U8KKYYNgI5MI8DnSSR6B3XFoRiN/b9x5gnhB+eOjJhMXRLVanB2240upqs63vL0i330jCiQmH6KgfuKTTN9GGo01t7jFqYE0P5YWCoR3q73BS8DnKYMKY8Epi/WVpRPUOtdaLC9W5huM+AdZKD/ZiFHlewAjhAFo=" # DOCKER_USERNAME
+    - secure: "TvzkXEL1hH5lFhIHZBRyVeTfTo25pORmwDpcGCu9O8Iyuyf+b33M3EEeCxsgkEWttAws50e5L8FOHIMMSrRGhOv8X+f/i902QkS2VgRdcMQUK4V9EEnz44Y1DTzBNduEOOv7sJWTutc0qn014iB7TC1qFLIERoriXP/2HCdmPGLWfkfOVIhe1obkjJ71vDMAWiO2wYUumjhjF8CxM2t+8Bk2BtEyuK2z22PF2fbGyiMfD90MGuhxavPMdm/dNLNb5KeQeuf97dKpkxQsKepeRgw4ctRezpKlgtxm90Y8X/8oyrMQeZV7yzwY4YCyIUZlO22OwRCXzDv6q7L++aduDP6NzgNP8k50JEpKR/9aMd6uLtmkBcEaXTL1bOBVaXX8eDKAMJtMEpbjee1geF+tcwzhS+wmmhBeC6HYkBgpt8Qc33PM04+AEPptX9xf6XCD4ycHHDgKzxPWZ0+35BOGT5pvfe4Lo6QLpkXifOhU0SeLQz8B/uI+QrhFx5UEkik2O7KEyAaHEBz9I7163jdGUhaJV9Gbj0MyM9nRCpCE3BBByVTlz/PvX4ELSRKBBDdjSEwVZupOfWL1MgeRyuHh0iwQRwamJqg1O2CfbvBvEZOWcv0b9Vf0a75kBwiiSv8Phcl5VG0cRl1YKk15ej5AwsH1g/DtjFAb89SPHP1ohJ8=" # DOCKER_PASSWORD
 
 language: go
 go:
@@ -11,7 +15,8 @@ install: dep ensure -vendor-only
 script: go test -v ./...
 
 before_deploy:
-  - docker build -t qmsk-e2_build build/
+  - docker build -t qmsk/e2 .
+  - docker build -t qmsk/e2-build build/
   - install -d -m 0777 dist
   - |
     docker run --rm \
@@ -19,16 +24,22 @@ before_deploy:
     -v $PWD:/src \
     -e SRC=/src \
     -e DIST=/dist \
-      qmsk-e2_build
+      qmsk/e2-build
 deploy:
-  skip_cleanup: true
-  on:
-    tags: true
-    go: '1.10'
-  provider: releases
-  api_key:
-    secure: "ChMW+s/WvS+qdYhGdZoom5QqtFMjAXu1oHW/KyGcbUX1GBmf+mXk2Av22wr7lLWtZKzh6gpgfiPHxGNvQuctnZncGchSDqIbS2FyW+33vha4drWs8Z6RgWPcYYvYcDEO5rj+UDGgc+ARVCQtpLUMmOSfOhkLq574Cu2O0MFw/yfD5046pVsynTt3kgdWQnTxP78juw0LePafNswjTMXuoIGt5B46mrKCsVdxDh3ufP5dfuthe987QgXr6WkMFf6Chv/K/65Al89hsULgmqtDRtqmeMebLxOEXMYg7w54N3NDWe9baAlNQm57w5zSsvEnji3gWfub/5i6PMMDaixSCdUv5luYYGFDv4JuarfVuws5sYy5+2cGSxLE75u67akRRjU5ILgKEokA1yk9Soarzv1cQxefsOxH/KaW/gormu/pVX2hsdCLjA3cv8QFBIiqt6mcXLcD5LCBM+SrVslAOUBspmy7lsEC0HiHrHnVDhdszE1FPQLRL5GyGr3cxcBBXRLoh5jrt+dPRYgtdPVkDjJp0sEIC9ICYYuJorBNpgv6coTzqFXW7j1ItjniCxrJTwp8K4p3nI/t0QCFZO7SqR3BD9m//jvBu+QjBtNPs9re+ZUetI2HJsoYjLYlyLzYt+J9Hs94g469MFzDrd+qAEB6caEZLkRfNzMnqS0mVP4="
-  file_glob: true
-  file:
-    - dist/SHA256SUM
-    - dist/*.tar.gz
+  - provider: releases
+    skip_cleanup: true
+    on:
+      tags: true
+      go: '1.10'
+    api_key:
+      secure: "ChMW+s/WvS+qdYhGdZoom5QqtFMjAXu1oHW/KyGcbUX1GBmf+mXk2Av22wr7lLWtZKzh6gpgfiPHxGNvQuctnZncGchSDqIbS2FyW+33vha4drWs8Z6RgWPcYYvYcDEO5rj+UDGgc+ARVCQtpLUMmOSfOhkLq574Cu2O0MFw/yfD5046pVsynTt3kgdWQnTxP78juw0LePafNswjTMXuoIGt5B46mrKCsVdxDh3ufP5dfuthe987QgXr6WkMFf6Chv/K/65Al89hsULgmqtDRtqmeMebLxOEXMYg7w54N3NDWe9baAlNQm57w5zSsvEnji3gWfub/5i6PMMDaixSCdUv5luYYGFDv4JuarfVuws5sYy5+2cGSxLE75u67akRRjU5ILgKEokA1yk9Soarzv1cQxefsOxH/KaW/gormu/pVX2hsdCLjA3cv8QFBIiqt6mcXLcD5LCBM+SrVslAOUBspmy7lsEC0HiHrHnVDhdszE1FPQLRL5GyGr3cxcBBXRLoh5jrt+dPRYgtdPVkDjJp0sEIC9ICYYuJorBNpgv6coTzqFXW7j1ItjniCxrJTwp8K4p3nI/t0QCFZO7SqR3BD9m//jvBu+QjBtNPs9re+ZUetI2HJsoYjLYlyLzYt+J9Hs94g469MFzDrd+qAEB6caEZLkRfNzMnqS0mVP4="
+    file_glob: true
+    file:
+      - dist/SHA256SUM
+      - dist/*.tar.gz
+  - provider: script
+    skip_cleanup: true
+    script: ./build/docker-push.sh
+    on:
+      tags: true
+      go: '1.10'
