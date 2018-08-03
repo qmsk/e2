@@ -10,9 +10,7 @@ echo "building package=$PACKAGE version=$VERSION at $DIST"
 # build static
 ( cd ./static
 
-    export CI=true
-
-    bower install
+    npm install
 )
 
 # prepare base/src dist
