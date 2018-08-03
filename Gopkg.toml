@@ -31,8 +31,7 @@
 
 [[constraint]]
   name = "github.com/kidoman/embd"
-  source = "github.com/SpComb/embd"
-  branch = "digitalpin-exported"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/kr/pretty"
