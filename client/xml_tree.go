@@ -35,7 +35,7 @@ func xmlID(e xml.StartElement, idValue reflect.Value) error {
 	}
 
 	if _, err := fmt.Sscanf(value, valueFmt, idValue.Interface()); err != nil {
-		return fmt.Errorf("fmt.Sscanf %#v %#v %#v: %v", value, valueFmt, err)
+		return fmt.Errorf("fmt.Sscanf %#v %v %#v: %v", value, valueFmt, idValue.Interface(), err)
 	} else {
 		return nil
 	}

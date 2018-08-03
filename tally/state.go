@@ -223,8 +223,8 @@ func (state *State) update(options *Options) {
 
 func (state State) Print() {
 	fmt.Printf("Inputs: %d\n", len(state.Inputs))
-	for input, id := range state.Inputs {
-		fmt.Printf("\t%d: %s/%s\n", id, input.Source, input.Name)
+	for input, inputState := range state.Inputs {
+		fmt.Printf("\t%d: %s/%s\n", inputState.ID, input.Source, input.Name)
 	}
 	fmt.Printf("Link: %d\n", len(state.links))
 	for _, link := range state.links {

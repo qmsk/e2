@@ -20,7 +20,7 @@ func (cmd *PresetList) Execute(args []string) error {
 		fmt.Printf("#%-7d %-8s     %s\n", len(presets), "Seq", "Name")
 
 		for _, preset := range presets {
-			fmt.Printf("%-8d %-8.2f     %s\n", preset.ID, preset.Sno, preset.Name)
+			fmt.Printf("%-8d %-3d.%3d     %s\n", preset.ID, preset.Sno.Group, preset.Sno.Index, preset.Name)
 		}
 	}
 
