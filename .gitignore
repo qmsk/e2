@@ -4,10 +4,8 @@
 *.pyc
 .DS_Store
 
-MANIFEST
-
 static/bower_components/
-qmsk_e2.egg-info/
+static/node_modules/
 
 bin/
 opt/
