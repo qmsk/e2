@@ -15,12 +15,10 @@ RUN go install -v ./cmd/...
 # web frontend
 FROM node:9.8.0 as web-build
 
-RUN npm install -g bower
-
 WORKDIR /go/src/github.com/qmsk/e2/static
 
-COPY static/bower.json ./
-RUN CI=true bower --allow-root install
+COPY static/package.json ./
+RUN npm install
 
 COPY static ./
 
@@ -39,6 +37,7 @@ COPY --from=go-build /go/bin/client /go/bin/server /go/bin/tally /opt/qmsk-e2/bi
 COPY --from=web-build /go/src/github.com/qmsk/e2/static/ /opt/qmsk-e2/static
 
 USER qmsk-e2
+ENV PATH=$PATH:/opt/qmsk-e2/bin
 CMD ["/opt/qmsk-e2/bin/tally", \
   "--http-listen=:8001", "--http-static=/opt/qmsk-e2/static" \
 ]
