@@ -1,4 +1,0 @@
-[submodule "vendor/github.com/kidoman/embd"]
-	path = vendor/github.com/kidoman/embd
-	url = https://github.com/SpComb/embd.git
-	branch = digitalpin-exported
