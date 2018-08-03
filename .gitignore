@@ -4,7 +4,7 @@
 *.pyc
 .DS_Store
 
-static/bower_components/
+static/node_modules/
 static/node_modules/
 
 bin/
