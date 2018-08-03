@@ -21,6 +21,30 @@ This implementation supports the following device APIs:
 * TCP port 9878 "telnet" (write-only, preset recalls and program cut/autotrans)
 * UDP port 40961 discovery
 
+## Install
+
+### Docker
+
+Docker images for `amd64` are available from Docker Hub: https://hub.docker.com/r/qmsk/e2/
+
+```
+docker pull qmsk/e2
+docker run --rm --net=host --name=e2-test qmsk/e2 tally --discovery-interface=eth0 --http-listen=127.0.0.1:8001 --http-static=/opt/qmsk-e2/static
+```
+
+### Raspberry PI
+
+Pre-built debian packages for ARM are available from GitHub releases: https://github.com/qmsk/e2/releases
+
+```
+wget https://github.com/qmsk/e2/releases/download/v0.6.0-dev.5/qmsk-e2_0.6.0-dev.5_armhf.deb
+sudo dpkg -i qmsk-e2_0.6.0-dev.5_armhf.deb
+sudo edit /etc/default/qmsk-e2-tally
+sudo systemctl restart qmsk-e2-tally
+```
+
+The package installs the binaries at `/opt/qmsk-e2`, creates a `qmsk-e2` user and configures the systemd `qmsk-e2-tally.service` to run using `/etc/default/qmsk-e2-tally` for configuration.
+
 ## Building
 
 The project consists of a set Go applications, and a Javascript web frontend. Once built, the binary Go applications + Javascript assets can be distributed and executed without needing to install the development tools and instructions listed here.
