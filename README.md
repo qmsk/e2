@@ -31,9 +31,7 @@ Release binaries are built using the Docker-based setup under [build](/build)
 
     go get github.com/qmsk/e2/cmd/...
 
-Building the backend code requires at least [Go version 1.4](https://golang.org/dl/). Earlier versions lack support for:
-
-* `atomic.Value` (added in Go 1.4)
+Building the backend code requires [Go version 1.10](https://golang.org/dl/).
 
 The Go binaries can also be cross-compiled for different platforms, such as building Linux ARM binaries on your laptop for use on a RaspberryPI:
 
