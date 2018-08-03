@@ -24,4 +24,9 @@ cd $GOPATH/src/github.com/qmsk/e2
 
 dep ensure -vendor-only
 
+( cd ./static
+
+    npm install
+)
+
 exec "$@"

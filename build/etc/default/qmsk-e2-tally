@@ -1,0 +1,6 @@
+TALLY_GPIO_PINS=23 24 21 20 16 12 26 19 13 6
+TALLY_OPTIONS=\
+  --discovery-interface=eth0 \
+  --http-listen=:8001 --http-static=/opt/qmsk-e2/static \
+  --gpio --gpio-green-pin=23 --gpio-red-pin=24 \
+  --gpio-tally-pin=21 --gpio-tally-pin=20 --gpio-tally-pin=16 --gpio-tally-pin=12 --gpio-tally-pin=26 --gpio-tally-pin=19 --gpio-tally-pin=13 --gpio-tally-pin=6 \

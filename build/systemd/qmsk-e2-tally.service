@@ -1,0 +1,18 @@
+[Unit]
+Description=github.com/qmsk/e2 tally
+After=network.target
+
+[Service]
+User=qmsk-e2
+PermissionsStartOnly=true
+
+EnvironmentFile=/etc/default/qmsk-e2-tally
+ExecStartPre=/opt/qmsk-e2/bin/gpio-export.sh $TALLY_GPIO_PINS
+ExecStart=/opt/qmsk-e2/bin/tally $TALLY_OPTIONS
+ExecStopPost=/opt/qmsk-e2/bin/gpio-unexport.sh $TALLY_GPIO_PINS
+
+KillSignal=SIGINT
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
