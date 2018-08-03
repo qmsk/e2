@@ -54,6 +54,14 @@
   branch = "master"
   name = "golang.org/x/net"
 
+# golang.org/x/sys/unix is broken on Go 1.6 as of https://github.com/golang/sys/commit/e072cadbbdc8dd3d3ffa82b8b4b9304c261d9311
+#
+# https://github.com/qmsk/e2/issues/33
+# https://github.com/golang/go/issues/26576
+[[override]]
+  name = "golang.org/x/sys"
+  revision = "ac767d655b"
+
 [prune]
   go-tests = true
   unused-packages = true
