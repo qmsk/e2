@@ -1,0 +1,29 @@
+{
+  "name": "qmsk-e2",
+  "version": "0.5.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qmsk/e2.git"
+  },
+  "author": "Tero Marttila <terom@fixme.fi>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/qmsk/e2/issues"
+  },
+  "homepage": "https://github.com/qmsk/e2#readme",
+  "dependencies": {
+    "angular": "^1.5.7",
+    "angular-resource": "^1.5.0",
+    "angular-route": "^1.5.0",
+    "angular-ui-bootstrap": "^1.1.2",
+    "angular-websocket": "^2.0.0",
+    "angularjs-scroll-glue": "^2.0.7",
+    "bootstrap": "^3.3.6",
+    "jquery": "^2.2.0",
+    "jsonformatter": "^0.4.2"
+  }
+}
