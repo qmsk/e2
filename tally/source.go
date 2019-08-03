@@ -214,7 +214,7 @@ func (source Source) updateState(state *State) error {
 			}
 
 			for bgIndex, bgLayer := range screen.BGLyr {
-				if bgLayer.LastBGSourceIndex == bgSourceID {
+				if bgLayer.LastBGSourceIndex == bgSourceID && bgLayer.ShowMatte == 0 {
 					if bgIndex == screen.CurrBGLyr {
 						status.Program = true
 					} else {
