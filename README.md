@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/qmsk/e2.svg?branch=master)](https://travis-ci.org/qmsk/e2)
+
+
 # qmsk-e2
 E2 Client, Tally system. Web UI with Presets.
 
