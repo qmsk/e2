@@ -53,7 +53,10 @@ Release binaries are built using the Docker-based setup under [build](/build)
 
 ### Backend
 
-    go get github.com/qmsk/e2/cmd/...
+Load vendored dependencies using [godep](https://github.com/golang/dep):
+
+    $ git clone github.com/qmsk/e2
+    e2 $ dep ensure
 
 Building the backend code requires [Go version 1.10](https://golang.org/dl/).
 
