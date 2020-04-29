@@ -23,7 +23,7 @@
     "angular-websocket": "^2.0.0",
     "angularjs-scroll-glue": "^2.0.7",
     "bootstrap": "^3.3.6",
-    "jquery": "^2.2.0",
+    "jquery": "^3.5.0",
     "jsonformatter": "^0.4.2"
   }
 }
