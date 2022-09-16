@@ -22,7 +22,7 @@
     "angular-ui-bootstrap": "^1.1.2",
     "angular-websocket": "^2.0.0",
     "angularjs-scroll-glue": "^2.0.7",
-    "bootstrap": "^3.3.6",
+    "bootstrap": "^3.4.1",
     "jquery": "^2.2.0",
     "jsonformatter": "^0.4.2"
   }
